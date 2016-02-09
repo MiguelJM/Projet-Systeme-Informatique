@@ -495,7 +495,8 @@ char *yytext;
 #line 2 "analyslex.v2.l"
 #include <string.h>
 #include <stdlib.h>
-#line 499 "lex.yy.c"
+#include "y.tab.h"
+#line 500 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -709,9 +710,9 @@ YY_DECL
 		}
 
 	{
-#line 6 "analyslex.v2.l"
+#line 7 "analyslex.v2.l"
 
-#line 715 "lex.yy.c"
+#line 716 "lex.yy.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -770,130 +771,130 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 7 "analyslex.v2.l"
+#line 8 "analyslex.v2.l"
 printf(" ");
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 8 "analyslex.v2.l"
-return tINT;
+#line 9 "analyslex.v2.l"
+return (tINT);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 9 "analyslex.v2.l"
+#line 10 "analyslex.v2.l"
 return(tConst);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 11 "analyslex.v2.l"
+#line 12 "analyslex.v2.l"
 return(tDIF);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 12 "analyslex.v2.l"
+#line 13 "analyslex.v2.l"
 return(tDIF);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 13 "analyslex.v2.l"
+#line 14 "analyslex.v2.l"
 return(tDIF);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 14 "analyslex.v2.l"
+#line 15 "analyslex.v2.l"
 return(tDIF);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 15 "analyslex.v2.l"
+#line 16 "analyslex.v2.l"
 return(tPO);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 16 "analyslex.v2.l"
+#line 17 "analyslex.v2.l"
 return(tPF);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 17 "analyslex.v2.l"
+#line 18 "analyslex.v2.l"
 return(tOR);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 18 "analyslex.v2.l"
+#line 19 "analyslex.v2.l"
 return(tAND);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 19 "analyslex.v2.l"
+#line 20 "analyslex.v2.l"
 return(tCO);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 20 "analyslex.v2.l"
+#line 21 "analyslex.v2.l"
 return(tCF);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 21 "analyslex.v2.l"
+#line 22 "analyslex.v2.l"
 return(tPV);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 22 "analyslex.v2.l"
+#line 23 "analyslex.v2.l"
 return(tPLUS);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 23 "analyslex.v2.l"
+#line 24 "analyslex.v2.l"
 return(tSOU);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 24 "analyslex.v2.l"
+#line 25 "analyslex.v2.l"
 return(tMUL);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 25 "analyslex.v2.l"
+#line 26 "analyslex.v2.l"
 return(tDIV);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 26 "analyslex.v2.l"
+#line 27 "analyslex.v2.l"
 return(tE);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 28 "analyslex.v2.l"
+#line 29 "analyslex.v2.l"
 return(tPRINT);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 29 "analyslex.v2.l"
+#line 30 "analyslex.v2.l"
 return(tIF);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 30 "analyslex.v2.l"
+#line 31 "analyslex.v2.l"
 return(tWHILE);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 31 "analyslex.v2.l"
+#line 32 "analyslex.v2.l"
 return(tID);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 32 "analyslex.v2.l"
+#line 33 "analyslex.v2.l"
 return(tNUM);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 33 "analyslex.v2.l"
+#line 34 "analyslex.v2.l"
 ECHO;
 	YY_BREAK
-#line 897 "lex.yy.c"
+#line 898 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1888,7 +1889,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 32 "analyslex.v2.l"
+#line 33 "analyslex.v2.l"
 
 
 void main(void){

@@ -1,11 +1,12 @@
 %{
 #include <string.h>
 #include <stdlib.h>
+#include "y.tab.h"
 %}
 
 %%
 [ \t]+ printf(" ");
-"int" 	return tINT;
+"int" 	return (tINT);
 "const" return(tConst);
 
 "<"  return(tDIF);
