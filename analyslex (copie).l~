@@ -1,0 +1,37 @@
+%{
+#include <string.h>
+#include "y.tab.h"
+#include <stdlib.h>
+%}
+
+%%
+[ \t]+ printf(" ");
+"int" printf("Trouvé un tINT!\n");
+"const" printf("Trouvé un tConst!\n");
+
+"<"  return(tDIF);
+">"  return(tDIF);
+"==" return(tDIF);
+"!=" return(tDIF);
+"("  return(tPO);
+")"  return(tPF);
+"||" return(tOR);
+"&&" return(tAND);
+"{"  return(tCO);
+"}"  return(tCF);
+";"  return(tPV);
+"+"  return(tPLUS);
+"-"  return(tSOU);
+"*"  return(tMUL);
+"/"  return(tDIV);
+"="  return(tE);
+
+"printf"  		return(tPRINT);
+"if" 			return(tIF);
+"while" 		return(tWHILE);
+[a-zA-Z][a-zA-Z0-9_]* 	return(tID);
+[0-9]+ 			return(tNUM);
+%%
+void main(void){
+	yylex();
+}

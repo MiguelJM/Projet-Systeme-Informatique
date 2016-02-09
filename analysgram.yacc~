@@ -29,52 +29,71 @@
 %%
 
 Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
-			{printf("Fonction trouvé");}
+			{printf("Fonction trouvee");}
 	
 Param 		:	tINT tID tV Param
-				| tINT tID
-				| 
-				;
+			| tINT tID
+			| 
+			;
+			{printf("Parametre trouve");}
 				
 Body		:	¿¿??
 				;
 
-If			:	tIF tPO Cond tPF tCO Body tCF
+If		:	tIF tPO Cond tPF tCO Body tCF;
+			{printf("IF trouve");}
+
 Cond		:	tID tDIF tID
-				| tPO Cond tPF tOR tPO Cond tPF
-				| tPO Cond tPF tAND tPO Cond tPF
-				| tINT tDIF tINT
-				;
+			| tPO Cond tPF tOR tPO Cond tPF
+			| tPO Cond tPF tAND tPO Cond tPF
+			| tINT tDIF tINT
+			;
+			{printf("Condition trouvee");}
 
 While		:	tWHILE tPO Cond tPF tCO Body tCF;
+			{printf("While trouve");}
 
 Print 		:	tPRINT tPO PrintCont tPF tPV;
+			{printf("Print trouve");}
+
 PrintCont	:	tID tPLUS PrintCont
-				| tString tPLUS PrintCont
-				| tID
-				| tString
-				;
+			| tString tPLUS PrintCont
+			| tID
+			| tString
+			;
+			{printf("Contenu du Print trouve");}
 
 Const		:	Declar tV Const
-				Declar tPV
-				;				
+			Declar tPV
+			;
+			{printf("Constante trouvee");}
+				
 Declar		:	tINT tID tE Expr
-				| tINT tID
-				;
+			| tINT tID
+			;
+			{printf("Declaration trouvee");}
+
 Expr		:	tNUM Op Expr	
-				| tNUM
-				;
-Op			: 	tPLUS
-				| tSOU
-				| tMUL
-				| tDIV
-				;
+			| tNUM
+			;
+			{printf("Expresion trouvee");}
+
+Op		: 	tPLUS
+			| tSOU
+			| tMUL
+			| tDIV
+			;
+			{printf("Operateur trouve");}
+				
 
 Main		: 	tMAIN tPO TPF TCO Body TCF;
+			{printf("Condition trouve");}
 
-Val			: 	tINT
-				| tID
-				;
+
+Val		: 	tINT
+			| tID
+			;
+			{printf("Valeur trouvee");}
 
 /***TODO: Add () operators.***/
 Sum			: 	Val tPLUS Val tPV;   { $$=$1+$3; }
