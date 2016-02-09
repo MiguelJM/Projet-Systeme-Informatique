@@ -1,0 +1,93 @@
+%{
+	#include <stdio.h>
+	int yylex(void);
+	void yyerror(char *);
+%}
+
+%token tINT 			
+%token tDIF
+%token tID
+%token tOR
+%token tAND
+%token tPO
+%token tPF
+%token tCO
+%token tCF
+%token tIF
+%token tWHILE
+%token tPV
+%token tPLUS
+%token tString
+%token tE
+%token tMAIN
+%token tSOU
+%token tMUL
+%token tDIV
+%token tPRINT
+%token tNUM
+
+%%
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
+	
+Param 		:	tINT tID tV Param
+				| tINT tID
+				| 
+				;
+				
+Body		:	¿¿??
+				;
+
+If			:	tIF tPO Cond tPF tCO Body tCF
+Cond		:	tID tDIF tID
+				| tPO Cond tPF tOR tPO Cond tPF
+				| tPO Cond tPF tAND tPO Cond tPF
+				| tINT tDIF tINT
+				;
+
+While		:	tWHILE tPO Cond tPF tCO Body tCF;
+
+Print 		:	tPRINT tPO PrintCont tPF tPV;
+PrintCont	:	tID tPLUS PrintCont
+				| tString tPLUS PrintCont
+				| tID
+				| tString
+				;
+
+Const		:	Declar tV Const
+				Declar tPV
+				;				
+Declar		:	tINT tID tE Expr
+				| tINT tID
+				;
+Expr		:	tNUM Op Expr	
+				| tNUM
+				;
+Op			: 	tPLUS
+				| tSOU
+				| tMUL
+				| tDIV
+				;
+
+Main		: 	tMAIN tPO TPF TCO Body TCF;
+
+Val			: 	tINT
+				| tID
+				;
+
+/***TODO: Add () operators.***/
+Sum			: 	Val tPLUS Val tPV;   { $$=$1+$3; }
+Sub			:	Val tSOU Val tPV;
+Mult		:	Val tMUL Val tPV;
+Div			:	Val tDIV Val tPV;
+
+%%
+
+void yyerror(char *s) {
+	fprintf(stderr, "%s\n", s);
+}
+
+int main(void) {
+	yyparse();
+	return 0;
+}

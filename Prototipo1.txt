@@ -1,0 +1,91 @@
+TP 1 Projet Systèmes Informatiques.
+
+Règles:
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
+Param 		:	tINT tID tV Param
+				| tINT tID
+				| €
+				;
+				
+Body		:	¿¿??
+				;
+
+If			:	tIF tPO Cond tPF tCO Body tCF
+Cond		:	tID tDIF tID
+				| tPO Cond tPF tOR tPO Cond tPF
+				| tPO Cond tPF tAND tPO Cond tPF
+				| tINT tDIF tINT
+				;
+
+While		:	tWHILE tPO Cond tPF tCO Body tCF;
+
+Print 		:	tPRINT tPO PrintCont tPF tPV;
+PrintCont	:	tID tPLUS PrintCont
+				| tString tPLUS PrintCont
+				| tID
+				| tString
+				;
+
+Const		:	Declar tV Const
+				Declar tPV
+				;				
+Declar		:	tINT tID tE Expr
+				| tINT tID
+				;
+Expr		:	tNUM Op Expr	
+				| tNUM
+				;
+Op			: 	tPLUS
+				| tSOU
+				| tMUL
+				| tDIV
+				;
+
+Main		: 	tMAIN tPO TPF TCO Body TCF;
+
+Val			: 	tINT
+				| tID
+				;
+Sum			: 	Val tPLUS Val tPV;
+Sub			:	Val tSOU Val tPV;
+Mult		:	Val tMUL Val tPV;
+Div			:	Val tDIV Val tPV;
+***TODO: Faltan los paréntesis como operadores.***
+
+
+tINT 			:> int
+tDIF 			:> '<' '>' '==' '!='
+tID			 	:> [a-zA-Z][a-zA-Z0-9_]*
+tOR				:> '||'
+tAND			:> '&&'
+tPO				:> '('
+tPF				:> ')'
+tCO				:> '{'
+tCF				:> '}'
+tIF				:> 'if'
+tWHILE			:> 'while'
+tPV				:> ';'
+tPLUS			:> '+'
+tString			:> "[any symbol]*"
+tE				:> '='
+tMAIN			:> 'main'
+tSOU			:> '-'
+tMUL			:> '*'
+tDIV			:> '/'
+tPRINT			:> printf
+tNUM			:> [0-9]+
+
+
+
+Analyse lexical apres grammatical
+actions printf pour verifier que les tokens sont bien detectés "I found a variable!", s'il n'est pas un token il imprime un erreur. Apres au lieu de print on fairait return tToken;
+noms de tokens commencent par un t
+
+1) Identification de tokens -> Actions de type printf
+2) Une fois que les tokens sont bien identifies, on utilise "return tToken;"
+
+
+
+
+
