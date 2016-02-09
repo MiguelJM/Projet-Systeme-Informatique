@@ -1,0 +1,30 @@
+git remote add URL
+
+
+git add .
+git commit -m "comentario"
+git push -u origin master
+
+
+First version YACC
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
+				{printf("Fonction trouvé");}
+			
+			
+			
+			
+Second version YACC
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
+			{Code ASM}		
+			
+			
+main()			--------> creation et 
+{                                                           _______
+	int a;		--------> Créer une table de symboles      | a |   |
+	int b;      --------> Ajouter b à la table de symboles | b |   |
+	a=5;		--------> AFC @a 5
+	b=a+3;		--------> ADD @b @a @3
+									 ^ est un varialbe temporaire
+}
