@@ -29,7 +29,6 @@
 %%
 
 Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
-			{printf("Fonction trouvé");}
 	
 Param 		:	tINT tID tV Param
 				| tINT tID
