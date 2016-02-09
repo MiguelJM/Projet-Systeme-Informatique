@@ -25,81 +25,96 @@
 %token tDIV
 %token tPRINT
 %token tNUM
+%token tV
 
 %%
 
-Fonction	: 	tINT tID tPO Param tPF tCO Body tCF;
-			{printf("Fonction trouvee");}
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 
+				{printf("Fonction trouvee");}
+			;
 	
 Param 		:	tINT tID tV Param
 			| tINT tID
 			| 
+				{printf("Parametre trouve");}
 			;
-			{printf("Parametre trouve");}
 				
-Body		:	¿¿??
-				;
+Body		:	tPO tPO tPO
+				{printf("Corriger Body");}
+			;
 
-If		:	tIF tPO Cond tPF tCO Body tCF;
-			{printf("IF trouve");}
+If		:	tIF tPO Cond tPF tCO Body tCF
+				{printf("IF trouve");}
+			;
 
 Cond		:	tID tDIF tID
 			| tPO Cond tPF tOR tPO Cond tPF
 			| tPO Cond tPF tAND tPO Cond tPF
 			| tINT tDIF tINT
+				{printf("Condition trouvee");}
 			;
-			{printf("Condition trouvee");}
 
-While		:	tWHILE tPO Cond tPF tCO Body tCF;
-			{printf("While trouve");}
+While		:	tWHILE tPO Cond tPF tCO Body tCF
+				{printf("While trouve");}
+			;
 
-Print 		:	tPRINT tPO PrintCont tPF tPV;
-			{printf("Print trouve");}
+Print 		:	tPRINT tPO PrintCont tPF tPV
+				{printf("Print trouve");}
+			;
 
 PrintCont	:	tID tPLUS PrintCont
 			| tString tPLUS PrintCont
 			| tID
 			| tString
+				{printf("Contenu du Print trouve");}
 			;
-			{printf("Contenu du Print trouve");}
 
 Const		:	Declar tV Const
 			Declar tPV
+				{printf("Constante trouvee");}
 			;
-			{printf("Constante trouvee");}
-				
+
 Declar		:	tINT tID tE Expr
 			| tINT tID
+				{printf("Declaration trouvee");}
 			;
-			{printf("Declaration trouvee");}
 
 Expr		:	tNUM Op Expr	
 			| tNUM
+				{printf("Expresion trouvee");}
 			;
-			{printf("Expresion trouvee");}
 
 Op		: 	tPLUS
 			| tSOU
 			| tMUL
 			| tDIV
-			;
-			{printf("Operateur trouve");}
+				{printf("Operateur trouve");}
 				
+			;
 
-Main		: 	tMAIN tPO TPF TCO Body TCF;
-			{printf("Condition trouve");}
+Main		: 	tMAIN tPO tPF tCO Body tCF
+				{printf("Condition trouve");}
+			;
 
 
 Val		: 	tINT
 			| tID
+				{printf("Valeur trouvee");}
 			;
-			{printf("Valeur trouvee");}
 
 /***TODO: Add () operators.***/
-Sum		: 	Val tPLUS Val tPV;   { $$=$1+$3; }	{printf("Somme trouvee");}
-Sub		:	Val tSOU Val tPV;		{printf("Substraction trouvee");}
-Mult		:	Val tMUL Val tPV;		{printf("Multiplication trouvee");}
-Div		:	Val tDIV Val tPV;		{printf("Division trouvee");}
+Sum		:	Val tPLUS Val tPV	
+				{ $$=$1+$3; printf("Somme trouvee");}
+			;
+Sub		:	Val tSOU Val tPV	
+				{printf("Substraction trouvee");}
+			;
+Mult		:	Val tMUL Val tPV	
+				{printf("Multiplication trouvee");}
+			;
+Div		:	Val tDIV Val tPV	
+				{printf("Division trouvee");}
+			;
 
 %%
 
