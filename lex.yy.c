@@ -495,7 +495,7 @@ char *yytext;
 #line 2 "analyslex.v2.l"
 #include <string.h>
 #include <stdlib.h>
-\*#include "y.tab.h"*\
+#include "y.tab.h"
 #line 500 "lex.yy.c"
 
 #define INITIAL 0
@@ -782,7 +782,7 @@ return(tINT);
 case 3:
 YY_RULE_SETUP
 #line 10 "analyslex.v2.l"
-return(tConst);
+return(tCONST);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP

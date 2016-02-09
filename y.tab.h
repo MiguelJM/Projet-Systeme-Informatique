@@ -66,7 +66,8 @@ extern int yydebug;
     tDIV = 276,
     tPRINT = 277,
     tNUM = 278,
-    tV = 279
+    tV = 279,
+    tCONST = 280
   };
 #endif
 /* Tokens.  */
@@ -92,6 +93,7 @@ extern int yydebug;
 #define tPRINT 277
 #define tNUM 278
 #define tV 279
+#define tCONST 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

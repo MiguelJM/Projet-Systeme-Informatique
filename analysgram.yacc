@@ -26,6 +26,7 @@
 %token tPRINT
 %token tNUM
 %token tV
+%token tCONST
 
 %%
 

@@ -1,13 +1,13 @@
 %{
 #include <string.h>
 #include <stdlib.h>
-/*#include "y.tab.h"*/
+#include "y.tab.h"
 %}
 
 %%
 [ \t]+ printf(" ");
 "int" return(tINT);
-"const" return(tConst);
+"const" return(tCONST);
 
 "<"  return(tDIF);
 ">"  return(tDIF);
