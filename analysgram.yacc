@@ -4,6 +4,7 @@
 	void yyerror(char *);
 %}
 
+%start Expr
 %token tINT 			
 %token tDIF
 %token tID
@@ -75,32 +76,26 @@ Const		:	Declar tV Const
 				{printf("Constante trouvee");}
 			;
 
-Declar		:	tINT tID tE Expr
-			| tINT tID
-				{printf("Declaration trouvee");}
+Declar		: tINT tID tE Expr		{printf("Declaration trouvee");}
+			| tINT tID				{printf("Declaration trouvee");}
 			;
 
-Expr		:	tNUM Op Expr	
-			| tNUM
-				{printf("Expresion trouvee");}
+Expr		:	tNUM Op Expr		{printf("Expresion trouvee");}	
+			| tNUM					{printf("Expresion trouvee");}
 			;
 
-Op		: 	tPLUS
-			| tSOU
-			| tMUL
-			| tDIV
-				{printf("Operateur trouve");}
-				
+Op		: 	tPLUS			{printf("Operateur trouve");}
+			| tSOU			{printf("Operateur trouve");}
+			| tMUL			{printf("Operateur trouve");}
+			| tDIV			{printf("Operateur trouve");}				
 			;
 
-Main		: 	tMAIN tPO tPF tCO Body tCF
-				{printf("Condition trouve");}
+Main		: 	tMAIN tPO tPF tCO Body tCF		{printf("Condition trouve");}
 			;
 
 
-Val		: 	tINT
-			| tID
-				{printf("Valeur trouvee");}
+Val		: 	tINT		{printf("Valeur trouvee");}
+			| tID		{printf("Valeur trouvee");}
 			;
 
 /***TODO: Add () operators.***/

@@ -5,7 +5,6 @@
 %}
 
 %%
-[ \t]+ printf(" ");
 "int" return(tINT);
 "const" return(tCONST);
 
@@ -32,6 +31,7 @@
 [a-zA-Z][a-zA-Z0-9_]* 	return(tID);
 [0-9]+ 			return(tNUM);
 %%
+/*
 void main(void){
 	yylex();
-}
+}*/
