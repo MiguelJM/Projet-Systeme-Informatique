@@ -1,0 +1,9 @@
+# #!/usr/bin/bash
+# Script used to compile Lex, Yacc and GCC at the same time
+# Don't forget to use chmod 755 this_script_name if permission is not granted
+
+flex analyslex.v2.l
+yacc -d analysgram.yacc
+gcc y.tab.c lex.yy.c -ll -o v2Exec
+
+echo "Script Executed!"

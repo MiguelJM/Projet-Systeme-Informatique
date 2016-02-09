@@ -4,8 +4,8 @@
 	void yyerror(char *);
 %}
 
-%start Expr
-%token tINT 			
+%start TestStart
+%token tINT 
 %token tDIF
 %token tID
 %token tOR
@@ -18,7 +18,7 @@
 %token tWHILE
 %token tPV
 %token tPLUS
-%token tString
+%token tSTRING
 %token tE
 %token tMAIN
 %token tSOU
@@ -28,88 +28,88 @@
 %token tNUM
 %token tV
 %token tCONST
+%token tNUM
 
 %%
 
-Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 
-				{printf("Fonction trouvee");}
+TestStart	:	TestMessage
+		;
+
+TestMessage	: 	Div		{printf("\n Succesful test");}
+		;
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
 			;
 	
-Param 		:	tINT tID tV Param
-			| tINT tID
-			| 
-				{printf("Parametre trouve");}
+Param 		:	tINT tID tV Param 		{printf("\n Parametre trouve with ,");}
+				| tINT tID				{printf("\n Parametre trouve without ,");}
 			;
 				
-Body		:	tPO tPO tPO
-				{printf("Corriger Body");}
+Body		:	tPO tPO tPO						{printf("\n Corriger Body");}				
 			;
 
-If		:	tIF tPO Cond tPF tCO Body tCF
-				{printf("IF trouve");}
+If			:	tIF tPO Cond tPF tCO Body tCF	{printf("\n IF trouve");}
 			;
 
-Cond		:	tID tDIF tID
-			| tPO Cond tPF tOR tPO Cond tPF
-			| tPO Cond tPF tAND tPO Cond tPF
-			| tINT tDIF tINT
-				{printf("Condition trouvee");}
+Cond		:	Val tDIF Val	{printf ("\n Condition trouvee");}
+				| tPO Cond tPF tOR tPO Cond tPF		{printf("\n Condition trouvee");}
+				| tPO Cond tPF tAND tPO Cond tPF	{printf("\n Condition trouvee");}
 			;
 
-While		:	tWHILE tPO Cond tPF tCO Body tCF
-				{printf("While trouve");}
+While		:	tWHILE tPO Cond tPF tCO Body tCF	{printf("\n While trouve");}
+				;
+
+Print 		:	tPRINT tPO PrintCont tPF tPV		{printf("\n Print trouve");}				
 			;
 
-Print 		:	tPRINT tPO PrintCont tPF tPV
-				{printf("Print trouve");}
+PrintCont	:	PrintContText tPLUS PrintCont	{printf("\n Contenu du Print trouve");}
+				| PrintContText					{printf("\n Contenu du Print trouve");}
 			;
 
-PrintCont	:	tID tPLUS PrintCont
-			| tString tPLUS PrintCont
-			| tID
-			| tString
-				{printf("Contenu du Print trouve");}
+PrintContText	:	Val 				{printf("\n PrintContText trouve");}
+					| tSTRING			{printf("\n PrintContText trouve");}
+				;
+
+
+Const		:	Declar tV Const tPV  	{printf("\n Constante trouvee");}
+				|Declar tPV				{printf("\n Constante trouvee");}				
 			;
 
-Const		:	Declar tV Const
-			Declar tPV
-				{printf("Constante trouvee");}
+Declar		: 	tINT tID tE Expr		{printf("\n Declaration trouvee");}
+				| tINT tID				{printf("\n Declaration trouvee");}
 			;
 
-Declar		: tINT tID tE Expr		{printf("Declaration trouvee");}
-			| tINT tID				{printf("Declaration trouvee");}
+Expr		:	tNUM Op Expr		{printf("\n Expresion trouvee");}	
+				| tNUM				{printf("\n Expresion trouvee");}
 			;
 
-Expr		:	tNUM Op Expr		{printf("Expresion trouvee");}	
-			| tNUM					{printf("Expresion trouvee");}
+Op			: 	tPLUS			{printf("\n Operateur trouve");}
+				| tSOU			{printf("\n Operateur trouve");}
+				| tMUL			{printf("\n Operateur trouve");}
+				| tDIV			{printf("\n Operateur trouve");}				
 			;
 
-Op		: 	tPLUS			{printf("Operateur trouve");}
-			| tSOU			{printf("Operateur trouve");}
-			| tMUL			{printf("Operateur trouve");}
-			| tDIV			{printf("Operateur trouve");}				
-			;
-
-Main		: 	tMAIN tPO tPF tCO Body tCF		{printf("Condition trouve");}
+Main			: 	tMAIN tPO tPF tCO Body tCF		{printf("\n Main trouve");}
 			;
 
 
-Val		: 	tINT		{printf("Valeur trouvee");}
-			| tID		{printf("Valeur trouvee");}
+Val			:	tNUM		{printf("\n Valeur avec Num trouvee");}
+				| tID		{printf("\n Valeur avec ID trouvee");}
 			;
 
-/***TODO: Add () operators.***/
-Sum		:	Val tPLUS Val tPV	
-				{ $$=$1+$3; printf("Somme trouvee");}
+/***TODO: Add () operators
+	  Aren't Expr and Sum+Sub+Mult+Div the same thing? Take in mind the ASM translation	
+***/
+Sum			:	Val	tPLUS Val tPV	{ printf("\n Somme trouvee");}
 			;
-Sub		:	Val tSOU Val tPV	
-				{printf("Substraction trouvee");}
+
+Sub			:	Val tSOU Val tPV		{printf("\n Substraction trouvee");}
 			;
-Mult		:	Val tMUL Val tPV	
-				{printf("Multiplication trouvee");}
+
+Mult		:	Val tMUL Val tPV		{printf("\n Multiplication trouvee");}
 			;
-Div		:	Val tDIV Val tPV	
-				{printf("Division trouvee");}
+
+Div			:	Val tDIV Val tPV		{printf("\n Division trouvee");}
 			;
 
 %%

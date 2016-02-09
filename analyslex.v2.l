@@ -24,12 +24,15 @@
 "*"  return(tMUL);
 "/"  return(tDIV);
 "="  return(tE);
+","  return(tV);
 
+"main"			return(tMAIN);
 "printf"  		return(tPRINT);
 "if" 			return(tIF);
 "while" 		return(tWHILE);
 [a-zA-Z][a-zA-Z0-9_]* 	return(tID);
 [0-9]+ 			return(tNUM);
+["][a-zA-Z0-9]*["]		return(tSTRING);
 %%
 /*
 void main(void){

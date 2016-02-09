@@ -58,7 +58,7 @@ extern int yydebug;
     tWHILE = 268,
     tPV = 269,
     tPLUS = 270,
-    tString = 271,
+    tSTRING = 271,
     tE = 272,
     tMAIN = 273,
     tSOU = 274,
@@ -84,7 +84,7 @@ extern int yydebug;
 #define tWHILE 268
 #define tPV 269
 #define tPLUS 270
-#define tString 271
+#define tSTRING 271
 #define tE 272
 #define tMAIN 273
 #define tSOU 274
