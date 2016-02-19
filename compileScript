@@ -1,6 +1,7 @@
 # #!/usr/bin/bash
 # Script used to compile Lex, Yacc and GCC at the same time
 # Don't forget to use chmod 755 this_script_name if permission is not granted
+# To execute this file write ./compileScript in terminal
 
 flex analyslex.v2.l
 yacc -d analysgram.yacc
