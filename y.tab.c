@@ -62,7 +62,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "analysgram.yacc" /* yacc.c:339  */
+#line 1 "analysgramAss.yacc" /* yacc.c:339  */
 
 	#include <stdio.h>
 	int yylex(void);
@@ -1244,26 +1244,26 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 38 "analysgram.yacc" /* yacc.c:1646  */
+#line 38 "analysgramAss.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
 #line 1250 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 96 "analysgram.yacc" /* yacc.c:1646  */
+#line 96 "analysgramAss.yacc" /* yacc.c:1646  */
     {printf("\n Valeur avec Num trouvee");}
 #line 1256 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 97 "analysgram.yacc" /* yacc.c:1646  */
+#line 97 "analysgramAss.yacc" /* yacc.c:1646  */
     {printf("\n Valeur avec ID trouvee");}
 #line 1262 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 112 "analysgram.yacc" /* yacc.c:1646  */
-    {printf("\n Division trouvee");}
+#line 112 "analysgramAss.yacc" /* yacc.c:1646  */
+    {printf("MOV ax,%d\nADD ax,%d\n",(yyvsp[-3]),(yyvsp[-1]));}
 #line 1268 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1496,7 +1496,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 115 "analysgram.yacc" /* yacc.c:1906  */
+#line 115 "analysgramAss.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
