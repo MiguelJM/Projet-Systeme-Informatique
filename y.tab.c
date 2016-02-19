@@ -67,8 +67,9 @@
 	#include <stdio.h>
 	int yylex(void);
 	void yyerror(char *);
+	FILE *fp;
 
-#line 72 "y.tab.c" /* yacc.c:339  */
+#line 73 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -169,7 +170,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 173 "y.tab.c" /* yacc.c:358  */
+#line 174 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -469,7 +470,7 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    35,    35,    38,    96,    97,   112
+       0,    36,    36,    39,    97,   102,   119
 };
 #endif
 
@@ -1244,31 +1245,38 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 38 "analysgramAss.yacc" /* yacc.c:1646  */
+#line 39 "analysgramAss.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1250 "y.tab.c" /* yacc.c:1646  */
+#line 1251 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 96 "analysgramAss.yacc" /* yacc.c:1646  */
-    {printf("\n Valeur avec Num trouvee");}
-#line 1256 "y.tab.c" /* yacc.c:1646  */
+#line 97 "analysgramAss.yacc" /* yacc.c:1646  */
+    {
+								(yyval)=1;
+								printf("\n Valeur avec Num trouvee %d", (yyval));
+								fprintf(fp, "Val : %d\n",(yyval));
+							}
+#line 1261 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 97 "analysgramAss.yacc" /* yacc.c:1646  */
-    {printf("\n Valeur avec ID trouvee");}
-#line 1262 "y.tab.c" /* yacc.c:1646  */
+#line 102 "analysgramAss.yacc" /* yacc.c:1646  */
+    {printf("\n Valeur avec ID trouvee");
+								fprintf(fp, "Val : %d\n",(yyval));
+							 (yyval) = (yyvsp[0]); }
+#line 1269 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 112 "analysgramAss.yacc" /* yacc.c:1646  */
-    {printf("MOV ax,%d\nADD ax,%d\n",(yyvsp[-3]),(yyvsp[-1]));}
-#line 1268 "y.tab.c" /* yacc.c:1646  */
+#line 119 "analysgramAss.yacc" /* yacc.c:1646  */
+    { (yyval)=(yyvsp[-3]);
+										fprintf(fp, "\nFirst number : %d\n",(yyval)); }
+#line 1276 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1272 "y.tab.c" /* yacc.c:1646  */
+#line 1280 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1496,7 +1504,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 115 "analysgramAss.yacc" /* yacc.c:1906  */
+#line 124 "analysgramAss.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
@@ -1504,6 +1512,12 @@ void yyerror(char *s) {
 }
 
 int main(void) {
+
+	printf("\nParser V2.0\n\n");
+
+	fp = fopen("assOutput.out","w");
+
 	yyparse();
+	fclose(fp);
 	return 0;
 }

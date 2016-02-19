@@ -2,6 +2,7 @@
 	#include <stdio.h>
 	int yylex(void);
 	void yyerror(char *);
+	FILE *fp;
 %}
 
 %start TestStart
@@ -33,10 +34,10 @@
 %%
 
 TestStart	:	TestMessage
-		;
+			;
 
 TestMessage	: 	Div		{printf("\n Succesful test");}
-		;
+			;
 
 Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
 			;
@@ -93,8 +94,14 @@ Main			: 	tMAIN tPO tPF tCO Body tCF		{printf("\n Main trouve");}
 			;
 
 
-Val			:	tNUM		{printf("\n Valeur avec Num trouvee");}
-				| tID		{printf("\n Valeur avec ID trouvee");}
+Val			:	tNUM		{
+								$$=1;
+								printf("\n Valeur avec Num trouvee %d", $$);
+								fprintf(fp, "Val : %d\n",$$);
+							}
+				| tID		{printf("\n Valeur avec ID trouvee");
+								fprintf(fp, "Val : %d\n",$$);
+							 $$ = $1; }
 			;
 
 /***TODO: Add () operators
@@ -109,7 +116,9 @@ Sub			:	Val tSOU Val tPV		{printf("\n Substraction trouvee");}
 Mult		:	Val tMUL Val tPV		{printf("\n Multiplication trouvee");}
 			;
 
-Div			:	Val tDIV Val tPV		{printf("MOV ax,%d\nADD ax,%d\n",$1,$3);}
+Div			:	Val tDIV Val tPV		{ $$=$1;
+										fprintf(fp, "\nFirst number : %d\n",$$); }
+/*{fprintf(fp, "\nMOV ax,%d\nADD ax,%d\n",$1,$3); }*/
 			;
 
 %%
@@ -119,6 +128,12 @@ void yyerror(char *s) {
 }
 
 int main(void) {
+
+	printf("\nParser V2.0\n\n");
+
+	fp = fopen("assOutput.out","w");
+
 	yyparse();
+	fclose(fp);
 	return 0;
 }
