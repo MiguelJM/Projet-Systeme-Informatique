@@ -73,6 +73,7 @@
 	FILE *fp;	
 
 	#include "symtab.h"
+	#include "labtab.h"
 
 	struct symTable
 	{
@@ -85,7 +86,7 @@
 	int tableIndex = 0;
   
 
-#line 89 "y.tab.c" /* yacc.c:339  */
+#line 90 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -175,12 +176,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 24 "analysgramAssExp.yacc" /* yacc.c:355  */
+#line 25 "analysgramAssExp.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 184 "y.tab.c" /* yacc.c:355  */
+#line 185 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -195,7 +196,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 199 "y.tab.c" /* yacc.c:358  */
+#line 200 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -495,7 +496,7 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    59,    59,    62,   111,   115
+       0,    60,    60,    63,   115,   119
 };
 #endif
 
@@ -1267,31 +1268,31 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 62 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 63 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1273 "y.tab.c" /* yacc.c:1646  */
+#line 1274 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 111 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 115 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 								printf("\n Valeur avec Num trouvee %d", (yyvsp[0].nb));
 								fprintf(fp, "Val : %d \n", (yyvsp[0].nb));
 							}
-#line 1282 "y.tab.c" /* yacc.c:1646  */
+#line 1283 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 115 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 119 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 								printf("\n Valeur avec ID trouvee");
 								fprintf(fp, "Val : \n");
 							 }
-#line 1291 "y.tab.c" /* yacc.c:1646  */
+#line 1292 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1295 "y.tab.c" /* yacc.c:1646  */
+#line 1296 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1519,7 +1520,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 151 "analysgramAssExp.yacc" /* yacc.c:1906  */
+#line 155 "analysgramAssExp.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {

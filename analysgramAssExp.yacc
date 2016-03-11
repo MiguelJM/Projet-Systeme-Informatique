@@ -8,6 +8,7 @@
 	FILE *fp;	
 
 	#include "symtab.h"
+	#include "labtab.h"
 
 	struct symTable
 	{
@@ -69,7 +70,10 @@ Param 		:	tINT tID tV Param 		{printf("\n Parametre trouve with ,");}
 				| tINT tID				{printf("\n Parametre trouve without ,");}
 			;
 				
-Body		:	tPO tPO tPO						{printf("\n Corriger Body");}				
+Body		:	Declar						{printf("\n Corriger Body");}
+			|	If							{printf("\n Corriger Body");}
+			|	While						{printf("\n Corriger Body");}
+			|	Print						{printf("\n Corriger Body");}			
 			;
 
 If			:	tIF tPO Cond tPF tCO Body tCF	{printf("\n IF trouve");}
@@ -104,7 +108,7 @@ Declar		: 	| Declar tV Declar tPV	{printf("\n Declaration trouvee");}
 				| tINT tID				{printf("\n Declaration trouvee");}
 			;
 
-Main			: 	tMAIN tPO tPF tCO Body tCF		{printf("\n Main trouve");}
+Main		: 	tMAIN tPO tPF tCO Body tCF		{printf("\n Main trouve");}
 			;
 
 

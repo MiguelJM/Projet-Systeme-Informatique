@@ -10,70 +10,65 @@
 #define SHIFT 4
 
 /* the hash function */
-static int hash ( char * key )
-{ 
+static int labHash ( char key )
+{
   int temp = 0;
-  int i = 0;
-  while (key[i] != '\0')
-  { 
-    temp = ((temp << SHIFT) + key[i]) % SIZE;
-    ++i;
-  }
+  temp = ((temp << SHIFT) + key) % SIZE;
+
   return temp;
 }
 
-/* a linked list of references (line nos) for each variable 
-typedef struct RefListRec 
+/* a linked list of references (line nos) for each variable */
+typedef struct labRefListRec 
 { 
      //int lineno;
-     struct RefListRec * next;
-     /* ADDED 
-     int type;          //Constant? - 0 no - 1 yes
-} * RefList; */
-
+     struct labRefListRec * next;
+     /* MODIFIED */
+     int lineno;          //Line number
+} * RefList;
 
 
 /* hash entry holds variable name and its reference list */
-typedef struct HashRec { 
+typedef struct labHashRec { 
      char st_name[MAXTOKENLEN];
      //int st_size;
      //RefList lines;
+     /* MODIFIED */
      int st_address;          //Index where the variable is stored.
-     /* ADDED */
-     int st_type;
-     struct HashRec * next;
-} * Node;
+     int st_from;          //Index where the variable is stored.
+     int st_to;
+     struct labHashRec * next;
+} * labNode;
 
 /* the hash table */
-static Node hashTable[SIZE];
+static labNode labHashTable[SIZE];
 
  /* insert an entry with its line number - if entry
   *  already exists just add its reference line no.  
-  */
-void insert( char * name, int type )
+  */  
+  /* MODIFIED */
+void lab_set_to( int from, int to )
 { 
-  /* ADDED */
-  int h = hash(name);
-  Node l =  hashTable[h];
-  while ((l != NULL) && (strcmp(name,l->st_name) != 0))
+  int h = labHash((char) from);
+  labNode l =  labHashTable[h];
+  while ((l != NULL) && (from != l->st_from))
     l = l->next;
   if (l == NULL) /* variable not yet in table */
   { 
-    l = (Node) malloc(sizeof(struct HashRec));
-    strcpy(l->st_name, name);  
-    /* ADDED */
-    l->st_type = type;
+    l = (labNode) malloc(sizeof(struct labHashRec));
+    l->st_from = from;  
+    l->st_to = to;
     //l->lines = (RefList) malloc(sizeof(struct RefListRec));
     //l->lines->lineno = lineno;
     //l->lines->next = NULL;
-    l->next = hashTable[h];
-    hashTable[h] = l; 
+    l->next = labHashTable[h];
+    labHashTable[h] = l; 
     l->st_address = h;
-    printf("Var inserted.\n");
+    printf("Label inserted.\n");
   }
   else /* found in table, so just add line number */
   { 
-    printf("Var already exists.\n");
+    printf("Label already exists.\n");
     /*
     RefList t = l->lines;
     while (t->next != NULL) t = t->next;
@@ -84,39 +79,40 @@ void insert( char * name, int type )
 } 
 
 /* return address of symbol if found or -1 if not found */
-int lookup ( char * name )
+int lab_lookup ( int from )
 { 
-  int h = hash(name);
-  Node l =  hashTable[h];
-  while ((l != NULL) && (strcmp(name,l->st_name) != 0))
+  int h = labHash((char) from);
+  labNode l =  labHashTable[h];
+  while ((l != NULL) && (from != l->st_from))
     l = l->next;
   if (l == NULL){ 
-    printf("Var not found.\n");
+    printf("Label not found.\n");
      return -1;
    }
   else{ 
-    printf("Var found in %d.\n", l->st_address);
+    printf("Label found in %d.\n", l->st_address);
     return l->st_address;
   }
-    printf("No variabless on the table.\n");
+    printf("No labels on the table.\n");
 }
 
 /* return type value of symbol or -1 if symbol not found */
-int lookupType( char * name )
+/*int lookupType( int from )
 {
+  char name = from;
   int h = hash(name);
   Node l =  hashTable[h];
-  while ((l != NULL) && (strcmp(name,l->st_name) != 0))
+  while ((l != NULL) && (from != l->st_from) != 0))
     l = l->next;
   if (l == NULL) {
-    printf("Variable not found.\n");
+    printf("Label not found.\n");
     return -1;
   }
   else {
-    printf("The variable type is: %d.\n", l->st_type);
+    printf("The Var type is: %d.\n", l->st_type);
     return l->st_type;
   }
-}
+}*/
 
 
 /* set datatype of symbol returns 0 if symbol not found 
@@ -134,20 +130,20 @@ int setType( char * name, int t )
 }*/
 
 /* print to stdout by default */ 
-void symtab_print(FILE * of) {  
+void labtab_print(FILE * of) {  
   int i;
-  fprintf(of,"\n------------ ------ ---------- \n");
-  fprintf(of,"Name         Type       Position\n");
-  fprintf(of,"------------ ------ ---------- \n");
+  fprintf(of,"\n------- ------\n");
+  fprintf(of,"From         To\n");
+  fprintf(of,"-------- ------\n");
   for (i=0; i < SIZE; ++i)
   { 
-    if (hashTable[i] != NULL) //If there is a value on the list
+    if (labHashTable[i] != NULL) //If there is a value on the list
     { 
-      Node l = hashTable[i];
+      labNode l = labHashTable[i];
       while (l != NULL)
       { 
         //RefList t = l->lines;
-        fprintf(of,"%-12s %-7i %-7i",l->st_name, l->st_type, l->st_address);
+        fprintf(of,"%-7i %-7i %-7i",l->st_from, l->st_to, l->st_address);
 
         /*if (l->st_type == INT_TYPE)
            fprintf(of,"%-7s","int ");
