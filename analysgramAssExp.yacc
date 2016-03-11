@@ -53,6 +53,11 @@
 
 %type <nb> Sum
 
+%right tE
+%left tPLUS tSOU
+%left tMUL tDIV
+
+
 %%
 
 
@@ -117,6 +122,14 @@ Val			:	tNUM		{
 								fprintf(fp, "Val : \n");
 							 }
 			;
+
+/*
+Ins :   tADD tNUM tNUM tNUM   { $2 = $3 + $4; }
+        | tSUB tNUM tNUM tNUM { $2 = $3 - $4; }
+        | tMUL tNUM tNUM tNUM { $2 = $3 * $4; }
+        | tDIV tNUM tNUM tNUM { $2 = $3 / $4; }
+*/
+
 
 /*TODO: Test Expr*/
 
