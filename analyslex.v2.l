@@ -31,8 +31,14 @@
 "if" 			return(tIF);
 "while" 		return(tWHILE);
 [a-zA-Z][a-zA-Z0-9_]* 	return(tID);
-[0-9]+ 			return(tNUM);
-["][a-zA-Z0-9]*["]		return(tSTRING);
+[0-9]+ 			{
+				yylval.nb = atof(yytext); 
+				return(tNUM);
+			}
+["][a-zA-Z0-9]*["]	{
+				yylval.variable = strdup(yytext); 
+				return(tVAR);
+			}
 %%
 /*
 void main(void){

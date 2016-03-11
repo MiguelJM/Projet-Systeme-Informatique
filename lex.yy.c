@@ -895,19 +895,25 @@ return(tID);
 case 25:
 YY_RULE_SETUP
 #line 34 "analyslex.v2.l"
-return(tNUM);
+{
+				yylval.nb = atof(yytext); 
+				return(tNUM);
+			}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 35 "analyslex.v2.l"
-return(tSTRING);
+#line 38 "analyslex.v2.l"
+{
+				yylval.variable = strdup(yytext); 
+				return(tVAR);
+			}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 36 "analyslex.v2.l"
+#line 42 "analyslex.v2.l"
 ECHO;
 	YY_BREAK
-#line 911 "lex.yy.c"
+#line 917 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1902,7 +1908,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 35 "analyslex.v2.l"
+#line 41 "analyslex.v2.l"
 
 
 /*

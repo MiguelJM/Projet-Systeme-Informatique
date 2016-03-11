@@ -1,4 +1,13 @@
-Val : 1
-Val : 1
 
-First number : 1
+------------ ------ ---------- 
+Name         Type       Position
+------------ ------ ---------- 
+arnold       0       10     
+arnoldo      0       16     
+a            0       97     
+b            0       98     
+c            1       99     
+d            0       100    
+e            1       101    
+g            1       103    
+Val : 

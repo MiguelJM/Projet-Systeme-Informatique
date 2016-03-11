@@ -58,7 +58,7 @@ extern int yydebug;
     tWHILE = 268,
     tPV = 269,
     tPLUS = 270,
-    tSTRING = 271,
+    tVAR = 271,
     tE = 272,
     tMAIN = 273,
     tSOU = 274,
@@ -84,7 +84,7 @@ extern int yydebug;
 #define tWHILE 268
 #define tPV 269
 #define tPLUS 270
-#define tSTRING 271
+#define tVAR 271
 #define tE 272
 #define tMAIN 273
 #define tSOU 274
@@ -97,7 +97,16 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
+{
+#line 24 "analysgramAssExp.yacc" /* yacc.c:1909  */
+
+	int nb;
+	char * variable;
+
+#line 109 "y.tab.h" /* yacc.c:1909  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

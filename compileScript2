@@ -3,7 +3,7 @@
 # Don't forget to use chmod 755 this_script_name if permission is not granted
 
 flex analyslex.v2.l
-yacc -d analysgramAss.yacc
+yacc -d analysgramAssExp.yacc
 gcc y.tab.c lex.yy.c -ll -o v2Exec
 
 echo "Script Executed!"
