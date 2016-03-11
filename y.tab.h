@@ -54,18 +54,18 @@ extern int yydebug;
     tPF = 264,
     tCO = 265,
     tCF = 266,
-    tIF = 267,
-    tWHILE = 268,
-    tPV = 269,
-    tPLUS = 270,
-    tVAR = 271,
-    tE = 272,
-    tMAIN = 273,
-    tSOU = 274,
-    tMUL = 275,
-    tDIV = 276,
-    tPRINT = 277,
-    tNUM = 278,
+    tWHILE = 267,
+    tPV = 268,
+    tPLUS = 269,
+    tVAR = 270,
+    tE = 271,
+    tMAIN = 272,
+    tSOU = 273,
+    tMUL = 274,
+    tDIV = 275,
+    tPRINT = 276,
+    tNUM = 277,
+    tIF = 278,
     tV = 279,
     tCONST = 280
   };
@@ -80,18 +80,18 @@ extern int yydebug;
 #define tPF 264
 #define tCO 265
 #define tCF 266
-#define tIF 267
-#define tWHILE 268
-#define tPV 269
-#define tPLUS 270
-#define tVAR 271
-#define tE 272
-#define tMAIN 273
-#define tSOU 274
-#define tMUL 275
-#define tDIV 276
-#define tPRINT 277
-#define tNUM 278
+#define tWHILE 267
+#define tPV 268
+#define tPLUS 269
+#define tVAR 270
+#define tE 271
+#define tMAIN 272
+#define tSOU 273
+#define tMUL 274
+#define tDIV 275
+#define tPRINT 276
+#define tNUM 277
+#define tIF 278
 #define tV 279
 #define tCONST 280
 
@@ -100,7 +100,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 25 "analysgramAssExp.yacc" /* yacc.c:1909  */
+#line 29 "analysgramAssExp.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;

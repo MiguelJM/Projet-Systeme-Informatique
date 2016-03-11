@@ -10,6 +10,8 @@
 	#include "symtab.h"
 	#include "labtab.h"
 
+#define instSIZE 1000 
+
 	struct symTable
 	{
 		char name[64];
@@ -19,6 +21,8 @@
 
 	struct symTable table[255];
 	int tableIndex = 0;
+
+	int pc = 0; //instruction counter
   
 %}
 
@@ -37,7 +41,7 @@
 %token tPF
 %token tCO
 %token tCF
-%token tIF
+/*%token tIF*/
 %token tWHILE
 %token tPV
 %token tPLUS
@@ -48,11 +52,11 @@
 %token tMUL
 %token tDIV
 %token tPRINT
-%token <nb> tNUM
+%token <nb> tNUM tIF
 %token tV
 %token tCONST
 
-%type <nb> Sum
+%type <nb> Expr If
 
 %right tE
 %left tPLUS tSOU
@@ -65,7 +69,7 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	Val		{printf("\n Succesful test");}
+TestMessage	: 	Main		{printf("\n Succesful test");}
 			;
 
 Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
@@ -75,13 +79,24 @@ Param 		:	tINT tID tV Param 		{printf("\n Parametre trouve with ,");}
 				| tINT tID				{printf("\n Parametre trouve without ,");}
 			;
 				
-Body		:	Declar						{printf("\n Corriger Body");}
-			|	If							{printf("\n Corriger Body");}
-			|	While						{printf("\n Corriger Body");}
-			|	Print						{printf("\n Corriger Body");}			
+Body		:	Declar						{printf("\n Body trouve");}
+			|	If							{printf("\n Body trouve");}
+			|	While						{printf("\n Body trouve");}
+			|	Print						{printf("\n Body trouve");}	
+			| 	Assign						{printf("\n Body trouve");}
+			|	Body Body					{printf("\n Body trouve");}		
 			;
 
-If			:	tIF tPO Cond tPF tCO Body tCF	{printf("\n IF trouve");}
+Assign 		:	tID tE Declar tPV			{printf("\n Assignation trouvee");}
+			|	tID tE Val tPV				{printf("\n Assignation trouvee");}
+			;
+
+If			:	tIF tPO Cond tPF tCO Body tCF	{
+													printf("\n IF trouve");
+												 	$1 = pc;
+												 	pc++;
+													printf("\n %d", $1);
+												 }
 			;
 
 Cond		:	Val tDIF Val	{printf ("\n Condition trouvee");}
@@ -108,7 +123,8 @@ Const		:	Declar tV Const tPV  	{printf("\n Constante trouvee");}
 				|Declar tPV				{printf("\n Constante trouvee");}				
 			;
 
-Declar		: 	| Declar tV Declar tPV	{printf("\n Declaration trouvee");}
+Declar		: 	Declar tPV 				{printf("\n Declaration trouvee");}
+				| Declar tV Declar 		{printf("\n Declaration trouvee");}
 				| tINT tID tE Expr 		{printf("\n Declaration trouvee");}
 				| tINT tID				{printf("\n Declaration trouvee");}
 			;
@@ -175,6 +191,16 @@ void yyerror(char *s) {
 
 int main(void) {
 
+
+	//Instruction (label) table
+	int **lableTable = malloc(instSIZE * 4 * sizeof(int));
+
+	//Initialization of the label table
+	int i;
+	for(i = 0; i < instSIZE; i++)
+	    lableTable[i] = malloc(4 * sizeof(int));
+
+
 	printf("\nParser V2.0\n\n");
 
 	fp = fopen("assOutput.out","w");
@@ -199,6 +225,8 @@ int main(void) {
 	lookup("arnold");
 	lookup("e");
 	symtab_print(fp);
+
+
 
 	yyparse();
 	fclose(fp);
