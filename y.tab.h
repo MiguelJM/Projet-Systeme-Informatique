@@ -47,65 +47,63 @@ extern int yydebug;
   {
     tINT = 258,
     tDIF = 259,
-    tID = 260,
-    tOR = 261,
-    tAND = 262,
-    tPO = 263,
-    tPF = 264,
-    tCO = 265,
-    tCF = 266,
-    tWHILE = 267,
-    tPV = 268,
-    tPLUS = 269,
-    tVAR = 270,
-    tE = 271,
-    tMAIN = 272,
-    tSOU = 273,
-    tMUL = 274,
-    tDIV = 275,
-    tPRINT = 276,
-    tNUM = 277,
-    tIF = 278,
-    tV = 279,
-    tCONST = 280
+    tOR = 260,
+    tAND = 261,
+    tPO = 262,
+    tPF = 263,
+    tCO = 264,
+    tCF = 265,
+    tWHILE = 266,
+    tPV = 267,
+    tPLUS = 268,
+    tVAR = 269,
+    tE = 270,
+    tMAIN = 271,
+    tSOU = 272,
+    tMUL = 273,
+    tDIV = 274,
+    tPRINT = 275,
+    tNUM = 276,
+    tIF = 277,
+    tV = 278,
+    tCONST = 279
   };
 #endif
 /* Tokens.  */
 #define tINT 258
 #define tDIF 259
-#define tID 260
-#define tOR 261
-#define tAND 262
-#define tPO 263
-#define tPF 264
-#define tCO 265
-#define tCF 266
-#define tWHILE 267
-#define tPV 268
-#define tPLUS 269
-#define tVAR 270
-#define tE 271
-#define tMAIN 272
-#define tSOU 273
-#define tMUL 274
-#define tDIV 275
-#define tPRINT 276
-#define tNUM 277
-#define tIF 278
-#define tV 279
-#define tCONST 280
+#define tOR 260
+#define tAND 261
+#define tPO 262
+#define tPF 263
+#define tCO 264
+#define tCF 265
+#define tWHILE 266
+#define tPV 267
+#define tPLUS 268
+#define tVAR 269
+#define tE 270
+#define tMAIN 271
+#define tSOU 272
+#define tMUL 273
+#define tDIV 274
+#define tPRINT 275
+#define tNUM 276
+#define tIF 277
+#define tV 278
+#define tCONST 279
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 29 "analysgramAssExp.yacc" /* yacc.c:1909  */
+#line 40 "analysgramAssExp.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
 
-#line 109 "y.tab.h" /* yacc.c:1909  */
+#line 107 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

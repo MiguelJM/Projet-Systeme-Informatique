@@ -10,19 +10,30 @@
 	#include "symtab.h"
 	#include "labtab.h"
 
-#define instSIZE 1000 
+#define instSIZE 8000 
 
-	struct symTable
+	struct labelTable
 	{
-		char name[64];
-		bool constant;		//0 es no 1 es constante y no puede ser modificada
-		int value;
+		char instruct[8];
+		int  param1;		//@1
+		int  param2;		//@2
+		int  param3;		//@3
 	};
 
-	struct symTable table[255];
-	int tableIndex = 0;
-
+	struct labelTable labTab[instSIZE];
 	int pc = 0; //instruction counter
+	/*Ex: 
+		  ADD @a @b temp1
+		  labelTable[pc].instruct[] = "ADD";
+		  labelTable[pc].param1 = @a
+		  labelTable[pc].param1 = @b
+		  labelTable[pc].param1 = @temp1
+
+		  JMP 10
+		  labelTable[pc].instruct[] = "JMP";
+		  labelTable[pc].param1 = 10
+	*/
+
   
 %}
 
@@ -34,7 +45,6 @@
 %start TestStart
 %token tINT 
 %token tDIF
-%token tID
 %token tOR
 %token tAND
 %token tPO
@@ -56,7 +66,7 @@
 %token tV
 %token tCONST
 
-%type <nb> Expr If
+%type <nb> Expr If Val
 
 %right tE
 %left tPLUS tSOU
@@ -69,14 +79,14 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	Main		{printf("\n Succesful test");}
+TestMessage	: 	Declar		{printf("\n Succesful test");}
 			;
 
-Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
+Fonction	: 	tINT tVAR tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
 			;
 	
-Param 		:	tINT tID tV Param 		{printf("\n Parametre trouve with ,");}
-				| tINT tID				{printf("\n Parametre trouve without ,");}
+Param 		:	tINT tVAR tV Param 		{printf("\n Parametre trouve with ,");}
+				| tINT tVAR				{printf("\n Parametre trouve without ,");}
 			;
 				
 Body		:	Declar						{printf("\n Body trouve");}
@@ -87,8 +97,20 @@ Body		:	Declar						{printf("\n Body trouve");}
 			|	Body Body					{printf("\n Body trouve");}		
 			;
 
-Assign 		:	tID tE Declar tPV			{printf("\n Assignation trouvee");}
-			|	tID tE Val tPV				{printf("\n Assignation trouvee");}
+Assign 		:	tVAR tE Declar tPV			{
+												if(lookupType($1) != -1)
+												{													
+													printf("\n Assignation trouvee");
+												}
+																					//TODO: ERROR VAR IS CONSTANT
+											}
+			|	tVAR tE Val tPV				{				
+												if(lookupType($1) != -1)
+												{													
+													printf("\n Assignation trouvee");
+												}
+																					//TODO: ERROR VAR IS CONSTANT
+											}
 			;
 
 If			:	tIF tPO Cond tPF tCO Body tCF	{
@@ -125,8 +147,30 @@ Const		:	Declar tV Const tPV  	{printf("\n Constante trouvee");}
 
 Declar		: 	Declar tPV 				{printf("\n Declaration trouvee");}
 				| Declar tV Declar 		{printf("\n Declaration trouvee");}
-				| tINT tID tE Expr 		{printf("\n Declaration trouvee");}
-				| tINT tID				{printf("\n Declaration trouvee");}
+				| tINT tVAR tE Expr 	{
+											insert($2, 0);									//TODO: ERROR VAR ALREADY EXISTS
+											printf("\n Declaration trouvee");
+										}
+				| tINT tVAR				{
+											insert($2, 0);									//TODO: ERROR VAR ALREADY EXISTS
+											printf("\n Declaration trouvee");
+										}
+				| tCONST tINT tVAR tE Expr	{
+												insert($3, 1);								//TODO: ERROR VAR ALREADY EXISTS
+												printf("\n Declaration trouvee");
+											}
+				| tCONST tINT tVAR			{
+												insert($3, 1);								//TODO: ERROR VAR ALREADY EXISTS
+												printf("\n Declaration trouvee");
+											}
+				| tINT tCONST tVAR tE Expr	{
+												insert($3, 1);								//TODO: ERROR VAR ALREADY EXISTS
+												printf("\n Declaration trouvee");
+											}
+				| tINT tCONST tVAR			{
+												insert($3, 1);								//TODO: ERROR VAR ALREADY EXISTS
+												printf("\n Declaration trouvee");
+											}
 			;
 
 Main		: 	tMAIN tPO tPF tCO Body tCF		{printf("\n Main trouve");}
@@ -137,9 +181,15 @@ Val			:	tNUM		{
 								printf("\n Valeur avec Num trouvee %d", $1);
 								fprintf(fp, "Val : %d \n", $1);
 							}
-				| tID		{	
-								printf("\n Valeur avec ID trouvee");
-								fprintf(fp, "Val : \n");
+				| tVAR		{	
+								if(lookup($1) != -1)
+								{
+																								//TODO: RETRIEVE VARIABLE
+									printf("\n Valeur avec ID trouvee");
+									fprintf(fp, "Val : \n");
+								}
+								else
+									printf("Erreur: La variable demandee n'existe pas.");		//TODO: ERROR VAR DOESN'T EXIST
 							 }
 			;
 
@@ -210,9 +260,9 @@ int main(void) {
 	assignValue("a", 11);*/
 
 
-	lookup("a");
+	//lookup("a");
 	insert("a", 0);
-	lookup("a");
+	/*lookup("a");
 	insert("a", 0);
 	lookupType("a");
 	insert("b", 0);
@@ -223,12 +273,12 @@ int main(void) {
 	insert("arnold", 0);
 	insert("arnoldo", 0);
 	lookup("arnold");
-	lookup("e");
-	symtab_print(fp);
+	lookup("e");*/
 
 
 
 	yyparse();
+	symtab_print(fp);
 	fclose(fp);
 	return 0;
 }

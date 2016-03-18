@@ -30,12 +30,12 @@
 "printf"  		return(tPRINT);
 "if" 			return(tIF);
 "while" 		return(tWHILE);
-[a-zA-Z][a-zA-Z0-9_]* 	return(tID);
+"const"			return(tCONST);
 [0-9]+ 			{
 				yylval.nb = atof(yytext); 
 				return(tNUM);
 			}
-["][a-zA-Z0-9]*["]	{
+[a-zA-Z][a-zA-Z0-9_]*	{
 				yylval.variable = strdup(yytext); 
 				return(tVAR);
 			}
