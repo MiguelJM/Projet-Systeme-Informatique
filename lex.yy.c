@@ -380,9 +380,9 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[57] =
     {   0,
-       27,   27,   30,   29,   27,   29,   25,   29,    7,    8,
+       28,   28,   30,   29,   28,   29,   25,   29,    7,    8,
        16,   14,   19,   15,   17,   26,   13,    3,   18,    4,
-       27,   27,   27,   27,   27,   27,   11,   29,   12,   27,
+       27,   27,   27,   27,   27,   27,   11,   29,   12,   28,
         6,   10,   26,    5,   27,   27,   22,   27,   27,   27,
        27,    9,   27,    1,   27,   27,   27,   27,   20,   27,
        27,    2,   27,   23,   21,    0
@@ -907,22 +907,22 @@ YY_RULE_SETUP
 {
 							yylval.nb = atof(yytext); 
 							return(tNUM);
-						}		
+						}	
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 39 "analyslex.v2.l"
 {
 							yylval.variable = strdup(yytext); 
-							return(tSTRING);
-						}
+							return(tVAR);
+						}	
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 43 "analyslex.v2.l"
 {
 							yylval.variable = strdup(yytext); 
-							return(tVAR);
+							return(tSTRING);
 						}
 	YY_BREAK
 case 29:

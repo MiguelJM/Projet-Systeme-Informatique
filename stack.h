@@ -12,46 +12,45 @@ struct stack
     int top;
 };
 typedef struct stack STACK;
-STACK s;
  
-void push(int);
-int  pop();
-void display(void);
+STACK push(int, STACK);
+STACK  pop(STACK);
+void display(STACK);
  
 /*  Function to add an element to the stack */
-void push ( int pushed_Element )
+STACK push ( int pushed_Element, STACK s )
 {
     int num;
     if (s.top == (MAXSIZE - 1))
     {
         printf ("Stack is Full\n");
-        return;
+        return s;
     }
     else
     {
         s.top = s.top + 1;
         s.stk[s.top] = pushed_Element;
     }
-    return;
+    return s;
 }
 /*  Function to delete an element from the stack */
-int pop ()
+STACK pop (STACK s)
 {
     int num;
     if (s.top == - 1)
     {
         printf ("Stack is Empty\n");
-        return (s.top);
+        return (s);
     }
     else
     {
-        num = s.stk[s.top];
+        //num = s.stk[s.top];
         s.top = s.top - 1;
     }
-    return(num);
+    return(s);
 }
 /*  Function to display the status of the stack */
-void display ()
+void display (STACK s)
 {
     int i;
     if (s.top == -1)

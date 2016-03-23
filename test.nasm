@@ -23,8 +23,8 @@ _start:
     mov eax, 10
     mov ebx, 10
     cmp eax, ebx                    ;Message length 
-    je  iflbl1; 
-    jmp ifNOTlbl1; 
+    je  iflbl1 
+    jmp ifNOTlbl1 
 iflbl1:
     MOV edx, 9   
     mov [printf_MSG], dword '1234'   ;New message

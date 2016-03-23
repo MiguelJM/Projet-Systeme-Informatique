@@ -42,11 +42,15 @@
 	int cp_Offset = 0; //Offset of the instruction counter
 
   	int tempCounter = 1; //Counter to determine if 0temp1 and 0temp2 are used
-  	int if_lbl_count = 0; //Counter to determine the if labels to use
+
+	struct stack if_stack;		//Keeps count of if statements to create labels
+  	int if_lbl_count = 0; 		//Counter to determine the if labels to use
 
 	char snum[5];		//To convert numbers to strings
 	char auxString[16];	
 	char auxString2[16];	
+
+	int auxNum;	
 
 	char retrievedString[64]; //Used to store user input in the printf instructions.
 	char stringPrinter[4]; 	//Used to create the printf instructions.
@@ -104,12 +108,12 @@ Param 		:	tINT tVAR tV Param 		{printf("\n Parametre trouve with ,");}
 				| tINT tVAR				{printf("\n Parametre trouve without ,");}
 			;
 				
-Body		:	Declar						{printf("\n Body trouve");}
-			|	If							{printf("\n Body trouve");}
-			|	While						{printf("\n Body trouve");}
-			|	Print						{printf("\n Body trouve");}	
-			| 	Assign						{printf("\n Body trouve");}
-			|	Body Body					{printf("\n Body trouve");}		
+Body		:	Declar						
+			|	If							
+			|	While						
+			|	Print							
+			| 	Assign						
+			|	Body Body							
 			;
 
 Assign 		:	tVAR tE tVAR tPV	{
@@ -119,7 +123,6 @@ Assign 		:	tVAR tE tVAR tPV	{
 
 										    insert_Instruction( "mov", address_Concat($1), address_Concat($3), "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee VARIABLE");
 										}
 										else
 										{
@@ -138,7 +141,6 @@ Assign 		:	tVAR tE tVAR tPV	{
 
 										    insert_Instruction( "mov", address_Concat($1), snum, "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee VARIABLE");
 										}
 										else
 										{
@@ -154,7 +156,6 @@ Assign 		:	tVAR tE tVAR tPV	{
 
 										    insert_Instruction( "mov", address_Concat($1), "eax", "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee");
 										}
 										else
 										{
@@ -167,41 +168,51 @@ Assign 		:	tVAR tE tVAR tPV	{
 
 If			:	tIF tPO Cond tPF 	{
 									 	$1 = cp;		//If is inserted the execution of the body but its instruction is inserted here
-										cp++;			//Jx instruction goes here
-										cp++;			//JMP instruction goes here (used in case if statement is not approved)
-										cp++;			//If label goes here (used in case if statement is not approved)
-										//insertar el if-label counter al stack				*************
-										//if-label counter++								************
+										cp++;    		//Jx	
+										cp++;			//JMP instruction goes here (used in case if statement is not approved)	
+										cp++;			//If label goes here (used in case if statement is approved)
+
+										if_stack = push(if_lbl_count, if_stack);	//Insert if label value to 										
+										if_lbl_count++;				
 									}
 				tCO Body tCF	{
 									//convert num to string		
 
-									sprintf(snum ,"%d", $1+1);
-									insert_Instruction( "JMF", snum, "", "", "", $1 );	//JMP FROM TO	
-									sprintf(snum ,"%d" , cp+1);
-									strcpy( labTab[$1].param2, snum );					//second parameter
+									auxNum = if_stack.stk[if_stack.top];	//take if label value from the stack	
+									if_stack = pop(if_stack);				//pop the value	
 
-									//sacar el if-label del stack	      	************									
-									//create string if_lbl_n
-									strcpy( auxString, "else_lbl_" );									
-									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									//create string if_lbl_n for Jx						//Assign the correct Jx: Je, Jg, etc... ************************
+									strcpy( auxString, "if_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									strcat( auxString, ":" );	
+									insert_Instruction( "Jx", auxString, "", "", "", $1 );		//Jx To ($1 stores the pointer before if began)
+
+									//create string else_lbl_n for JMP
+									strcpy( auxString, "else_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									insert_Instruction( "JMP", auxString, "", "", "", $1+1 );	//JMP TO		
+
+									//create string if_lbl_n for if lbl
+									strcpy( auxString, "if_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
 									strcat( auxString, ":" );
-									//insertar instruccion del if-label en $+3		***********
+									insert_Instruction( auxString, "", "", "", "", $1+2 );	//If label	
 
-									//create string else_lbl_n
+									//create string else_lbl_n	for else lbl
 									strcpy( auxString, "else_lbl_" );									
-									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
-									strcat( auxString, ":" );
-
-									insert_Instruction( auxString, "", "", "", "", cp );	//else label
+									strcat( auxString, ":" );		//Else label
+									insert_Instruction( auxString, "", "", "", "", cp );	//insert else label at the end of the if
 									cp++;			
 								}
 			;
 
 Cond		:	Val tDIF Val	{									
-									insert_Instruction( "CMP", "", "", "", "", $1 );	//JMP FROM TO	
+									insert_Instruction( "CMP", "", "", "", "", cp );	//COMPARISSON *****************	
 									cp++;
 								}
 				| tPO Cond tPF tOR tPO Cond tPF		{printf("\n Condition trouvee");}
@@ -378,7 +389,6 @@ Main		: 	tMAIN tPO tPF	{
 			;
 
 Val			:	tNUM		{
-								fprintf(fp, "numero : %d \n", tempCounter);
 								if( tempCounter == 1 )
 								{
 									tempCounter = 2;
@@ -389,16 +399,11 @@ Val			:	tNUM		{
 									tempCounter = 1;
 									$$=lookup("0temp2");	
 								}
-
-								printf("\n Valeur avec Num trouvee %d", $1);
-								fprintf(fp, "Val : %d \n", $1);
 							}
 				| tVAR		{	
 								if(lookup($1) != -1)
 								{
-									$$=lookup($1);					
-									printf("\n Valeur avec ID trouvee");
-									fprintf(fp, "Val : \n");
+									$$=lookup($1);			
 								}
 								else
 								{

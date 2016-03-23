@@ -107,16 +107,20 @@
 	int cp_Offset = 0; //Offset of the instruction counter
 
   	int tempCounter = 1; //Counter to determine if 0temp1 and 0temp2 are used
-  	int if_lbl_count = 0; //Counter to determine the if labels to use
+
+	struct stack if_stack;		//Keeps count of if statements to create labels
+  	int if_lbl_count = 0; 		//Counter to determine the if labels to use
 
 	char snum[5];		//To convert numbers to strings
 	char auxString[16];	
 	char auxString2[16];	
 
+	int auxNum;	
+
 	char retrievedString[64]; //Used to store user input in the printf instructions.
 	char stringPrinter[4]; 	//Used to create the printf instructions.
 
-#line 120 "y.tab.c" /* yacc.c:339  */
+#line 124 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -208,12 +212,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 55 "analysgramAssExp.yacc" /* yacc.c:355  */
+#line 59 "analysgramAssExp.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 217 "y.tab.c" /* yacc.c:355  */
+#line 221 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -228,7 +232,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 232 "y.tab.c" /* yacc.c:358  */
+#line 236 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -528,10 +532,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    94,    94,    97,   107,   108,   109,   110,   111,   112,
-     115,   131,   150,   168,   168,   203,   207,   208,   211,   214,
-     217,   218,   295,   299,   300,   301,   312,   323,   334,   345,
-     356,   380,   396,   414,   429,   444,   459,   462,   463
+       0,    98,    98,   101,   111,   112,   113,   114,   115,   116,
+     119,   134,   152,   169,   169,   215,   219,   220,   223,   226,
+     229,   230,   307,   311,   312,   313,   324,   335,   346,   357,
+     368,   392,   404,   420,   435,   450,   465,   468,   469
 };
 #endif
 
@@ -1357,49 +1361,13 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 97 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 101 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1363 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 4:
-#line 107 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1369 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 5:
-#line 108 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1375 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 6:
-#line 109 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1381 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 110 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1387 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 8:
-#line 111 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1393 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 9:
-#line 112 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Body trouve");}
-#line 1399 "y.tab.c" /* yacc.c:1646  */
+#line 1367 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 115 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 119 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) != -1 && lookupType((yyvsp[-1].variable)) != -1 ) //Both variables exist
 										{									
@@ -1407,7 +1375,6 @@ yyreduce:
 
 										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), address_Concat((yyvsp[-1].variable)), "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee VARIABLE");
 										}
 										else
 										{
@@ -1416,11 +1383,11 @@ yyreduce:
 											ce++;
 										}	
 									}
-#line 1420 "y.tab.c" /* yacc.c:1646  */
+#line 1387 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 131 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 134 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) != -1 ) 	
 										{									
@@ -1431,7 +1398,6 @@ yyreduce:
 
 										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), snum, "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee VARIABLE");
 										}
 										else
 										{
@@ -1440,11 +1406,11 @@ yyreduce:
 											ce++;
 										}	
 									}
-#line 1444 "y.tab.c" /* yacc.c:1646  */
+#line 1410 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 150 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 152 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 										if(lookupType((yyvsp[-3].variable)) != -1)	
 										{									
@@ -1452,7 +1418,6 @@ yyreduce:
 
 										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), "eax", "", "", cp );
 										    cp++;			
-											printf("\n Assignation trouvee");
 										}
 										else
 										{
@@ -1461,93 +1426,104 @@ yyreduce:
 											ce++;
 										}
 									}
-#line 1465 "y.tab.c" /* yacc.c:1646  */
+#line 1430 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 168 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 169 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
+										printf("Counter = %d", cp);
 									 	(yyvsp[-3].nb) = cp;		//If is inserted the execution of the body but its instruction is inserted here
-										cp++;			//Jx instruction goes here
-										cp++;			//JMP instruction goes here (used in case if statement is not approved)
-										cp++;			//If label goes here (used in case if statement is not approved)
-										//insertar el if-label counter al stack				*************
-										//if-label counter++								************
+										cp++;    		//Jx	
+										cp++;			//JMP instruction goes here (used in case if statement is not approved)	
+										cp++;			//If label goes here (used in case if statement is approved)
+
+										if_stack = push(if_lbl_count, if_stack);	//Insert if label value to 										
+										if_lbl_count++;				
 									}
-#line 1478 "y.tab.c" /* yacc.c:1646  */
+#line 1445 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 176 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 179 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 									//convert num to string		
 
-									sprintf(snum ,"%d", (yyvsp[-7].nb)+1);
-									insert_Instruction( "JMF", snum, "", "", "", (yyvsp[-7].nb) );	//JMP FROM TO	
-									sprintf(snum ,"%d" , cp+1);
-									strcpy( labTab[(yyvsp[-7].nb)].param2, snum );					//second parameter
+									auxNum = if_stack.stk[if_stack.top];	//take if label value from the stack	
+									if_stack = pop(if_stack);				//pop the value	
 
-									//sacar el if-label del stack	      	************									
-									//create string if_lbl_n
-									strcpy( auxString, "else_lbl_" );									
-									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									//create string if_lbl_n for Jx						//Assign the correct Jx: Je, Jg, etc... ************************
+									strcpy( auxString, "if_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									strcat( auxString, ":" );	
+									insert_Instruction( "Jx", auxString, "", "", "", (yyvsp[-7].nb) );		//Jx To ($1 stores the pointer before if began)
+
+									//create string else_lbl_n for JMP
+									strcpy( auxString, "else_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									insert_Instruction( "JMP", auxString, "", "", "", (yyvsp[-7].nb)+1 );	//JMP TO		
+
+									//create string if_lbl_n for if lbl
+									strcpy( auxString, "if_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
 									strcat( auxString, ":" );
-									//insertar instruccion del if-label en $+3		***********
+									insert_Instruction( auxString, "", "", "", "", (yyvsp[-7].nb)+2 );	//If label	
 
-									//create string else_lbl_n
+									//create string else_lbl_n	for else lbl
 									strcpy( auxString, "else_lbl_" );									
-									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
-									strcat( auxString, ":" );
-
-									insert_Instruction( auxString, "", "", "", "", cp );	//else label
+									strcat( auxString, ":" );		//Else label
+									insert_Instruction( auxString, "", "", "", "", cp );	//insert else label at the end of the if
 									cp++;			
 								}
-#line 1508 "y.tab.c" /* yacc.c:1646  */
+#line 1484 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 203 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 215 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {									
-									insert_Instruction( "CMP", "", "", "", "", (yyvsp[-2].nb) );	//JMP FROM TO	
+									insert_Instruction( "CMP", "", "", "", "", cp );	//JMP FROM TO	
 									cp++;
 								}
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 207 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 219 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Condition trouvee");}
-#line 1523 "y.tab.c" /* yacc.c:1646  */
+#line 1499 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 208 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 220 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Condition trouvee");}
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1505 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 211 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 223 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n While trouve");}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1511 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 214 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 226 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Print trouve");}
-#line 1541 "y.tab.c" /* yacc.c:1646  */
+#line 1517 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 217 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 229 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Contenu du Print trouve");}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
+#line 1523 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 218 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 230 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 														//TODO: Add \n management
 														int mod;
@@ -1625,29 +1601,29 @@ yyreduce:
 														cp++;	
 		
 													}
-#line 1629 "y.tab.c" /* yacc.c:1646  */
+#line 1605 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 295 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 307 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Contenu du Print trouve");}
-#line 1635 "y.tab.c" /* yacc.c:1646  */
+#line 1611 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 299 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 311 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Declaration trouvee");}
-#line 1641 "y.tab.c" /* yacc.c:1646  */
+#line 1617 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 300 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 312 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Declaration trouvee");}
-#line 1647 "y.tab.c" /* yacc.c:1646  */
+#line 1623 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 301 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 313 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {				
 											if(lookup((yyvsp[-2].variable)) == -1)
 											{
@@ -1659,11 +1635,11 @@ yyreduce:
 												ce++;
 											}
 										}
-#line 1663 "y.tab.c" /* yacc.c:1646  */
+#line 1639 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 312 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 324 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 											if(lookup((yyvsp[0].variable)) == -1)
 											{
@@ -1675,11 +1651,11 @@ yyreduce:
 												ce++;
 											}
 										}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
+#line 1655 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 323 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 335 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[-2].variable)) == -1)
 												{
@@ -1691,11 +1667,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1695 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 334 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 346 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[0].variable)) == -1)
 												{
@@ -1707,11 +1683,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1711 "y.tab.c" /* yacc.c:1646  */
+#line 1687 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 345 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 357 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[-2].variable)) == -1)
 												{
@@ -1723,11 +1699,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1727 "y.tab.c" /* yacc.c:1646  */
+#line 1703 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 356 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 368 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[0].variable)) == -1)
 												{
@@ -1739,13 +1715,12 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1743 "y.tab.c" /* yacc.c:1646  */
+#line 1719 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 380 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 392 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
-								fprintf(fp, "numero : %d \n", tempCounter);
 								if( tempCounter == 1 )
 								{
 									tempCounter = 2;
@@ -1756,21 +1731,16 @@ yyreduce:
 									tempCounter = 1;
 									(yyval.nb)=lookup("0temp2");	
 								}
-
-								printf("\n Valeur avec Num trouvee %d", (yyvsp[0].nb));
-								fprintf(fp, "Val : %d \n", (yyvsp[0].nb));
 							}
-#line 1764 "y.tab.c" /* yacc.c:1646  */
+#line 1736 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 396 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 404 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)
 								{
-									(yyval.nb)=lookup((yyvsp[0].variable));					
-									printf("\n Valeur avec ID trouvee");
-									fprintf(fp, "Val : \n");
+									(yyval.nb)=lookup((yyvsp[0].variable));			
 								}
 								else
 								{
@@ -1781,11 +1751,11 @@ yyreduce:
 									ce++;
 								}
 							 }
-#line 1785 "y.tab.c" /* yacc.c:1646  */
+#line 1755 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 414 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 420 "analysgramAssExp.yacc" /* yacc.c:1646  */
     { 	
 										fprintf(fp, "mov eax, [%d]\n", (yyvsp[-2].nb)); //eax = [a/0temp1]
 										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
@@ -1801,11 +1771,11 @@ yyreduce:
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en 0temp2
 										printf("\n Somme trouvee");
 									}
-#line 1805 "y.tab.c" /* yacc.c:1646  */
+#line 1775 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 429 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 435 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 										fprintf(fp, "mov eax, [%d]\n", (yyvsp[-2].nb)); //eax = [a/0temp1]
 										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
@@ -1821,11 +1791,11 @@ yyreduce:
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
 										printf("\n Substraction trouvee");
 									}
-#line 1825 "y.tab.c" /* yacc.c:1646  */
+#line 1795 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 444 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 450 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 										fprintf(fp, "mov ax, [%d]\n", (yyvsp[-2].nb)); //ax = [a/0temp1]
 										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
@@ -1841,19 +1811,19 @@ yyreduce:
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
 										printf("\n Multiplication trouvee");
 									}
-#line 1845 "y.tab.c" /* yacc.c:1646  */
+#line 1815 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 459 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 465 "analysgramAssExp.yacc" /* yacc.c:1646  */
     { 
 											fprintf(fp, "\nFirst number : \n"); 
 									}
-#line 1853 "y.tab.c" /* yacc.c:1646  */
+#line 1823 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1857 "y.tab.c" /* yacc.c:1646  */
+#line 1827 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2081,7 +2051,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 472 "analysgramAssExp.yacc" /* yacc.c:1906  */
+#line 478 "analysgramAssExp.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {

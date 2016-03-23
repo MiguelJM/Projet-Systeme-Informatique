@@ -1,3 +1,5 @@
+mov [a], [b]
+mov [a], [b]
 
 ------------ ------ ---------- 
 Name         Type       Position
@@ -11,4 +13,16 @@ Label Table :
 ----------------------------------------------------- 
  Instruction | param1 | param2 | param 3 | comments |
 ----------------------------------------------------- 
-Number of lines : 1
+ CMP                                                   ; 
+ Jx             if_lbl_0:                              ; 
+ JMP            else_lbl_0                             ; 
+ if_lbl_0:                                             ; 
+ mov            [a]          [b]                       ; 
+ CMP                                                   ; 
+ Jx             if_lbl_1:                              ; 
+ JMP            else_lbl_1                             ; 
+ if_lbl_1:                                             ; 
+ mov            [a]          [b]                       ; 
+ else_lbl_1:                                           ; 
+ else_lbl_0:                                           ; 
+Number of lines : 13

@@ -35,14 +35,14 @@
 [0-9]+ 					{
 							yylval.nb = atof(yytext); 
 							return(tNUM);
-						}		
-[a-zA-Z0-9_\ \\]*			{
-							yylval.variable = strdup(yytext); 
-							return(tSTRING);
-						}
+						}	
 [a-zA-Z][a-zA-Z0-9_]*	{
 							yylval.variable = strdup(yytext); 
 							return(tVAR);
+						}	
+[a-zA-Z0-9_\ \\]*		{
+							yylval.variable = strdup(yytext); 
+							return(tSTRING);
 						}
 %%
 /*
