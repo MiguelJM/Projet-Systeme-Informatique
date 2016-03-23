@@ -68,40 +68,55 @@
 	#include <string.h>
 	#include <stdbool.h>
 
+	#include "symtab.h"
+	#include "stack.h"
+
 	int yylex(void);
 	void yyerror(char *);
+
+	char *address_Concat( char * );
+	void insert_Instruction( char *, char *, char *, char *, char *, int );
+
 	FILE *fp;	
 
-	#include "symtab.h"
-	#include "labtab.h"
+
 
 #define instSIZE 8000 
 
 	struct labelTable
 	{
-		char instruct[8];
-		int  param1;		//@1
-		int  param2;		//@2
-		int  param3;		//@3
+		char instruct[16];
+		char  param1[16];		//@1
+		char  param2[16];		//@2
+		char  param3[16];		//@3
+		char  comments[16];		//Comments of the line
 	};
 
-	struct labelTable labTab[instSIZE];
-	int pc = 0; //instruction counter
-	/*Ex: 
-		  ADD @a @b temp1
-		  labelTable[pc].instruct[] = "ADD";
-		  labelTable[pc].param1 = @a
-		  labelTable[pc].param1 = @b
-		  labelTable[pc].param1 = @temp1
+	struct errorTable
+	{
+		char error[128];
+		int line;
+	};
 
-		  JMP 10
-		  labelTable[pc].instruct[] = "JMP";
-		  labelTable[pc].param1 = 10
-	*/
+	;
+	struct errorTable errTab[instSIZE];		//Stores found errors
+	int ce = 0; //error counter
 
-  
+	struct labelTable labTab[instSIZE];		//Stores ASM instructions
+	int cp = 0; //instruction counter
+	int cp_Offset = 0; //Offset of the instruction counter
 
-#line 105 "y.tab.c" /* yacc.c:339  */
+  	int tempCounter = 1; //Counter to determine if 0temp1 and 0temp2 are used
+  	int if_lbl_count = 0; //Counter to determine the if labels to use
+
+	char snum[5];		//To convert numbers to strings
+	char auxString[16];	
+	char auxString2[16];	
+
+	char retrievedString[64]; //Used to store user input in the printf instructions.
+	char stringPrinter[4]; 	//Used to create the printf instructions.
+
+#line 120 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -148,16 +163,18 @@ extern int yydebug;
     tPV = 267,
     tPLUS = 268,
     tVAR = 269,
-    tE = 270,
-    tMAIN = 271,
-    tSOU = 272,
-    tMUL = 273,
-    tDIV = 274,
-    tPRINT = 275,
-    tNUM = 276,
-    tIF = 277,
-    tV = 278,
-    tCONST = 279
+    tSTRING = 270,
+    tE = 271,
+    tMAIN = 272,
+    tSOU = 273,
+    tMUL = 274,
+    tDIV = 275,
+    tPRINT = 276,
+    tNUM = 277,
+    tIF = 278,
+    tV = 279,
+    tCONST = 280,
+    tGUILLEMETS = 281
   };
 #endif
 /* Tokens.  */
@@ -173,28 +190,30 @@ extern int yydebug;
 #define tPV 267
 #define tPLUS 268
 #define tVAR 269
-#define tE 270
-#define tMAIN 271
-#define tSOU 272
-#define tMUL 273
-#define tDIV 274
-#define tPRINT 275
-#define tNUM 276
-#define tIF 277
-#define tV 278
-#define tCONST 279
+#define tSTRING 270
+#define tE 271
+#define tMAIN 272
+#define tSOU 273
+#define tMUL 274
+#define tDIV 275
+#define tPRINT 276
+#define tNUM 277
+#define tIF 278
+#define tV 279
+#define tCONST 280
+#define tGUILLEMETS 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 40 "analysgramAssExp.yacc" /* yacc.c:355  */
+#line 55 "analysgramAssExp.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 198 "y.tab.c" /* yacc.c:355  */
+#line 217 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -209,7 +228,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 213 "y.tab.c" /* yacc.c:358  */
+#line 232 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -449,23 +468,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  9
+#define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   36
+#define YYLAST   110
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  25
+#define YYNTOKENS  27
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  6
+#define YYNNTS  14
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  19
+#define YYNRULES  38
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  35
+#define YYNSTATES  89
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   279
+#define YYMAXUTOK   281
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -501,15 +520,18 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    79,    79,    82,   148,   149,   150,   154,   158,   162,
-     166,   170,   180,   184,   206,   207,   208,   209,   213,   214
+       0,    94,    94,    97,   107,   108,   109,   110,   111,   112,
+     115,   131,   150,   168,   168,   203,   207,   208,   211,   214,
+     217,   218,   295,   299,   300,   301,   312,   323,   334,   345,
+     356,   380,   396,   414,   429,   444,   459,   462,   463
 };
 #endif
 
@@ -519,9 +541,11 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "tINT", "tDIF", "tOR", "tAND", "tPO",
-  "tPF", "tCO", "tCF", "tWHILE", "tPV", "tPLUS", "tVAR", "tE", "tMAIN",
-  "tSOU", "tMUL", "tDIV", "tPRINT", "tNUM", "tIF", "tV", "tCONST",
-  "$accept", "TestStart", "TestMessage", "Declar", "Val", "Expr", YY_NULLPTR
+  "tPF", "tCO", "tCF", "tWHILE", "tPV", "tPLUS", "tVAR", "tSTRING", "tE",
+  "tMAIN", "tSOU", "tMUL", "tDIV", "tPRINT", "tNUM", "tIF", "tV", "tCONST",
+  "tGUILLEMETS", "$accept", "TestStart", "TestMessage", "Body", "Assign",
+  "If", "$@1", "Cond", "While", "Print", "PrintCont", "Declar", "Val",
+  "Expr", YY_NULLPTR
 };
 #endif
 
@@ -532,14 +556,14 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279
+     275,   276,   277,   278,   279,   280,   281
 };
 # endif
 
-#define YYPACT_NINF -16
+#define YYPACT_NINF -41
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-16)))
+  (!!((Yystate) == (-41)))
 
 #define YYTABLE_NINF -1
 
@@ -550,10 +574,15 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    12,     3,    27,   -16,   -10,    13,    15,    16,   -16,
-     -16,    -3,    -6,    17,    18,   -10,    -6,   -16,   -16,   -16,
-      -8,    -6,    -6,    -1,    -6,    -6,    -6,    -6,    -8,    -8,
-     -16,   -15,   -15,   -16,   -16
+     -17,    16,    26,   -41,   -41,    52,   -41,    52,   -41,   -41,
+      19,    33,    40,   -41,    -7,     7,    56,   -41,    60,    64,
+      30,    52,    52,     0,    65,    57,    80,    88,    29,   -41,
+     -41,   -41,   -41,    -8,    84,    85,    78,    81,    52,    54,
+      -5,    82,   -41,    30,   -41,    -1,   -41,   -41,    55,    83,
+      89,    55,    86,    90,   -41,    66,   -41,    91,    34,    87,
+      -8,    70,    55,    92,    62,   -41,   -41,   -41,    55,    55,
+      55,    55,    74,    93,    -5,    55,    70,    30,   -41,    44,
+      44,   -41,   -41,   -41,   -41,   -41,    70,    35,   -41
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -561,22 +590,29 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     2,     3,     7,     0,     0,     1,
-       4,     0,     0,    11,     9,     5,     0,    13,    12,    19,
-       6,     0,     0,     0,     0,     0,     0,     0,    10,     8,
-      18,    14,    15,    16,    17
+       0,     0,     0,     2,     3,     0,     1,     0,    32,    31,
+       0,     0,     0,    13,     0,     0,     0,    15,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     8,
+       5,     6,     7,     4,     0,     0,    26,     0,     0,     0,
+       0,     0,    14,     9,    23,     0,    16,    17,     0,    30,
+       0,     0,    32,    31,    38,     0,    22,     0,     0,    28,
+      24,    25,     0,     0,     0,    10,    11,    12,     0,     0,
+       0,     0,     0,     0,     0,     0,    29,     0,    37,    33,
+      34,    35,    36,    21,    19,    20,    27,     0,    18
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -16,   -16,   -16,    20,   -16,    -2
+     -41,   -41,   -41,   -20,   -41,   104,   -41,    -2,   -41,   -41,
+      36,    63,    -4,   -40
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3,     4,     5,    19,    20
+      -1,     2,     3,    43,    29,    30,    16,    10,    31,    32,
+      58,    33,    54,    55
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -584,42 +620,67 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,    16,    10,    26,    27,    24,     8,    30,    17,    25,
-      26,    27,    24,    11,    23,    18,    25,    26,    27,    28,
-      29,     2,    31,    32,    33,    34,     6,     9,    12,    13,
-      14,    15,    21,    22,     0,     0,     7
+      28,    11,    23,    11,    44,    12,     1,     8,    61,    56,
+      17,    64,    18,    19,    36,     9,    45,    11,    11,    34,
+      35,    57,    76,     5,    27,    37,     6,    13,    79,    80,
+      81,    82,    23,    23,    11,    86,    50,    14,    23,    42,
+      24,    24,    73,    25,    25,    88,    24,    74,    15,    25,
+      26,    26,     1,     1,    27,    27,    26,    87,     1,     7,
+      27,    51,    51,    70,    71,    20,     8,    21,    52,     8,
+      78,    22,    38,    39,     9,    68,    53,     9,    67,    68,
+      69,    70,    71,    68,    69,    70,    71,    40,    69,    70,
+      71,    41,    46,    47,    48,    49,    59,    63,    65,    62,
+      83,    77,    66,    75,     4,    84,    72,     0,    60,     0,
+      85
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     7,    12,    18,    19,    13,     3,     8,    14,    17,
-      18,    19,    13,    23,    16,    21,    17,    18,    19,    21,
-      22,    24,    24,    25,    26,    27,    14,     0,    15,    14,
-      14,    11,    15,    15,    -1,    -1,    24
+      20,     5,     3,     7,    12,     7,    23,    14,    48,    14,
+      14,    51,     5,     6,    14,    22,    24,    21,    22,    21,
+      22,    26,    62,     7,    25,    25,     0,     8,    68,    69,
+      70,    71,     3,     3,    38,    75,    38,     4,     3,    10,
+      11,    11,     8,    14,    14,    10,    11,    13,     8,    14,
+      21,    21,    23,    23,    25,    25,    21,    77,    23,     7,
+      25,     7,     7,    19,    20,     9,    14,     7,    14,    14,
+       8,     7,     7,    16,    22,    13,    22,    22,    12,    13,
+      18,    19,    20,    13,    18,    19,    20,     7,    18,    19,
+      20,     3,     8,     8,    16,    14,    14,     8,    12,    16,
+      26,     9,    12,    16,     0,    12,    15,    -1,    45,    -1,
+      74
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    24,    26,    27,    28,    14,    24,     3,     0,
-      12,    23,    15,    14,    14,    28,     7,    14,    21,    29,
-      30,    15,    15,    30,    13,    17,    18,    19,    30,    30,
-       8,    30,    30,    30,    30
+       0,    23,    28,    29,    32,     7,     0,     7,    14,    22,
+      34,    39,    34,     8,     4,     8,    33,    39,     5,     6,
+       9,     7,     7,     3,    11,    14,    21,    25,    30,    31,
+      32,    35,    36,    38,    34,    34,    14,    25,     7,    16,
+       7,     3,    10,    30,    12,    24,     8,     8,    16,    14,
+      34,     7,    14,    22,    39,    40,    14,    26,    37,    14,
+      38,    40,    16,     8,    40,    12,    12,    12,    13,    18,
+      19,    20,    15,     8,    13,    16,    40,     9,     8,    40,
+      40,    40,    40,    26,    12,    37,    40,    30,    10
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    25,    26,    27,    28,    28,    28,    28,    28,    28,
-      28,    28,    29,    29,    30,    30,    30,    30,    30,    30
+       0,    27,    28,    29,    30,    30,    30,    30,    30,    30,
+      31,    31,    31,    33,    32,    34,    34,    34,    35,    36,
+      37,    37,    37,    38,    38,    38,    38,    38,    38,    38,
+      38,    39,    39,    40,    40,    40,    40,    40,    40
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     3,     4,     2,     5,     3,
-       5,     3,     1,     1,     3,     3,     3,     3,     3,     1
+       0,     2,     1,     1,     1,     1,     1,     1,     1,     2,
+       4,     4,     4,     0,     8,     3,     7,     7,     7,     5,
+       3,     3,     1,     2,     3,     4,     2,     5,     3,     5,
+       3,     1,     1,     3,     3,     3,     3,     3,     1
 };
 
 
@@ -1296,129 +1357,503 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 82 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 97 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1302 "y.tab.c" /* yacc.c:1646  */
+#line 1363 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 148 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Declaration trouvee");}
-#line 1308 "y.tab.c" /* yacc.c:1646  */
+#line 107 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1369 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 149 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {printf("\n Declaration trouvee");}
-#line 1314 "y.tab.c" /* yacc.c:1646  */
+#line 108 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1375 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 150 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {
-											insert((yyvsp[-2].variable), 0);									//TODO: ERROR VAR ALREADY EXISTS
-											printf("\n Declaration trouvee");
-										}
-#line 1323 "y.tab.c" /* yacc.c:1646  */
+#line 109 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1381 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 154 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {
-											insert((yyvsp[0].variable), 0);									//TODO: ERROR VAR ALREADY EXISTS
-											printf("\n Declaration trouvee");
-										}
-#line 1332 "y.tab.c" /* yacc.c:1646  */
+#line 110 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1387 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 158 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {
-												insert((yyvsp[-2].variable), 1);								//TODO: ERROR VAR ALREADY EXISTS
-												printf("\n Declaration trouvee");
-											}
-#line 1341 "y.tab.c" /* yacc.c:1646  */
+#line 111 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1393 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 162 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {
-												insert((yyvsp[0].variable), 1);								//TODO: ERROR VAR ALREADY EXISTS
-												printf("\n Declaration trouvee");
-											}
-#line 1350 "y.tab.c" /* yacc.c:1646  */
+#line 112 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Body trouve");}
+#line 1399 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 166 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 115 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
-												insert((yyvsp[-2].variable), 1);								//TODO: ERROR VAR ALREADY EXISTS
-												printf("\n Declaration trouvee");
-											}
-#line 1359 "y.tab.c" /* yacc.c:1646  */
+										if( lookupType((yyvsp[-3].variable)) != -1 && lookupType((yyvsp[-1].variable)) != -1 ) //Both variables exist
+										{									
+										    fprintf(fp, "mov [%s], [%s]\n", (yyvsp[-3].variable), (yyvsp[-1].variable)); 	//a = b
+
+										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), address_Concat((yyvsp[-1].variable)), "", "", cp );
+										    cp++;			
+											printf("\n Assignation trouvee VARIABLE");
+										}
+										else
+										{
+											strcpy( errTab[ce].error, "Trying to assign value to a constant.\n" );
+											errTab[ce].line = ce;
+											ce++;
+										}	
+									}
+#line 1420 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 170 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 131 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
-												insert((yyvsp[0].variable), 1);								//TODO: ERROR VAR ALREADY EXISTS
-												printf("\n Declaration trouvee");
-											}
-#line 1368 "y.tab.c" /* yacc.c:1646  */
+										if( lookupType((yyvsp[-3].variable)) != -1 ) 	
+										{									
+										    fprintf(fp, "mov [%s], %d\n", (yyvsp[-3].variable), (yyvsp[-1].nb)); 	//a = 4
+
+										    //convert num to string			
+											sprintf(snum ,"%d" , (yyvsp[-1].nb));
+
+										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), snum, "", "", cp );
+										    cp++;			
+											printf("\n Assignation trouvee VARIABLE");
+										}
+										else
+										{
+											strcpy( errTab[ce].error, "Trying to assign value to a constant.\n" );
+											errTab[ce].line = ce;
+											ce++;
+										}	
+									}
+#line 1444 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 180 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 150 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {
-								printf("\n Valeur avec Num trouvee %d", (yyvsp[0].nb));
-								fprintf(fp, "Val : %d \n", (yyvsp[0].nb));
-							}
-#line 1377 "y.tab.c" /* yacc.c:1646  */
+										if(lookupType((yyvsp[-3].variable)) != -1)	
+										{									
+										    fprintf(fp, "mov [%d], eax\n", lookup((yyvsp[-3].variable))); 	//a = Resultado
+
+										    insert_Instruction( "mov", address_Concat((yyvsp[-3].variable)), "eax", "", "", cp );
+										    cp++;			
+											printf("\n Assignation trouvee");
+										}
+										else
+										{
+											strcpy( errTab[ce].error, "Trying to assign value to a constant.\n" );
+											errTab[ce].line = ce;
+											ce++;
+										}
+									}
+#line 1465 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 184 "analysgramAssExp.yacc" /* yacc.c:1646  */
+#line 168 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+									 	(yyvsp[-3].nb) = cp;		//If is inserted the execution of the body but its instruction is inserted here
+										cp++;			//Jx instruction goes here
+										cp++;			//JMP instruction goes here (used in case if statement is not approved)
+										cp++;			//If label goes here (used in case if statement is not approved)
+										//insertar el if-label counter al stack				*************
+										//if-label counter++								************
+									}
+#line 1478 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 176 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+									//convert num to string		
+
+									sprintf(snum ,"%d", (yyvsp[-7].nb)+1);
+									insert_Instruction( "JMF", snum, "", "", "", (yyvsp[-7].nb) );	//JMP FROM TO	
+									sprintf(snum ,"%d" , cp+1);
+									strcpy( labTab[(yyvsp[-7].nb)].param2, snum );					//second parameter
+
+									//sacar el if-label del stack	      	************									
+									//create string if_lbl_n
+									strcpy( auxString, "else_lbl_" );									
+									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									strcat( auxString, snum );
+									strcat( auxString, ":" );
+									//insertar instruccion del if-label en $+3		***********
+
+									//create string else_lbl_n
+									strcpy( auxString, "else_lbl_" );									
+									sprintf(snum , "%d", 99999);	//Insertar el valor sacado del stack **********
+									strcat( auxString, snum );
+									strcat( auxString, ":" );
+
+									insert_Instruction( auxString, "", "", "", "", cp );	//else label
+									cp++;			
+								}
+#line 1508 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 203 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {									
+									insert_Instruction( "CMP", "", "", "", "", (yyvsp[-2].nb) );	//JMP FROM TO	
+									cp++;
+								}
+#line 1517 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 207 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Condition trouvee");}
+#line 1523 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 208 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Condition trouvee");}
+#line 1529 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 18:
+#line 211 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n While trouve");}
+#line 1535 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 214 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Print trouve");}
+#line 1541 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 217 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Contenu du Print trouve");}
+#line 1547 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 218 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {	
+														//TODO: Add \n management
+														int mod;
+
+														strcpy( retrievedString, (yyvsp[-1].variable) ); 
+														strcpy( stringPrinter, "'" ); 	
+														int count = 0, count2 = 0;
+
+														sprintf(snum, "%d", (int) strlen(retrievedString));
+														strcpy( auxString, snum );
+														insert_Instruction( "MOV", "edx", auxString, "", "Message length", cp );	//Message length
+														cp++;
+
+														while( retrievedString[count] != '\0')
+														{
+															stringPrinter[count2] = retrievedString[count];  
+
+															if( count2 == 3 )		//Print every 4 characters to respect dword size
+															{
+																//Create string with printf_MSG+count+1
+    															strcpy( auxString, "printf_MSG+" );
+																sprintf(snum, "%d", count-count2);	
+    															strcat( auxString, snum );
+
+																//Create string with dword stringPrinter[0]+[1]+[2]+[3]
+    															strcpy( auxString2, "dword " );
+    															stringPrinter[count2+1] = '\0';
+    															strcat( auxString2, stringPrinter );
+
+																insert_Instruction( "MOV", address_Concat(auxString), auxString2, "", "New message", cp );	//Message[0,1,2,3]
+																cp++;	
+																count2 = 0;
+															}
+															else{
+																count2 ++;	
+															}														
+
+															count ++;
+														}
+
+														if( count2 > 0 )
+														{
+															/*if( retrievedString[count] == '\' && retrievedString[count+1] == 'n' )  //New line detected
+															{
+																count++;
+																auxString
+																insert_Instruction( "MOV", address_Concat("printf_MSG+count+1"), "dword + stringPrinter", "", "New message", cp );	//add new line
+																	cp++;
+															}*/
+
+															//Create string with printf_MSG+count+1
+    														strcpy( auxString, "printf_MSG+" );
+															sprintf(snum, "%d", count-count2);		
+    														strcat( auxString, snum );
+
+															//Create string with dword stringPrinter[0]+[1]+[2]+[3]
+    														strcpy( auxString2, "dword " );
+    														stringPrinter[count2] = '\0';
+    														strcat( auxString2, stringPrinter );
+
+															insert_Instruction( "MOV", address_Concat(auxString), auxString2, "", "New message", cp );	//Message[0,1,2,3]
+															cp++;													
+
+															count ++;
+															count2 ++;
+														}
+
+														insert_Instruction( "MOV", "ecx", "printf_MSG", "", "Message to write", cp );	
+														cp++;	
+														insert_Instruction( "MOV", "ebx", "1", "", "file descriptor (stdout)", cp );	
+														cp++;	
+														insert_Instruction( "MOV", "eax", "4", "", "Message to write", cp );
+														cp++;	
+														insert_Instruction( "INT", "80h", "", "", "System call (Call Kernel)", cp );	//Call Kernel
+														cp++;	
+		
+													}
+#line 1629 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 295 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Contenu du Print trouve");}
+#line 1635 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 299 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Declaration trouvee");}
+#line 1641 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 300 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {printf("\n Declaration trouvee");}
+#line 1647 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 301 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {				
+											if(lookup((yyvsp[-2].variable)) == -1)
+											{
+												insert((yyvsp[-2].variable), 0);
+											}else
+											{												
+												strcpy( errTab[ce].error, "Variable %s already exists.\n" );
+												errTab[ce].line = ce;
+												ce++;
+											}
+										}
+#line 1663 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 312 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+											if(lookup((yyvsp[0].variable)) == -1)
+											{
+												insert((yyvsp[0].variable), 0);
+											}else
+											{												
+												strcpy( errTab[ce].error, "Variable already exists.\n" );
+												errTab[ce].line = ce;
+												ce++;
+											}
+										}
+#line 1679 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 323 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+												if(lookup((yyvsp[-2].variable)) == -1)
+												{
+													insert((yyvsp[-2].variable), 1);
+												}else
+												{												
+													strcpy( errTab[ce].error, "Variable already exists.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
+#line 1695 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 334 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+												if(lookup((yyvsp[0].variable)) == -1)
+												{
+													insert((yyvsp[0].variable), 1);
+												}else
+												{												
+													strcpy( errTab[ce].error, "Variable already exists.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
+#line 1711 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 345 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+												if(lookup((yyvsp[-2].variable)) == -1)
+												{
+													insert((yyvsp[-2].variable), 1);
+												}else
+												{												
+													strcpy( errTab[ce].error, "Variable already exists.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
+#line 1727 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 356 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+												if(lookup((yyvsp[0].variable)) == -1)
+												{
+													insert((yyvsp[0].variable), 1);
+												}else
+												{												
+													strcpy( errTab[ce].error, "Variable already exists.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
+#line 1743 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 380 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {
+								fprintf(fp, "numero : %d \n", tempCounter);
+								if( tempCounter == 1 )
+								{
+									tempCounter = 2;
+									(yyval.nb)=lookup("0temp1");	
+								}		
+								else
+								{
+									tempCounter = 1;
+									(yyval.nb)=lookup("0temp2");	
+								}
+
+								printf("\n Valeur avec Num trouvee %d", (yyvsp[0].nb));
+								fprintf(fp, "Val : %d \n", (yyvsp[0].nb));
+							}
+#line 1764 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 396 "analysgramAssExp.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)
 								{
-																								//TODO: RETRIEVE VARIABLE
+									(yyval.nb)=lookup((yyvsp[0].variable));					
 									printf("\n Valeur avec ID trouvee");
 									fprintf(fp, "Val : \n");
 								}
 								else
-									printf("Erreur: La variable demandee n'existe pas.");		//TODO: ERROR VAR DOESN'T EXIST
+								{
+									strcpy( errTab[ce].error, "The variable " );
+									strcat( errTab[ce].error, (yyvsp[0].variable) );
+									strcat( errTab[ce].error, " does not exist.\n" );		
+									errTab[ce].line = ce;
+									ce++;
+								}
 							 }
-#line 1392 "y.tab.c" /* yacc.c:1646  */
+#line 1785 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 206 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    { 	printf("\n Somme trouvee");}
-#line 1398 "y.tab.c" /* yacc.c:1646  */
+  case 33:
+#line 414 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    { 	
+										fprintf(fp, "mov eax, [%d]\n", (yyvsp[-2].nb)); //eax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
+										 cp++;			
+									    fprintf(fp, "mov ebx, [%d]\n", (yyvsp[0].nb)); //ebx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", address_Concat(lookupName((yyvsp[0].nb))), "", "", cp );
+									     cp++;
+
+									    fprintf(fp, "add eax, ebx\n"); 		//eax = eax + ebx
+										 insert_Instruction( "add", "eax", "ebx", "", "", cp );
+									     cp++;
+
+										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en 0temp2
+										printf("\n Somme trouvee");
+									}
+#line 1805 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 207 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {	printf("\n Substraction trouvee");}
-#line 1404 "y.tab.c" /* yacc.c:1646  */
+  case 34:
+#line 429 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {	
+										fprintf(fp, "mov eax, [%d]\n", (yyvsp[-2].nb)); //eax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
+										 cp++;			
+									    fprintf(fp, "mov ebx, [%d]\n", (yyvsp[0].nb)); //ebx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", address_Concat(lookupName((yyvsp[0].nb))), "", "", cp );
+									     cp++;
+
+									    fprintf(fp, "sub eax, ebx\n"); 		//eax - ebx
+										 insert_Instruction( "sub", "eax", "ebx", "", "", cp );
+									     cp++;
+
+										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
+										printf("\n Substraction trouvee");
+									}
+#line 1825 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 208 "analysgramAssExp.yacc" /* yacc.c:1646  */
-    {	printf("\n Multiplication trouvee");}
-#line 1410 "y.tab.c" /* yacc.c:1646  */
+  case 35:
+#line 444 "analysgramAssExp.yacc" /* yacc.c:1646  */
+    {	
+										fprintf(fp, "mov ax, [%d]\n", (yyvsp[-2].nb)); //ax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", address_Concat(lookupName((yyvsp[-2].nb))), "", "", cp );
+										 cp++;			
+									    fprintf(fp, "mov bx, [%d]\n", (yyvsp[0].nb)); //bx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", address_Concat(lookupName((yyvsp[0].nb))), "", "", cp );
+									     cp++;
+
+									    fprintf(fp, "mul bx\n"); 			//ax * bx
+										 insert_Instruction( "mul", "bx", "", "", "", cp );
+									     cp++;
+
+										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
+										printf("\n Multiplication trouvee");
+									}
+#line 1845 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 209 "analysgramAssExp.yacc" /* yacc.c:1646  */
+  case 36:
+#line 459 "analysgramAssExp.yacc" /* yacc.c:1646  */
     { 
 											fprintf(fp, "\nFirst number : \n"); 
-										}
-#line 1418 "y.tab.c" /* yacc.c:1646  */
+									}
+#line 1853 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1422 "y.tab.c" /* yacc.c:1646  */
+#line 1857 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1646,12 +2081,61 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 234 "analysgramAssExp.yacc" /* yacc.c:1906  */
+#line 472 "analysgramAssExp.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
 	fprintf(stderr, "%s\n", s);
 }
+
+/*Error management*/
+void print_Error_Table()
+{
+	if( ce > 0 )
+		fprintf(fp, "\nErrors found : \n");
+	for (int i = 0 ; i < ce; i++)
+		fprintf(fp, "Error found in line: %d \n %s \n", errTab[i].line+1, errTab[i].error );
+
+}
+/*End of error management*/
+
+
+
+
+/*Label Table Management*/
+void print_Label_Table()
+{
+  	fprintf(fp,"\nLabel Table :\n----------------------------------------------------- \n");
+	fprintf(fp, " Instruction | param1 | param2 | param 3 | comments |\n");
+  	fprintf(fp,"----------------------------------------------------- \n");
+	for (int i = 0 ; i < cp; i++)
+	{
+		fprintf(fp, " %-14s %-12s %-12s %-12s ;%-s \n", labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3, labTab[i].comments );
+	}
+}
+
+char* address_Concat( char *varName ) //concatenates [] with the address: the result is similar to: [a]
+{
+	char *result = malloc(16 * sizeof(char));
+	strcat(result, "[");
+	strcat(result, varName);
+	strcat(result, "]");
+
+	return result;	
+}
+
+void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment, int counter  )	//inserts all values to the table
+{
+	strcpy( labTab[counter].instruct, inst );
+	strcpy( labTab[counter].param1, p1 );	  
+	strcpy( labTab[counter].param2, p2 );	  
+	strcpy( labTab[counter].param3, p3 );	  
+	strcpy( labTab[counter].comments, comment );
+}
+/*End of label Table Management*/
+
+
+
 
 
 
@@ -1671,6 +2155,13 @@ int main(void) {
 
 	fp = fopen("assOutput.out","w");
 
+
+	insert("0temp1", 0);	//Temp variables inserted with number before to avoid conflict with user create variables	
+	insert("0temp2", 0);
+
+
+
+
 	/*insertSymbol("a", 1, 10);
 	insertSymbol("a", 0, 10);
 	assignValue("a", 11);*/
@@ -1678,6 +2169,7 @@ int main(void) {
 
 	//lookup("a");
 	insert("a", 0);
+	insert("b", 0);
 	/*lookup("a");
 	insert("a", 0);
 	lookupType("a");
@@ -1692,9 +2184,11 @@ int main(void) {
 	lookup("e");*/
 
 
-
 	yyparse();
 	symtab_print(fp);
+	print_Label_Table();
+	print_Error_Table();
+	fprintf(fp, "Number of lines : %d\n", cp+1); 
 	fclose(fp);
 	return 0;
 }
@@ -1702,3 +2196,4 @@ int main(void) {
 
 
 
+/*TODO: Users can't name a variable 0temp1 nor 0temp2*/

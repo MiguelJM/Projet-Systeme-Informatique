@@ -118,6 +118,19 @@ int lookupType( char * name )
   }
 }
 
+/* return name of symbol or -1 if symbol not found */
+char* lookupName( int address )
+{
+  Node l =  hashTable[address];
+  if (l == NULL) {
+    printf("Variable not found.\n");
+    return "NULL";
+  }
+  else {
+    printf("The variable name is: %s.\n", l->st_name);
+    return l->st_name;
+  }
+}
 
 /* set datatype of symbol returns 0 if symbol not found 
 int setType( char * name, int t )

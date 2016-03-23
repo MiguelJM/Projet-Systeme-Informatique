@@ -57,16 +57,18 @@ extern int yydebug;
     tPV = 267,
     tPLUS = 268,
     tVAR = 269,
-    tE = 270,
-    tMAIN = 271,
-    tSOU = 272,
-    tMUL = 273,
-    tDIV = 274,
-    tPRINT = 275,
-    tNUM = 276,
-    tIF = 277,
-    tV = 278,
-    tCONST = 279
+    tSTRING = 270,
+    tE = 271,
+    tMAIN = 272,
+    tSOU = 273,
+    tMUL = 274,
+    tDIV = 275,
+    tPRINT = 276,
+    tNUM = 277,
+    tIF = 278,
+    tV = 279,
+    tCONST = 280,
+    tGUILLEMETS = 281
   };
 #endif
 /* Tokens.  */
@@ -82,28 +84,30 @@ extern int yydebug;
 #define tPV 267
 #define tPLUS 268
 #define tVAR 269
-#define tE 270
-#define tMAIN 271
-#define tSOU 272
-#define tMUL 273
-#define tDIV 274
-#define tPRINT 275
-#define tNUM 276
-#define tIF 277
-#define tV 278
-#define tCONST 279
+#define tSTRING 270
+#define tE 271
+#define tMAIN 272
+#define tSOU 273
+#define tMUL 274
+#define tDIV 275
+#define tPRINT 276
+#define tNUM 277
+#define tIF 278
+#define tV 279
+#define tCONST 280
+#define tGUILLEMETS 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 40 "analysgramAssExp.yacc" /* yacc.c:1909  */
+#line 55 "analysgramAssExp.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
 
-#line 107 "y.tab.h" /* yacc.c:1909  */
+#line 111 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
