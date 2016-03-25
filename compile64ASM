@@ -1,0 +1,4 @@
+#!/bin/bash
+
+nasm -f elf64 -o test64.o test64.nasm
+gcc -o test64 test64.o

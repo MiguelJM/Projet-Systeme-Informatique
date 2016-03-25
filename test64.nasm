@@ -1,11 +1,9 @@
 
 section .text
-    global _start
-    ;global main
+    global main
     extern printf
 
-_start:
-;main:
+main:
 
 
     ;printf example
@@ -16,14 +14,13 @@ _start:
         call printf
         pop rdi
 
-
-        mov eax, [num2]    ; put a from store into register
-    add eax, 2      ; a+2
-    push    eax     ; value of a+2
-        push    dword [num2]   ; value of variable a
-        push    dword fmt   ; address of ctrl string
-        call    printf      ; Call C function
-        add     esp, 12     ; pop stack 3 push times 4 bytes
+    mov rax, 10
+    mov [num1], rax
+    mov rdi, num1
+        mov rax, 1
+        push rdi
+        ;call printf
+        pop rdi
 
     ;write 'Test example'  
    ; mov edx, 1

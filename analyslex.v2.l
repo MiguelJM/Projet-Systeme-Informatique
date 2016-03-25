@@ -31,6 +31,7 @@
 "if" 			return(tIF);
 "while" 		return(tWHILE);
 "const"			return(tCONST);
+"else"			return(tELSE);
 "\""				return(tGUILLEMETS);
 [0-9]+ 					{
 							yylval.nb = atof(yytext); 

@@ -1,4 +1,16 @@
 mov [a], [b]
+mov [a], 6
+mov [a], 1
+mov [a], 12
+mov [a], 123
+mov [a], 1234
+mov [a], 12345
+mov [a], 123456
+mov [a], 6
+mov [a], 17
+mov [a], [b]
+mov [a], [b]
+mov [a], [b]
 mov [a], [b]
 
 ------------ ------ ---------- 
@@ -13,16 +25,49 @@ Label Table :
 ----------------------------------------------------- 
  Instruction | param1 | param2 | param 3 | comments |
 ----------------------------------------------------- 
+ section        .text                                  ; 
+ global         _start                                 ; 
+ _start:                                               ; 
  CMP                                                   ; 
  Jx             if_lbl_0:                              ; 
  JMP            else_lbl_0                             ; 
  if_lbl_0:                                             ; 
  mov            [a]          [b]                       ; 
+ JMP            else_lbl_0_ignr:                           ; 
+ else_lbl_0:                                           ; 
+ mov            [a]          6                         ; 
  CMP                                                   ; 
  Jx             if_lbl_1:                              ; 
  JMP            else_lbl_1                             ; 
  if_lbl_1:                                             ; 
- mov            [a]          [b]                       ; 
+ mov            [a]          1                         ; 
+ mov            [a]          12                        ; 
+ mov            [a]          123                       ; 
+ mov            [a]          1234                      ; 
+ mov            [a]          12345                     ; 
+ mov            [a]          123456                    ; 
+ JMP            else_lbl_1_ignr:                           ; 
  else_lbl_1:                                           ; 
- else_lbl_0:                                           ; 
-Number of lines : 13
+ mov            [a]          6                         ; 
+ mov            [a]          17                        ; 
+ CMP                                                   ; 
+ Jx             if_lbl_2:                              ; 
+ JMP            else_lbl_2                             ; 
+ if_lbl_2:                                             ; 
+ mov            [a]          [b]                       ; 
+ JMP            else_lbl_2_ignr:                           ; 
+ else_lbl_2:                                           ; 
+ mov            [a]          [b]                       ; 
+ else_lbl_2_ignr:                                        ; 
+ CMP                                                   ; 
+ Jx             if_lbl_3:                              ; 
+ JMP            else_lbl_3                             ; 
+ if_lbl_3:                                             ; 
+ mov            [a]          [b]                       ; 
+ JMP            else_lbl_3_ignr:                           ; 
+ else_lbl_3:                                           ; 
+ mov            [a]          [b]                       ; 
+ else_lbl_3_ignr:                                        ; 
+ else_lbl_1_ignr:                                        ; 
+ else_lbl_0_ignr:                                        ; 
+Number of lines : 46

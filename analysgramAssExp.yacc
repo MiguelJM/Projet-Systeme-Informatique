@@ -44,11 +44,12 @@
   	int tempCounter = 1; //Counter to determine if 0temp1 and 0temp2 are used
 
 	struct stack if_stack;		//Keeps count of if statements to create labels
+	struct stack else_stack;		//Keeps count of else statements to create labels
   	int if_lbl_count = 0; 		//Counter to determine the if labels to use
 
 	char snum[5];		//To convert numbers to strings
-	char auxString[16];	
-	char auxString2[16];	
+	char auxString[32];	
+	char auxString2[32];	
 
 	int auxNum;	
 
@@ -84,6 +85,7 @@
 %token tV
 %token tCONST
 %token tGUILLEMETS
+%token tELSE 
 
 %type <nb> Expr If Val
 
@@ -98,7 +100,7 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	If		{printf("\n Succesful test");}
+TestMessage	: 	Main		{printf("\n Succesful test");}
 			;
 
 Fonction	: 	tINT tVAR tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
@@ -120,8 +122,9 @@ Assign 		:	tVAR tE tVAR tPV	{
 										if( lookupType($1) != -1 && lookupType($3) != -1 ) //Both variables exist
 										{									
 										    fprintf(fp, "mov [%s], [%s]\n", $1, $3); 	//a = b
-
-										    insert_Instruction( "mov", address_Concat($1), address_Concat($3), "", "", cp );
+										    insert_Instruction( "mov", "eax", address_Concat($3), "", "", cp );
+										    cp++;	
+										    insert_Instruction( "mov", address_Concat($1), eax, "", "", cp );
 										    cp++;			
 										}
 										else
@@ -135,11 +138,13 @@ Assign 		:	tVAR tE tVAR tPV	{
 										if( lookupType($1) != -1 ) 	
 										{									
 										    fprintf(fp, "mov [%s], %d\n", $1, $3); 	//a = 4
-
+										    
 										    //convert num to string			
 											sprintf(snum ,"%d" , $3);
 
-										    insert_Instruction( "mov", address_Concat($1), snum, "", "", cp );
+										    insert_Instruction( "mov", "eax", snum, "", "", cp );
+										    cp++;	
+										    insert_Instruction( "mov", address_Concat($1), "eax", "", "", cp );
 										    cp++;			
 										}
 										else
@@ -166,20 +171,28 @@ Assign 		:	tVAR tE tVAR tPV	{
 									}
 			;
 
-If			:	tIF tPO Cond tPF 	{
+If			:	If 			{
+								//Erease the JMP else steps to build the else statement
+								else_stack = push(if_lbl_count-1, else_stack);	//Insert else label value to 
+								cp--;											//Erease the JMP ignore_else to write it later
+							}
+				Else 		
+			| 	tIF tPO Cond tPF 	{
 									 	$1 = cp;		//If is inserted the execution of the body but its instruction is inserted here
 										cp++;    		//Jx	
 										cp++;			//JMP instruction goes here (used in case if statement is not approved)	
 										cp++;			//If label goes here (used in case if statement is approved)
 
-										if_stack = push(if_lbl_count, if_stack);	//Insert if label value to 										
+										if_stack = push(if_lbl_count, if_stack);		//Insert if label value to 	
+										else_stack = push(if_lbl_count, else_stack);	//Insert else label value to 									
 										if_lbl_count++;				
-									}
+								}
 				tCO Body tCF	{
 									//convert num to string		
 
 									auxNum = if_stack.stk[if_stack.top];	//take if label value from the stack	
-									if_stack = pop(if_stack);				//pop the value	
+									if_stack = pop(if_stack);					//pop the value	
+									else_stack = pop(else_stack);				//pop the value	
 
 									//create string if_lbl_n for Jx						//Assign the correct Jx: Je, Jg, etc... ************************
 									strcpy( auxString, "if_lbl_" );										
@@ -201,13 +214,43 @@ If			:	tIF tPO Cond tPF 	{
 									strcat( auxString, ":" );
 									insert_Instruction( auxString, "", "", "", "", $1+2 );	//If label	
 
+									//Put a JMP to jump the else statement after if Body 			**********
+									strcpy( auxString, "else_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									strcat( auxString, "_ignr:" );
+									insert_Instruction( "JMP", auxString, "", "", "", cp );	//Ignore else label	
+									cp++;
+
 									//create string else_lbl_n	for else lbl
 									strcpy( auxString, "else_lbl_" );									
 									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
 									strcat( auxString, ":" );		//Else label
 									insert_Instruction( auxString, "", "", "", "", cp );	//insert else label at the end of the if
-									cp++;			
+									cp++;	
+
+									//Put a JMP label at the end of the else body
+									strcpy( auxString, "else_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									strcat( auxString, "_ignr:" );
+									insert_Instruction( auxString, "", "", "", "", cp );	//Ignore else label	
+									cp++;		
+								}
+			;
+
+Else		: tELSE tCO Body tCF {		
+									auxNum = else_stack.stk[else_stack.top];	//take if label value from the stack	
+									else_stack = pop(else_stack);				//pop the value	
+
+									//Put a JMP label at the end of the else body
+									strcpy( auxString, "else_lbl_" );										
+									sprintf(snum , "%d", auxNum);	
+									strcat( auxString, snum );
+									strcat( auxString, "_ignr:" );
+									insert_Instruction( auxString, "", "", "", "", cp );	//If label	
+									cp++;	
 								}
 			;
 

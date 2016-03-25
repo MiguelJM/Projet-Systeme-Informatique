@@ -1,0 +1,7 @@
+#!/bin/bash
+
+nasm -f elf test32.nasm
+#ld test32.o -o test32
+
+#Install with sudo apt-get install gcc-multilib -y
+gcc -m32 -o test32 test32.o
