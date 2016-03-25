@@ -6,11 +6,12 @@
 
 %%
 "int" return(tINT);
-"const" return(tCONST);
 
-"<"  return(tDIF);
-">"  return(tDIF);
-"==" return(tDIF);
+"<"  return(tMIN);
+">"  return(tMAY);
+"<=" return(tMINEQU);
+">=" return(tMAYEQU);
+"==" return(tEQU);
 "!=" return(tDIF);
 "("  return(tPO);
 ")"  return(tPF);

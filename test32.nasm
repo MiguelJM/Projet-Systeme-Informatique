@@ -110,7 +110,7 @@ IFOR:
     cmp eax, ebx 
 
     ;&& Ultimo If
-    je IFAND 
+    je $+4 
 
     ;Ultimo ir a else      
     jmp  exit 
@@ -129,17 +129,35 @@ IFAND:
 
 
     ;Print number 109 with printf
+ ;   mov eax, 109
+ ;   mov [num1], eax
+ ;   mov eax, [num1]
+ ;   push eax                ; eax = 1
+ ;   push fmt                ; fmt = "content in eax=%d",0xa,0
+ ;   call printf             
+ ;   add esp, 8 
+
+
+    ;Pointers example         ****************
     mov eax, 109
     mov [num1], eax
     mov eax, [num1]
-    push eax                ; eax = 1
+
+
+    mov eax, 900
+    mov [num2], eax
+    mov eax, [num2]
+
+    mov eax, num1       ;eax = direccion de num1
+    mov [num2], eax     ;num2 = direccion de num1
+    mov eax, [num2]
+    push eax                
     push fmt                ; fmt = "content in eax=%d",0xa,0
     call printf             
     add esp, 8 
 
 
-
-    ;write new message without printf
+    ;write new message without printf ******** print string
 
     MOV edx, 10                         ;Message length 
   ;  mov [printf_MSG], dword 'Hola'      ;New message
@@ -150,14 +168,14 @@ IFAND:
     ;mov ebx, 1                          ;file descriptor (stdout)
     ;mov eax, 4                          ;System call (sys_write)
     ;int 80h                             ;Call Kernel  
-    push printf_MSG;
-    call printf
-    add esp, 4
+ ;   push printf_MSG;
+  ;  call printf
+  ;  add esp, 4
 
-    push hola
-    push str
-    call printf
-    add esp, 8
+ ;   push hola
+ ;   push str
+  ;  call printf
+  ;  add esp, 8
 
 
 

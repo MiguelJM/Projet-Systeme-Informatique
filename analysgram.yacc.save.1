@@ -1,0 +1,114 @@
+%{
+	#include <stdio.h>
+	int yylex(void);
+	void yyerror(char *);
+%}
+
+%start Sum
+%token tINT 			
+%token tDIF
+%token tID
+%token tOR
+%token tAND
+%token tPO
+%token tPF
+%token tCO
+%token tCF
+%token tIF
+%token tWHILE
+%token tPV
+%token tPLUS
+%token tString
+%token tE
+%token tMAIN
+%token tSOU
+%token tMUL
+%token tDIV
+%token tPRINT
+%token tNUM
+%token tV
+%token tCONST
+
+%%
+
+Fonction	: 	tINT tID tPO Param tPF tCO Body tCF 	{printf("Fonction trouvee");}
+			;
+	
+Param 		:	tINT tID tV Param 		{printf("Parametre trouve");}
+				| tINT tID				{printf("Parametre trouve");}
+				| 						{printf("Parametre trouve");}
+			;
+				
+Body		:	tPO tPO tPO						{printf("Corriger Body");}				
+			;
+
+If			:	tIF tPO Cond tPF tCO Body tCF	{printf("IF trouve");}
+			;
+
+Cond		:	tID tDIF tID
+				| tPO Cond tPF tOR tPO Cond tPF		{printf("Condition trouvee");}
+				| tPO Cond tPF tAND tPO Cond tPF	{printf("Condition trouvee");}
+				| tINT tDIF tINT 					{printf("Condition trouvee");}
+			;
+
+While		:	tWHILE tPO Cond tPF tCO Body tCF	{printf("While trouve");}
+				;
+
+Print 		:	tPRINT tPO PrintCont tPF tPV		{printf("Print trouve");}				
+			;
+
+PrintCont	:	tID tPLUS PrintCont			{printf("Contenu du Print trouve");}
+				| tString tPLUS PrintCont	{printf("Contenu du Print trouve");}
+				| tID						{printf("Contenu du Print trouve");}
+				| tString					{printf("Contenu du Print trouve");}
+			;
+
+Const		:	Declar tV Const   	{printf("Constante trouvee");}
+				Declar tPV			{printf("Constante trouvee");}				
+			;
+
+Declar		: 	tINT tID tE Expr		{printf("Declaration trouvee");}
+				| tINT tID				{printf("Declaration trouvee");}
+			;
+
+Expr		:	tNUM Op Expr		{printf("Expresion trouvee");}	
+				| tNUM				{printf("Expresion trouvee");}
+			;
+
+Op			: 	tPLUS			{printf("Operateur trouve");}
+				| tSOU			{printf("Operateur trouve");}
+				| tMUL			{printf("Operateur trouve");}
+				| tDIV			{printf("Operateur trouve");}				
+			;
+
+Main		: 	tMAIN tPO tPF tCO Body tCF		{printf("Condition trouve");}
+			;
+
+
+Val			: 	tNum		{printf("Valeur avec Num trouvee");}
+				| tID		{printf("Valeur avec ID trouvee");}
+				;
+
+/***TODO: Add () operators.***/
+Sum			:	Val tPLUS Val tPV		{ $$=$1+$3; printf("Somme trouvee");}
+			;
+
+Sub			:	tNum tSOU Val tPV		{printf("Substraction trouvee");}
+			;
+
+Mult			:	tNum tMUL Val tPV		{printf("Multiplication trouvee");}
+			;
+
+Div			:	tNum tDIV Val tPV		{printf("Division trouvee");}
+			;
+
+%%
+
+void yyerror(char *s) {
+	fprintf(stderr, "%s\n", s);
+}
+
+int main(void) {
+	yyparse();
+	return 0;
+}

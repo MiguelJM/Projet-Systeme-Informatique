@@ -46,70 +46,80 @@ extern int yydebug;
   enum yytokentype
   {
     tINT = 258,
-    tDIF = 259,
-    tOR = 260,
-    tAND = 261,
-    tPO = 262,
-    tPF = 263,
-    tCO = 264,
-    tCF = 265,
-    tWHILE = 266,
-    tPV = 267,
-    tPLUS = 268,
-    tVAR = 269,
-    tSTRING = 270,
-    tE = 271,
-    tMAIN = 272,
-    tSOU = 273,
-    tMUL = 274,
-    tDIV = 275,
-    tPRINT = 276,
-    tNUM = 277,
-    tIF = 278,
-    tV = 279,
-    tCONST = 280,
-    tGUILLEMETS = 281,
-    tELSE = 282
+    tMIN = 259,
+    tMAY = 260,
+    tMINEQU = 261,
+    tMAYEQU = 262,
+    tEQU = 263,
+    tDIF = 264,
+    tOR = 265,
+    tAND = 266,
+    tPO = 267,
+    tPF = 268,
+    tCO = 269,
+    tCF = 270,
+    tWHILE = 271,
+    tPV = 272,
+    tPLUS = 273,
+    tVAR = 274,
+    tSTRING = 275,
+    tE = 276,
+    tMAIN = 277,
+    tSOU = 278,
+    tMUL = 279,
+    tDIV = 280,
+    tPRINT = 281,
+    tNUM = 282,
+    tIF = 283,
+    tV = 284,
+    tCONST = 285,
+    tGUILLEMETS = 286,
+    tELSE = 287
   };
 #endif
 /* Tokens.  */
 #define tINT 258
-#define tDIF 259
-#define tOR 260
-#define tAND 261
-#define tPO 262
-#define tPF 263
-#define tCO 264
-#define tCF 265
-#define tWHILE 266
-#define tPV 267
-#define tPLUS 268
-#define tVAR 269
-#define tSTRING 270
-#define tE 271
-#define tMAIN 272
-#define tSOU 273
-#define tMUL 274
-#define tDIV 275
-#define tPRINT 276
-#define tNUM 277
-#define tIF 278
-#define tV 279
-#define tCONST 280
-#define tGUILLEMETS 281
-#define tELSE 282
+#define tMIN 259
+#define tMAY 260
+#define tMINEQU 261
+#define tMAYEQU 262
+#define tEQU 263
+#define tDIF 264
+#define tOR 265
+#define tAND 266
+#define tPO 267
+#define tPF 268
+#define tCO 269
+#define tCF 270
+#define tWHILE 271
+#define tPV 272
+#define tPLUS 273
+#define tVAR 274
+#define tSTRING 275
+#define tE 276
+#define tMAIN 277
+#define tSOU 278
+#define tMUL 279
+#define tDIV 280
+#define tPRINT 281
+#define tNUM 282
+#define tIF 283
+#define tV 284
+#define tCONST 285
+#define tGUILLEMETS 286
+#define tELSE 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 60 "analysgramAssExp.yacc" /* yacc.c:1909  */
+#line 62 "analysgramAssExp.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
 
-#line 113 "y.tab.h" /* yacc.c:1909  */
+#line 123 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

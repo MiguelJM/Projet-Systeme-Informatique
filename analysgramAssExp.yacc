@@ -49,7 +49,9 @@
 
 	char snum[5];		//To convert numbers to strings
 	char auxString[32];	
-	char auxString2[32];	
+	char auxString2[32];
+
+	char last_if_type[8]; //Returns the last type of if retrieved	
 
 	int auxNum;	
 
@@ -64,6 +66,11 @@
 
 %start TestStart
 %token tINT 
+%token tMIN
+%token tMAY  
+%token tMINEQU
+%token tMAYEQU
+%token tEQU 
 %token tDIF
 %token tOR
 %token tAND
@@ -74,7 +81,7 @@
 %token tWHILE
 %token tPV
 %token tPLUS
-%token <variable> tVAR tSTRING
+%token <variable> tVAR tSTRING 
 %token tE
 %token tMAIN
 %token tSOU
@@ -87,6 +94,7 @@
 %token tGUILLEMETS
 %token tELSE 
 
+%type <variable> Cond CompareToken
 %type <nb> Expr If Val
 
 %right tE
@@ -100,7 +108,7 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	Main		{printf("\n Succesful test");}
+TestMessage	: 	If		{printf("\n Succesful test");}
 			;
 
 Fonction	: 	tINT tVAR tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
@@ -124,7 +132,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 										    fprintf(fp, "mov [%s], [%s]\n", $1, $3); 	//a = b
 										    insert_Instruction( "mov", "eax", address_Concat($3), "", "", cp );
 										    cp++;	
-										    insert_Instruction( "mov", address_Concat($1), eax, "", "", cp );
+										    insert_Instruction( "mov", address_Concat($1), "eax", "", "", cp );
 										    cp++;			
 										}
 										else
@@ -177,7 +185,7 @@ If			:	If 			{
 								cp--;											//Erease the JMP ignore_else to write it later
 							}
 				Else 		
-			| 	tIF tPO Cond tPF 	{
+			| 	tIF tPO Cond tPF	{
 									 	$1 = cp;		//If is inserted the execution of the body but its instruction is inserted here
 										cp++;    		//Jx	
 										cp++;			//JMP instruction goes here (used in case if statement is not approved)	
@@ -198,8 +206,7 @@ If			:	If 			{
 									strcpy( auxString, "if_lbl_" );										
 									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
-									strcat( auxString, ":" );	
-									insert_Instruction( "Jx", auxString, "", "", "", $1 );		//Jx To ($1 stores the pointer before if began)
+									insert_Instruction( last_if_type, auxString, "", "", "", $1 );		//Jx To ($1 stores the pointer before if began)
 
 									//create string else_lbl_n for JMP
 									strcpy( auxString, "else_lbl_" );										
@@ -218,7 +225,7 @@ If			:	If 			{
 									strcpy( auxString, "else_lbl_" );										
 									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
-									strcat( auxString, "_ignr:" );
+									strcat( auxString, "_ignr" );
 									insert_Instruction( "JMP", auxString, "", "", "", cp );	//Ignore else label	
 									cp++;
 
@@ -254,13 +261,137 @@ Else		: tELSE tCO Body tCF {
 								}
 			;
 
-Cond		:	Val tDIF Val	{									
-									insert_Instruction( "CMP", "", "", "", "", cp );	//COMPARISSON *****************	
-									cp++;
-								}
-				| tPO Cond tPF tOR tPO Cond tPF		{printf("\n Condition trouvee");}
-				| tPO Cond tPF tAND tPO Cond tPF	{printf("\n Condition trouvee");}
+//TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
+
+Cond		:	CondValueEAX CompareToken CondValueEBX 		{									
+																insert_Instruction( "CMP", "eax", "ebx", "", "", cp );	//COMPARISSON	
+																cp++;
+																strcpy (last_if_type, $2);
+															}
+				|  tPO Cond tPF tOR  	{
+												/**If true jump to if body**/
+
+												//create string if_lbl_n for if lbl
+												strcpy( auxString, "if_lbl_" );										
+												sprintf(snum , "%d", if_lbl_count);	
+												strcat( auxString, snum );		
+												insert_Instruction( last_if_type, auxString, "", "", "", cp );	//IF	
+												cp++;
+										}
+				 tPO Cond tPF 		{
+				 						/**If true jump to if body**/
+
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "if_lbl_" );										
+										sprintf(snum , "%d", if_lbl_count);	
+										strcat( auxString, snum );		
+										insert_Instruction( last_if_type, auxString, "", "", "", cp );	//IF	
+										cp++;
+
+										//jmp to else body 				
+				 						
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "else_lbl_" );										
+										sprintf(snum , "%d", if_lbl_count);	
+										strcat( auxString, snum );		
+										insert_Instruction( "JMP", auxString, "", "", "", cp );	//IF	
+										cp++;
+
+										$$=last_if_type;	//return last if 
+									}
+				| tPO Cond tPF tAND {
+										/**If true jump to next if**/
+
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "$+4" );			
+										insert_Instruction( last_if_type, auxString, "", "", "", cp );	//IF	
+										cp++;
+
+										//jmp to else body 				
+				 						
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "else_lbl_" );										
+										sprintf(snum , "%d", if_lbl_count);	
+										strcat( auxString, snum );		
+										insert_Instruction( "JMP", auxString, "", "", "", cp );	//IF	
+										cp++;
+									}
+				tPO Cond tPF		{
+										/**If true jump to if body**/
+
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "if_lbl_" );										
+										sprintf(snum , "%d", if_lbl_count);	
+										strcat( auxString, snum );		
+										insert_Instruction( last_if_type, auxString, "", "", "", cp );	//IF	
+										cp++;
+
+										//jmp to else body 				
+				 						
+										//create string if_lbl_n for if lbl
+										strcpy( auxString, "else_lbl_" );										
+										sprintf(snum , "%d", if_lbl_count);	
+										strcat( auxString, snum );		
+										insert_Instruction( "JMP", auxString, "", "", "", cp );	//IF	
+										cp++;
+
+										$$=last_if_type;	//return last if 
+									}
 			;
+
+CompareToken :	tMIN 	{
+							$<variable>$="JL";
+						}
+			|	tMAY 	{
+							$<variable>$="JG";
+						}	
+			|	tEQU 	{
+							$<variable>$="JE";
+						}	
+			|	tDIF 	{
+							$<variable>$="JNE";
+						}		
+			|	tMAYEQU 	{
+							$<variable>$="JGE";
+						}	
+			|	tMINEQU 	{
+							$<variable>$="JLE";
+						}	
+			 ;
+
+CondValueEAX 	:	tVAR 	{		
+								if(lookup($1) != -1)
+								{		
+									insert_Instruction( "MOV", "eax", address_Concat($1), "", "", cp );	 //mov eax, [var] 	
+									cp++;			
+								}
+								else
+								{
+									strcpy( errTab[ce].error, "The variable " );
+									strcat( errTab[ce].error, $1 );
+									strcat( errTab[ce].error, " does not exist.\n" );		
+									errTab[ce].line = ce;
+									ce++;
+								}		
+							}
+				|	tNUM	{		
+								sprintf(snum, "%d", $1);
+								insert_Instruction( "MOV", "eax", snum, "", "", cp );	 //mov eax, num	
+								cp++;
+							}
+				;
+
+
+CondValueEBX :	tVAR 	{						
+								insert_Instruction( "MOV", "ebx", address_Concat($1), "", "", cp );	 //mov eax, [var] 	
+								cp++;
+							}
+				|	tNUM	{		
+								sprintf(snum, "%d", $1);
+								insert_Instruction( "MOV", "ebx", snum, "", "", cp );	 //mov eax, num	
+								cp++;
+							}
+				;
 
 While		:	tWHILE tPO Cond tPF tCO Body tCF	{printf("\n While trouve");}
 				;
