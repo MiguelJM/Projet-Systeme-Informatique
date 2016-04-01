@@ -47,11 +47,15 @@
 	struct stack else_stack;		//Keeps count of else statements to create labels
   	int if_lbl_count = 0; 		//Counter to determine the if labels to use
 
+	struct stack while_stack;		//Keeps count of while statements to create labels
+  	int while_lbl_count = 0; 		//Counter to determine the while labels to use
+
 	char snum[5];		//To convert numbers to strings
 	char auxString[32];	
 	char auxString2[32];
 
-	char last_if_type[8]; //Returns the last type of if retrieved	
+	char last_if_type[8]; 	 //Returns the last type of if retrieved	
+	char last_while_type[8]; //Returns the last type of while retrieved
 
 	int auxNum;	
 
@@ -78,7 +82,6 @@
 %token tPF
 %token tCO
 %token tCF
-%token tWHILE
 %token tPV
 %token tPLUS
 %token <variable> tVAR tSTRING 
@@ -88,14 +91,14 @@
 %token tMUL
 %token tDIV
 %token tPRINT
-%token <nb> tNUM tIF
+%token <nb> tNUM tIF tWHILE
 %token tV
 %token tCONST
 %token tGUILLEMETS
 %token tELSE 
 
-%type <variable> Cond CompareToken
-%type <nb> Expr If Val
+%type <variable> Cond CondWhile CompareToken Val Expr
+%type <nb> If 
 
 %right tE
 %left tPLUS tSOU
@@ -108,7 +111,7 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	If		{printf("\n Succesful test");}
+TestMessage	: 	Main		{printf("\n Succesful test");}
 			;
 
 Fonction	: 	tINT tVAR tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
@@ -182,7 +185,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 If			:	If 			{
 								//Erease the JMP else steps to build the else statement
 								else_stack = push(if_lbl_count-1, else_stack);	//Insert else label value to 
-								cp--;											//Erease the JMP ignore_else to write it later
+								cp--;											//Erease the JMP ignore_else to write it after the else body
 							}
 				Else 		
 			| 	tIF tPO Cond tPF	{
@@ -202,7 +205,7 @@ If			:	If 			{
 									if_stack = pop(if_stack);					//pop the value	
 									else_stack = pop(else_stack);				//pop the value	
 
-									//create string if_lbl_n for Jx						//Assign the correct Jx: Je, Jg, etc... ************************
+									//create string if_lbl_n for Jx						
 									strcpy( auxString, "if_lbl_" );										
 									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
@@ -221,7 +224,7 @@ If			:	If 			{
 									strcat( auxString, ":" );
 									insert_Instruction( auxString, "", "", "", "", $1+2 );	//If label	
 
-									//Put a JMP to jump the else statement after if Body 			**********
+									//Put a JMP to jump the else statement after if Body 			
 									strcpy( auxString, "else_lbl_" );										
 									sprintf(snum , "%d", auxNum);	
 									strcat( auxString, snum );
@@ -339,6 +342,88 @@ Cond		:	CondValueEAX CompareToken CondValueEBX 		{
 									}
 			;
 
+
+//TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
+
+CondWhile		:	CondValueEAX CompareToken CondValueEBX 		{									
+																	insert_Instruction( "CMP", "eax", "ebx", "", "", cp );	//COMPARISSON	
+																	cp++;
+																	strcpy (last_while_type, $2);
+																}
+				|  tPO CondWhile tPF tOR  	{												
+												/**If true jump to while_Begin**/
+
+												//create string while_BEG_lbl_n 
+												strcpy( auxString, "while_BEG_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );			
+												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												cp++;
+											}
+				 tPO CondWhile tPF 			{
+						 						/**If true jump to while_Begin**/
+
+												//create string while_BEG_lbl_n 
+												strcpy( auxString, "while_BEG_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );				
+												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												cp++;	
+
+												//If false, exit the loop 				
+				 						
+												//create string while_END_lbl_n 
+												strcpy( auxString, "while_END_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );		
+												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+												cp++;
+
+												$$=last_while_type;	//return last if 
+											}
+				| tPO CondWhile tPF tAND 	{											
+												/**If true jump to next if**/
+
+												//create string if_lbl_n for if lbl
+												strcpy( auxString, "$+4" );			
+												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												cp++;
+
+												//If false, exit the loop 				
+				 						
+												//create string while_END_lbl_n 
+												strcpy( auxString, "while_END_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );		
+												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+												cp++;
+										}
+				tPO CondWhile tPF		{
+						 						/**If true jump to while_Begin**/
+
+												//create string while_BEG_lbl_n 
+												strcpy( auxString, "while_BEG_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );				
+												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												cp++;
+
+												//If false, exit the loop 				
+				 						
+												//create string while_END_lbl_n 
+												strcpy( auxString, "while_END_lbl_" );										
+												sprintf(snum , "%d", while_lbl_count);	
+												strcat( auxString, snum );		
+												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+												cp++;
+
+												$$=last_while_type;	//return last if 
+										}
+			;
+
+
+
+
 CompareToken :	tMIN 	{
 							$<variable>$="JL";
 						}
@@ -382,9 +467,20 @@ CondValueEAX 	:	tVAR 	{
 				;
 
 
-CondValueEBX :	tVAR 	{						
-								insert_Instruction( "MOV", "ebx", address_Concat($1), "", "", cp );	 //mov eax, [var] 	
-								cp++;
+CondValueEBX :	tVAR 		{			
+								if(lookup($1) != -1)
+								{				
+									insert_Instruction( "MOV", "ebx", address_Concat($1), "", "", cp );	 //mov eax, [var] 	
+									cp++;	
+								}
+								else
+								{
+									strcpy( errTab[ce].error, "The variable " );
+									strcat( errTab[ce].error, $1 );
+									strcat( errTab[ce].error, " does not exist.\n" );		
+									errTab[ce].line = ce;
+									ce++;
+								}	
 							}
 				|	tNUM	{		
 								sprintf(snum, "%d", $1);
@@ -393,7 +489,75 @@ CondValueEBX :	tVAR 	{
 							}
 				;
 
-While		:	tWHILE tPO Cond tPF tCO Body tCF	{printf("\n While trouve");}
+While		:	tWHILE 								{	
+														//create string while_lbl_n: for the while begin
+														strcpy( auxString, "while_lbl_" );										
+														sprintf(snum , "%d", while_lbl_count);	
+														strcat( auxString, snum );		
+														strcat( auxString, ":" );	
+
+														insert_Instruction( auxString, "", "", "", "", cp );	//WHILE:
+														cp++;		
+
+														$1=while_lbl_count;										//Store the while number
+			
+													}
+				tPO CondWhile tPF 					{ 	
+														/**If true jump to while_Begin**/
+
+														//create string while_BEG_lbl_n 
+														strcpy( auxString, "while_BEG_lbl_" );										
+														sprintf(snum , "%d", while_lbl_count);	
+														strcat( auxString, snum );				
+														insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+														cp++;
+
+														//If false, exit the loop 				
+						 						
+														//create string while_END_lbl_n 
+														strcpy( auxString, "while_END_lbl_" );										
+														sprintf(snum , "%d", while_lbl_count);	
+														strcat( auxString, snum );		
+														insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+														cp++;		
+
+														//create string while_BEG_lbl_n: for the while begin
+
+														/*Update while label counter*/
+														auxNum = while_lbl_count;	//take if label value from the stack	
+														while_stack = push(while_lbl_count, while_stack);		//Insert while label value to 						
+														while_lbl_count++;	
+
+														strcpy( auxString, "while_BEG_lbl_" );										
+														sprintf(snum , "%d", auxNum);	
+														strcat( auxString, snum );		
+														strcat( auxString, ":" );	
+
+														insert_Instruction( auxString, "", "", "", "", cp );	//WHILE:
+														cp++;		
+													}
+				tCO Body tCF						{						
+														auxNum = while_stack.stk[while_stack.top];	//take if label value from the stack	
+														while_stack = pop(while_stack);					//pop the value		
+
+														//create string while_lbl_n: for the while begin
+														strcpy( auxString, "while_lbl_" );										
+														sprintf(snum , "%d", auxNum);	
+														strcat( auxString, snum );
+
+														//In case end of while is reached, return to the condition check at the begining														
+														insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP WHILE
+														cp++;		
+
+														//create string while_end_lbl_n: for the while end
+														strcpy( auxString, "while_END_lbl_" );										
+														sprintf(snum , "%d", auxNum);	
+														strcat( auxString, snum );		
+														strcat( auxString, ":" );	
+
+														insert_Instruction( auxString, "", "", "", "", cp );	//WHILE_END:
+														cp++;	
+													}
 				;
 
 Print 		:	tPRINT tPO PrintCont tPF tPV		{printf("\n Print trouve");}				
@@ -566,18 +730,22 @@ Val			:	tNUM		{
 								if( tempCounter == 1 )
 								{
 									tempCounter = 2;
-									$$=lookup("0temp1");	
+									//$$=lookup("0temp1");	
 								}		
 								else
 								{
 									tempCounter = 1;
-									$$=lookup("0temp2");	
+									//$$=lookup("0temp2");	
 								}
+
+								sprintf(snum , "%d", $1);	
+								$$=snum;
 							}
 				| tVAR		{	
 								if(lookup($1) != -1)
 								{
-									$$=lookup($1);			
+									//$$=lookup($1);
+									$$=address_Concat($1);			
 								}
 								else
 								{
@@ -591,11 +759,11 @@ Val			:	tNUM		{
 			;
 
 Expr			:	Expr tPLUS Expr	{ 	
-										fprintf(fp, "mov eax, [%d]\n", $1); //eax = [a/0temp1]
-										 insert_Instruction( "mov", "eax", address_Concat(lookupName($1)), "", "", cp );
+										fprintf(fp, "mov eax, [%s]\n", $1); //eax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", $1, "", "", cp );
 										 cp++;			
-									    fprintf(fp, "mov ebx, [%d]\n", $3); //ebx = [b/0temp2]
-										 insert_Instruction( "mov", "ebx", address_Concat(lookupName($3)), "", "", cp );
+									     fprintf(fp, "mov ebx, [%s]\n", $3); //ebx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", $3, "", "", cp );
 									     cp++;
 
 									    fprintf(fp, "add eax, ebx\n"); 		//eax = eax + ebx
@@ -606,11 +774,11 @@ Expr			:	Expr tPLUS Expr	{
 										printf("\n Somme trouvee");
 									}
 				|	Expr tSOU Expr	{	
-										fprintf(fp, "mov eax, [%d]\n", $1); //eax = [a/0temp1]
-										 insert_Instruction( "mov", "eax", address_Concat(lookupName($1)), "", "", cp );
+										fprintf(fp, "mov eax, [%s]\n", $1); //eax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", $1, "", "", cp );
 										 cp++;			
-									    fprintf(fp, "mov ebx, [%d]\n", $3); //ebx = [b/0temp2]
-										 insert_Instruction( "mov", "ebx", address_Concat(lookupName($3)), "", "", cp );
+									    fprintf(fp, "mov ebx, [%s]\n", $3); //ebx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", $3, "", "", cp );
 									     cp++;
 
 									    fprintf(fp, "sub eax, ebx\n"); 		//eax - ebx
@@ -621,11 +789,11 @@ Expr			:	Expr tPLUS Expr	{
 										printf("\n Substraction trouvee");
 									}
 				|	Expr tMUL Expr	{	
-										fprintf(fp, "mov ax, [%d]\n", $1); //ax = [a/0temp1]
-										 insert_Instruction( "mov", "eax", address_Concat(lookupName($1)), "", "", cp );
+										fprintf(fp, "mov ax, [%s]\n", $1); //ax = [a/0temp1]
+										 insert_Instruction( "mov", "eax", $1, "", "", cp );
 										 cp++;			
-									    fprintf(fp, "mov bx, [%d]\n", $3); //bx = [b/0temp2]
-										 insert_Instruction( "mov", "ebx", address_Concat(lookupName($3)), "", "", cp );
+									    fprintf(fp, "mov bx, [%s]\n", $3); //bx = [b/0temp2]
+										 insert_Instruction( "mov", "ebx", $3, "", "", cp );
 									     cp++;
 
 									    fprintf(fp, "mul bx\n"); 			//ax * bx

@@ -1,3 +1,9 @@
+mov [a], [b]
+mov eax, [[a]]
+mov ebx, [1]
+add eax, ebx
+mov [97], eax
+mov [a], 6
 mov [a], 1
 mov [a], 12
 mov [a], 123
@@ -23,30 +29,59 @@ Label Table :
 ----------------------------------------------------- 
  Instruction | param1 | param2 | param 3 | comments |
 ----------------------------------------------------- 
+ section        .text                                  ; 
+ global         _start                                 ; 
+ _start:                                               ; 
  MOV            eax          [a]                       ; 
  MOV            ebx          [b]                       ; 
  CMP            eax          ebx                       ; 
- JLE            if_lbl_0                               ; 
- MOV            eax          [a]                       ; 
- MOV            ebx          [b]                       ; 
- CMP            eax          ebx                       ; 
- JLE            if_lbl_0                               ; 
- MOV            eax          [a]                       ; 
- MOV            ebx          [b]                       ; 
- CMP            eax          ebx                       ; 
- JLE            if_lbl_0                               ; 
- MOV            eax          [a]                       ; 
- MOV            ebx          [b]                       ; 
- CMP            eax          ebx                       ; 
- JG             if_lbl_0                               ; 
- JMP            else_lbl_0                             ; 
- JG             if_lbl_0                               ; 
- JMP            else_lbl_0                             ; 
- JG             if_lbl_0                               ; 
- JMP            else_lbl_0                             ; 
- JG             if_lbl_0                               ; 
+ JE             if_lbl_0                               ; 
  JMP            else_lbl_0                             ; 
  if_lbl_0:                                             ; 
+ mov            eax          [b]                       ; 
+ mov            [a]          eax                       ; 
+ while_lbl_0:                                          ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          10                        ; 
+ CMP            eax          ebx                       ; 
+ JE             while_BEG_lbl_0                           ; 
+ JMP            while_END_lbl_0                           ; 
+ while_BEG_lbl_0:                                        ; 
+ mov            eax          [a]                       ; 
+ mov            ebx          1                         ; 
+ add            eax          ebx                       ; 
+ mov            [a]          eax                       ; 
+ JMP            while_lbl_0                            ; 
+ while_END_lbl_0:                                        ; 
+ JMP            else_lbl_0_ignr                           ; 
+ else_lbl_0:                                           ; 
+ mov            eax          6                         ; 
+ mov            [a]          eax                       ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          [b]                       ; 
+ CMP            eax          ebx                       ; 
+ JLE            if_lbl_1                               ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          [b]                       ; 
+ CMP            eax          ebx                       ; 
+ JLE            $+4                                    ; 
+ JMP            else_lbl_1                             ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          [b]                       ; 
+ CMP            eax          ebx                       ; 
+ JLE            if_lbl_1                               ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          [b]                       ; 
+ CMP            eax          ebx                       ; 
+ JG             if_lbl_1                               ; 
+ JMP            else_lbl_1                             ; 
+ JG             if_lbl_1                               ; 
+ JMP            else_lbl_1                             ; 
+ JG             if_lbl_1                               ; 
+ JMP            else_lbl_1                             ; 
+ JG             if_lbl_1                               ; 
+ JMP            else_lbl_1                             ; 
+ if_lbl_1:                                             ; 
  mov            eax          1                         ; 
  mov            [a]          eax                       ; 
  mov            eax          12                        ; 
@@ -59,8 +94,8 @@ Label Table :
  mov            [a]          eax                       ; 
  mov            eax          123456                    ; 
  mov            [a]          eax                       ; 
- JMP            else_lbl_0_ignr                           ; 
- else_lbl_0:                                           ; 
+ JMP            else_lbl_1_ignr                           ; 
+ else_lbl_1:                                           ; 
  mov            eax          6                         ; 
  mov            [a]          eax                       ; 
  mov            eax          17                        ; 
@@ -68,34 +103,35 @@ Label Table :
  MOV            eax          [a]                       ; 
  MOV            ebx          [b]                       ; 
  CMP            eax          ebx                       ; 
- JNE            if_lbl_1                               ; 
+ JNE            if_lbl_2                               ; 
  MOV            eax          [a]                       ; 
  MOV            ebx          [b]                       ; 
  CMP            eax          ebx                       ; 
- JGE            if_lbl_1                               ; 
- JMP            else_lbl_1                             ; 
- JGE            if_lbl_1                               ; 
- JMP            else_lbl_1                             ; 
- if_lbl_1:                                             ; 
- mov            eax          0                         ; 
- mov            [a]          eax                       ; 
- JMP            else_lbl_1_ignr                           ; 
- else_lbl_1:                                           ; 
- mov            eax          [b]                       ; 
- mov            [a]          eax                       ; 
- else_lbl_1_ignr:                                        ; 
- MOV            eax          [a]                       ; 
- MOV            ebx          [b]                       ; 
- CMP            eax          ebx                       ; 
- JE             if_lbl_2                               ; 
+ JGE            if_lbl_2                               ; 
+ JMP            else_lbl_2                             ; 
+ JGE            if_lbl_2                               ; 
  JMP            else_lbl_2                             ; 
  if_lbl_2:                                             ; 
- mov            eax          [b]                       ; 
+ mov            eax          0                         ; 
  mov            [a]          eax                       ; 
  JMP            else_lbl_2_ignr                           ; 
  else_lbl_2:                                           ; 
  mov            eax          [b]                       ; 
  mov            [a]          eax                       ; 
  else_lbl_2_ignr:                                        ; 
+ MOV            eax          [a]                       ; 
+ MOV            ebx          [b]                       ; 
+ CMP            eax          ebx                       ; 
+ JE             if_lbl_3                               ; 
+ JMP            else_lbl_3                             ; 
+ if_lbl_3:                                             ; 
+ mov            eax          [b]                       ; 
+ mov            [a]          eax                       ; 
+ JMP            else_lbl_3_ignr                           ; 
+ else_lbl_3:                                           ; 
+ mov            eax          [b]                       ; 
+ mov            [a]          eax                       ; 
+ else_lbl_3_ignr:                                        ; 
+ else_lbl_1_ignr:                                        ; 
  else_lbl_0_ignr:                                        ; 
-Number of lines : 76
+Number of lines : 106

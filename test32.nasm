@@ -80,50 +80,78 @@ IFOR:
 
     ;Implementacion de if con '&&'
     ;Contenido
-    mov eax, 10
-    mov ebx, 10
-    ;Comparacion
-    cmp eax, ebx 
+;    mov eax, 10
+;    mov ebx, 10
+;    ;Comparacion
+;    cmp eax, ebx 
 
     ;If
-    je $+4       ;Saltar el else 
+;    je $+4       ;Saltar el else 
 
     ;ir a Else       
-    jmp  exit     
+;    jmp  exit     
     
+
     ;Contenido
-    mov eax, 10
-    mov ebx, 10
+;    mov eax, 10
+;    mov ebx, 10
     ;Comparacion
-    cmp eax, ebx 
+;    cmp eax, ebx 
 
     ;&& If
-    je $+4       ;Saltar el else   
+;    je $+4       ;Saltar el else   
 
     ;ir a else      
-    jmp  exit 
+ ;   jmp  exit 
 
     ;Contenido
-    mov eax, 10
-    mov ebx, 10
+ ;   mov eax, 10
+ ;   mov ebx, 10
     ;Comparacion
-    cmp eax, ebx 
+ ;   cmp eax, ebx 
 
     ;&& Ultimo If
-    je $+4 
+ ;   je $+4 
 
     ;Ultimo ir a else      
-    jmp  exit 
+  ;  jmp  exit 
 
 ;If Label
-IFAND:
-    mov eax, 109
+;IFAND:
+;    mov eax, 109
+;    mov [num1], eax
+;    mov eax, [num1]
+;    push eax                
+;    push fmt
+;    call printf             
+;    add esp, 8  
+
+
+    ;While loop
+    mov eax, 0
     mov [num1], eax
+
+WHILE:
+    ;If
     mov eax, [num1]
-    push eax                ; eax = 1
+    ;Comparacion
+    cmp eax, 10 
+    je EXIT_WHILE
+
+    ;Body
+    mov eax, [num1]
+    inc eax    
+    mov [num1], eax
+    push eax                
     push fmt
     call printf             
-    add esp, 8  
+    add esp, 8 
+
+    ;return to if
+    jmp WHILE
+
+
+EXIT_WHILE:
 
 
 

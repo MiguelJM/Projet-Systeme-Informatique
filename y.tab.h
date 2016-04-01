@@ -58,19 +58,19 @@ extern int yydebug;
     tPF = 268,
     tCO = 269,
     tCF = 270,
-    tWHILE = 271,
-    tPV = 272,
-    tPLUS = 273,
-    tVAR = 274,
-    tSTRING = 275,
-    tE = 276,
-    tMAIN = 277,
-    tSOU = 278,
-    tMUL = 279,
-    tDIV = 280,
-    tPRINT = 281,
-    tNUM = 282,
-    tIF = 283,
+    tPV = 271,
+    tPLUS = 272,
+    tVAR = 273,
+    tSTRING = 274,
+    tE = 275,
+    tMAIN = 276,
+    tSOU = 277,
+    tMUL = 278,
+    tDIV = 279,
+    tPRINT = 280,
+    tNUM = 281,
+    tIF = 282,
+    tWHILE = 283,
     tV = 284,
     tCONST = 285,
     tGUILLEMETS = 286,
@@ -91,19 +91,19 @@ extern int yydebug;
 #define tPF 268
 #define tCO 269
 #define tCF 270
-#define tWHILE 271
-#define tPV 272
-#define tPLUS 273
-#define tVAR 274
-#define tSTRING 275
-#define tE 276
-#define tMAIN 277
-#define tSOU 278
-#define tMUL 279
-#define tDIV 280
-#define tPRINT 281
-#define tNUM 282
-#define tIF 283
+#define tPV 271
+#define tPLUS 272
+#define tVAR 273
+#define tSTRING 274
+#define tE 275
+#define tMAIN 276
+#define tSOU 277
+#define tMUL 278
+#define tDIV 279
+#define tPRINT 280
+#define tNUM 281
+#define tIF 282
+#define tWHILE 283
 #define tV 284
 #define tCONST 285
 #define tGUILLEMETS 286
@@ -114,7 +114,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 62 "analysgramAssExp.yacc" /* yacc.c:1909  */
+#line 66 "analysgramAssExp.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
