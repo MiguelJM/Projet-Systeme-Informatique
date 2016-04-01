@@ -1,0 +1,7 @@
+#!/bin/bash
+#Script to launch ISE with its license
+
+export LM_LICENCE_FILE=2100@srv-gei-ens1
+export XILINXD_LICENSE_FILE=2100@srv-gei-ens1
+
+/usr/local/Xilinx.ISE/13.4/ISE_DS/ISE/bin/lin64/ise
