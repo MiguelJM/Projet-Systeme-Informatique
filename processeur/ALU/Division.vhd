@@ -24,6 +24,14 @@ use IEEE.STD_LOGIC_unsigned.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity Division is
+	generic(
+		n : integer := 8;
+		m : integer := 8
+		);
+	port(
+		RST : in std_logic;
+		CLK : in std_logic;
+		A   
 end Division;
 
 architecture Behavioral of Division is

@@ -83,7 +83,8 @@ component Multiplication is
 		);
 end component;
 
-signal Qn,Qp : std_logic_vector(7 downto 0);
+signal Qn,Qp : std_logic_vector(n-1 downto 0);
+signal St : std_logic_vector(n+m-1 downto 1);
 begin
 	Secuencial: process(RST;CLK)
 	begin
@@ -97,12 +98,13 @@ begin
 	Combinatoire: process(Ctrl_Alu, Ap, Bp)
 	begin
 	 case Ctrl_Alu is
-		when "00" => Suma : Somme port map(Ap,Bp,Sp,Np,Op,Zp,Cp);
-		when "01" => Resta : Soustraction port map(Ap,Bp,Sp,Np,Op,Zp,Cp);
-		when "10" => Mult : Multiplication port map(Ap,Bp,Sp);
-		when others => Sb <= A / B;
+		when "00" => Suma : Somme port map(Ap,Bp,St,Np,Op,Zp,Cp);
+		when "01" => Resta : Soustraction port map(Ap,Bp,St,Np,Op,Zp,Cp);
+		when "10" => Mult : Multiplication port map(Ap,Bp,St);
+		when others => Sp <= (others => '0');
 	end case;
-
+	
+	Sp <= St;
 
 end Behavioral;
 
