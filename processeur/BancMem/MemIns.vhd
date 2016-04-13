@@ -2,7 +2,7 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    11:36:51 04/08/2016 
+-- Create Date:    09:40:42 04/13/2016 
 -- Design Name: 
 -- Module Name:    MemIns - Behavioral 
 -- Project Name: 
@@ -33,21 +33,27 @@ use IEEE.numeric_std.all;
 --use UNISIM.VComponents.all;
 
 entity MemIns is
-	generic(
-		n : integer := 8
-		);
 	port(
-		Adr : in  std_logic_vector(n-1 downto 0);
+		Adr : in  std_logic_vector(7 downto 0);
 		CLK : in  std_logic;
-		OUTs: out std_logic-vector(n*4-1 downto 0)
+		OUTs: out std_logic-vector(31 downto 0)
 		);
 end MemIns;
 
 architecture Behavioral of MemIns is
-
+signal counter : std_logic_vector(7 downto 0) := (others => '0');
+signal DummyQ  : std_logic_vector(31 downto 0);
+type TABLE is array (7 downto 0) of std_logic_vector(31 downto 0);
 begin
-	
-
-
+	process(CLK,Adr)
+	begin
+		if(CLK'event and CLK='1') then
+			counter <= counter + 1;
+		elsif(counter = '255') then
+			counter <= 0;
+		end if;
+		DummyQ <= Adr(counter);
+	end process;
+	OUTs <= DummyQ;
 end Behavioral;
 

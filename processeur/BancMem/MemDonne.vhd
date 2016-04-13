@@ -58,8 +58,16 @@ begin
 		end if;
 	end process Secuencial;
 	
-	Combinatoire: process
-
+	--Qn <= INT when RW = '1' else Qp;
+	Combinatoire: process(Qp,RW,Adr,INT)
+	begin
+		case RW is
+			when "1" =>	Qn <= INT;		--Ecriture
+			when others =>	Qn <= Qp;	--Lecture
+		end case;
+	end process Combinatoire;
+	
+	OUTs <= Qp;
 
 end Behavioral;
 
