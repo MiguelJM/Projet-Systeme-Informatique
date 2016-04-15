@@ -25,11 +25,18 @@ use IEEE.numeric_std.all;
 
 entity Processor is
 	port(
-		
+		RST 	: in  std_logic;
+		CLK 	: in  std_logic;
+		--Entradas
+		--Salidas
+		QAp	: out std_logic_vector(7 downto 0);
+		QBp	: out std_logic_vector(7 downto 0)
+		);	
 end Processor;
 
 architecture Behavioral of Processor is
 
+--U01
 component MemIns is
 	port(
 		Adr : in  std_logic_vector(7 downto 0);
@@ -38,6 +45,7 @@ component MemIns is
 		);
 end component;
 
+--U02
 component ModDiv is
 	port(
 		INS 	: in std_logic_vector(31 downto 0);
@@ -48,6 +56,7 @@ component ModDiv is
 		);
 end component;
 
+--U03
 component LI_DI is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -61,6 +70,7 @@ component LI_DI is
 		);
 end component;
 
+--U04
 component BancReg is
 	port(
 		RST 	: in  std_logic;
@@ -76,7 +86,9 @@ component BancReg is
 end component;
 
 --Mulitplexor
+--U05
 
+--U06
 component DI_EX is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -91,9 +103,12 @@ component DI_EX is
 end component;
 
 --Modified ALU
+--U07
 
 --Multiplexor
+--U08
 
+--U09
 component EX_Mem is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -105,6 +120,7 @@ component EX_Mem is
 		);
 end component;
 
+--U10
 component MemDonne is
 	port(
 		RST : in  std_logic;
@@ -117,7 +133,9 @@ component MemDonne is
 end component;
 
 --Multiplexor
+--U11
 
+--U12
 component Mem_RE is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -132,6 +150,9 @@ end component;
 begin
 
 --Unit Declaration
+
+	U01 : MemIns port map
+	U01 : MemIns port map
 
 end Behavioral;
 
