@@ -50,9 +50,16 @@
   	int if_begin_count = 0; 			//Counter to determine the if labels to use
   	int else_begin_count = 0; 			//Counter to determine the else labels to use
 
-  	int if_lbl_count = 0; 		//Counter to determine the if labels to use
+  	int if_lbl_count = 0; 				//Counter to determine the if labels to use
 
-	struct stack while_begin;		//Stores the position after comparissons of the while (to add the last comparisson)
+	struct stack while_last_cond;		//Stores the position after comparissons of the while (to add the last comparisson)
+
+	struct stack while_begin_iter_stack;			//Keep count of number of while begin lines to add
+	struct stack while_begin_stack;						//Allows to assign while begin code lines to jump instructions
+	struct stack while_end_iter_stack;				//Keep count of number of while end lines to correct
+	struct stack while_end_stack;							//Allows to assign while end code lines to jump instructions
+  	int while_begin_count = 0; 						//Counter to determine the while begin labels to use
+  	int while_end_count = 0; 						//Counter to determine the while end labels to use
 
 	struct stack while_stack;		//Keeps count of while statements to create labels
   	int while_lbl_count = 0; 		//Counter to determine the while labels to use
@@ -215,9 +222,9 @@ If			:	If tELSE tCO Body tCF			{
 
 													if(if_iter_stack.top != -1)	//If there is one jmp to if begin
 													{
-														if_begin_count = if_iter_stack.stk[if_iter_stack.top];	//take if label value from the stack	
+														auxNum = if_iter_stack.stk[if_iter_stack.top];	//take if label value from the stack	
 														if_iter_stack = pop(if_iter_stack);						//pop the value		
-														for(int i=0  ; i<if_begin_count ; i++)	
+														for(int i=0  ; i<auxNum ; i++)	
 														{ 										
 															sprintf(snum , "%d", $2+1);									//If begin	
 															strcpy( labTab[if_stack.stk[if_stack.top]].param1, snum );	//put if begin on second parameter of jmp instruct
@@ -225,12 +232,11 @@ If			:	If tELSE tCO Body tCF			{
 														}
 													}													
 
-													printf("Else stack : %d \n", else_iter_stack.top);
 													if(else_iter_stack.top != -1)	//If there is one jmp to else begin
 													{
-														else_begin_count = else_iter_stack.stk[else_iter_stack.top];	//take if label value from the stack	
+														auxNum = else_iter_stack.stk[else_iter_stack.top];	//take if label value from the stack	
 														else_iter_stack = pop(else_iter_stack);							//pop the value		
-														for(int i=0  ; i<else_begin_count ; i++)	
+														for(int i=0  ; i<auxNum ; i++)	
 														{ 										
 															sprintf(snum , "%d", cp);										//Else begin	
 															strcpy( labTab[else_stack.stk[else_stack.top]].param2, snum );	//put if begin on second parameter of jmp instruct
@@ -286,78 +292,41 @@ Cond		:	CondValue CompareToken CondValue 		{
 //TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
 
 CondWhile		:	CondValue CompareToken CondValue 	{						
-															insert_Instruction( $2, "@X", $1, $3, "", cp );	//COMPARISSON	$1 and $3 not working
+															insert_Instruction( $2, "@X", $1, $3, "", cp );			//COMPARISSON	$1 and $3 not working
 															cp++;
 														}
-				|  tPO CondWhile tPF tOR  	{												
-												/**If true jump to while_Begin**/
-
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );			
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
-												cp++;
-											}
-				 tPO CondWhile tPF 			{
-						 						/**If true jump to while_Begin**/
-
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );				
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+				|  tPO CondWhile tPF tOR  	{											
+												sprintf(snum , "%d", cp+2);										
+												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
 												cp++;	
 
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+												while_begin_count++;
+												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
+												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
-
-												$$=last_while_type;	//return last if 
 											}
-				| tPO CondWhile tPF tAND 	{											
-												/**If true jump to next if**/
+				 tPO CondWhile tPF 			{											
+												sprintf(snum , "%d", cp+2);										
+												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
+												cp++;	
 
-												//create string if_lbl_n for if lbl
-												strcpy( auxString, "$+4" );			
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												while_begin_count++;
+												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
+												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
-
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
-												cp++;
-										}
-				tPO CondWhile tPF		{
-						 						/**If true jump to while_Begin**/
-
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );				
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
-												cp++;
-
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
-												cp++;
-
-												$$=last_while_type;	//return last if 
-										}
+											}
+				| tPO CondWhile tPF tAND 	{		
+												while_end_count++;
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
+												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
+												cp++;	
+											}
+				tPO CondWhile tPF			{			
+												while_end_count++;
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
+												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
+												cp++;	
+											}
 			;
 
 
@@ -397,8 +366,14 @@ CondValue 	 :	tVAR 		{
 				;
 
 ConditionWhile 	: 	tPO CondWhile tPF	{											
-											while_begin = push(cp, while_begin);	//Store while begin
-											cp++;		
+											while_last_cond = push(cp, while_last_cond);	//Store while begin
+											cp++;	
+
+											while_begin_iter_stack = push(while_begin_count, while_begin_iter_stack);	//store while begin iterations to later assign while begin line
+											while_begin_count = 0;
+
+											while_end_iter_stack = push(while_end_count, while_end_iter_stack);			//store while end iterations to later assign while end line
+											while_end_count = 0;	
 										}
 				;
 
@@ -407,15 +382,39 @@ While		:	tWHILE 								{
 			
 													}
 				ConditionWhile tCO Body tCF			{				
-														auxNum = while_begin.stk[while_begin.top];
-														while_begin = pop(while_begin);							//pop the value		
+														int whileBegin = while_last_cond.stk[while_last_cond.top];
+														while_last_cond = pop(while_last_cond);							//pop the value		
 
 														sprintf(snum , "%d", cp+1);										
-														insert_Instruction( "JMF", snum, "", "", "",  auxNum);	//Jump to while end in case condition is not met
+														insert_Instruction( "JMF", snum, "", "", "",  whileBegin);	//Jump to while end in case condition is not met
 
 														sprintf(snum , "%d", $1);												
 														insert_Instruction( "JMP", snum, "", "", "", cp );	//JMP to while begin
 														cp++;
+
+														if(while_begin_iter_stack.top != -1)	//If there is one jmp to if begin
+														{
+															auxNum = while_begin_iter_stack.stk[while_begin_iter_stack.top];	//take if label value from the stack	
+															while_begin_iter_stack = pop(while_begin_iter_stack);						//pop the value		
+															for(int i=0  ; i<auxNum ; i++)	
+															{ 										
+																sprintf(snum , "%d", whileBegin);									//while begin	
+																strcpy( labTab[while_begin_stack.stk[while_begin_stack.top]].param1, snum );	//put while begin on second parameter of jmp instruct
+																while_begin_stack = pop(while_begin_stack);				
+															}
+														}													
+
+														if(while_end_iter_stack.top != -1)	//If there is one jmp to else begin
+														{
+															auxNum = while_end_iter_stack.stk[while_end_iter_stack.top];	//take if label value from the stack	
+															while_end_iter_stack = pop(while_end_iter_stack);							//pop the value		
+															for(int i=0  ; i<auxNum ; i++)	
+															{ 										
+																sprintf(snum , "%d", cp);										//while end	
+																strcpy( labTab[while_end_stack.stk[while_end_stack.top]].param2, snum );	//put while end on second parameter of jmp instruct
+																while_end_stack = pop(while_end_stack);				
+															}
+														}
 													}
 				;
 
@@ -593,7 +592,8 @@ Expr			:	Expr tPLUS Expr	{
 %%
 
 void yyerror(char *s) {
-	fprintf(stderr, "%s\n", s);
+	printf("%s\n", s);
+	//fprintf(stderr, "%s\n", s);
 }
 
 /*Error management*/
@@ -614,11 +614,11 @@ void print_Error_Table()
 void print_Label_Table()
 {
   	fprintf(fp,"\nLabel Table :\n----------------------------------------------------- \n");
-	fprintf(fp, " Instruction | param1 | param2 | param 3 | comments |\n");
+	fprintf(fp, " \tInstruction | param1 | param2 | param 3 | comments |\n");
   	fprintf(fp,"----------------------------------------------------- \n");
 	for (int i = 0 ; i < cp; i++)
 	{
-		fprintf(fp, " %-14s %-12s %-12s %-12s ;%-s \n", labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3, labTab[i].comments );
+		fprintf(fp, "%-3d:  %-14s %-12s %-12s %-12s ;%-s \n", i, labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3, labTab[i].comments );
 	}
 }
 
@@ -640,9 +640,6 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 	strcpy( labTab[counter].comments, comment );
 }
 /*End of label Table Management*/
-
-
-
 
 
 
@@ -685,9 +682,6 @@ int main(void) {
 	insert("d", 0);
 	insert("e", 1);
 	insert("g", 1);
-	insert("arnold", 0);
-	insert("arnoldo", 0);
-	lookup("arnold");
 	lookup("e");*/
 
 
