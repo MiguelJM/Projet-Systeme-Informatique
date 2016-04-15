@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    11:33:50 04/08/2016 
+-- Create Date:    10:12:25 04/15/2016 
 -- Design Name: 
--- Module Name:    MemDonne - Behavioral 
+-- Module Name:    BancReg - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -23,39 +23,32 @@ use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
-entity MemDonne is
+entity BancReg is
 	port(
-		RST : in  std_logic;
-		CLK : in  std_logic;
-		Adr : in  std_logic_vector(7 downto 0);
-		INT : in  std_logic_vector(7 downto 0);
-		RW  : in  std_logic;
-		OUTs: out std_logic_vector(7 downto 0)
-	);
-end MemDonne;
+		RST 	: in  std_logic;
+		CLK 	: in  std_logic;
+		AA 	: in  std_logic_vector(3 downto 0);
+		AB 	: in  std_logic_vector(3 downto 0);
+		AW 	: in  std_logic_vector(3 downto 0);
+		W 		: in  std_logic;
+		DATA	: in  std_logic_vector(7 downto 0);
+		QA		: out std_logic_vector(7 downto 0);
+		QB		: out std_logic_vector(7 downto 0)
+		);
+end BancReg;
 
-architecture Behavioral of MemDonne is
+architecture Behavioral of BancReg is
 signal Qp,Qn : std_logic_vector(7 downto 0);
 begin
-	Secuencial: process(RST,CLK)
+	Secuential: process(RST,CLK)
 	begin
 		if(RST = '0') then
 			Qp <= (others => '0');
 		elsif(CLK'event and CLK = '1') then
 			Qp <= Qn;
 		end if;
-	end process Secuencial;
-	
-	--Qn <= INT when RW = '1' else Qp;
-	Combinatoire: process(Qp,RW,Adr,INT)
-	begin
-		case RW is
-			when "1" =>	Qn <= INT;		--Ecriture
-			when others =>	Qn <= Qp;	--Lecture
-		end case;
-	end process Combinatoire;
-	
-	OUTs <= Qp;
+	end process Secuential;
+
 
 end Behavioral;
 
