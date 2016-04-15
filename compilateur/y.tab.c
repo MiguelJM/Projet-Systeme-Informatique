@@ -115,9 +115,16 @@
   	int if_begin_count = 0; 			//Counter to determine the if labels to use
   	int else_begin_count = 0; 			//Counter to determine the else labels to use
 
-  	int if_lbl_count = 0; 		//Counter to determine the if labels to use
+  	int if_lbl_count = 0; 				//Counter to determine the if labels to use
 
-	struct stack while_begin;		//Stores the position after comparissons of the while (to add the last comparisson)
+	struct stack while_last_cond;		//Stores the position after comparissons of the while (to add the last comparisson)
+
+	struct stack while_begin_iter_stack;			//Keep count of number of while begin lines to add
+	struct stack while_begin_stack;						//Allows to assign while begin code lines to jump instructions
+	struct stack while_end_iter_stack;				//Keep count of number of while end lines to correct
+	struct stack while_end_stack;							//Allows to assign while end code lines to jump instructions
+  	int while_begin_count = 0; 						//Counter to determine the while begin labels to use
+  	int while_end_count = 0; 						//Counter to determine the while end labels to use
 
 	struct stack while_stack;		//Keeps count of while statements to create labels
   	int while_lbl_count = 0; 		//Counter to determine the while labels to use
@@ -134,7 +141,7 @@
 	char retrievedString[64]; //Used to store user input in the printf instructions.
 	char stringPrinter[4]; 	//Used to create the printf instructions.
 
-#line 138 "y.tab.c" /* yacc.c:339  */
+#line 145 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -238,12 +245,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 73 "analysGram.yacc" /* yacc.c:355  */
+#line 80 "analysGram.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 247 "y.tab.c" /* yacc.c:355  */
+#line 254 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -258,7 +265,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 262 "y.tab.c" /* yacc.c:358  */
+#line 269 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -500,16 +507,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   130
+#define YYLAST   132
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  33
+#define YYNTOKENS  34
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  22
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  50
+#define YYNRULES  51
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  112
+#define YYNSTATES  114
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -528,7 +535,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    33,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -558,12 +565,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   117,   117,   120,   130,   131,   132,   133,   134,   135,
-     138,   155,   173,   192,   203,   207,   247,   251,   251,   271,
-     271,   288,   292,   292,   323,   323,   366,   369,   372,   378,
-     393,   399,   405,   405,   422,   430,   431,   432,   443,   454,
-     465,   476,   487,   511,   536,   553,   561,   568,   576,   583,
-     584
+       0,   124,   124,   127,   137,   138,   139,   140,   141,   142,
+     145,   162,   180,   199,   210,   214,   253,   257,   257,   277,
+     277,   294,   298,   298,   318,   318,   335,   338,   341,   347,
+     362,   368,   378,   381,   381,   422,   430,   431,   432,   443,
+     454,   465,   476,   487,   511,   536,   553,   561,   568,   576,
+     583,   584
 };
 #endif
 
@@ -576,10 +583,10 @@ static const char *const yytname[] =
   "tMAYEQU", "tEQU", "tDIF", "tOR", "tAND", "tPO", "tPF", "tCO", "tCF",
   "tPV", "tPLUS", "tVAR", "tSTRING", "tE", "tMAIN", "tSOU", "tMUL", "tDIV",
   "tPRINT", "tNUM", "tIF", "tWHILE", "tELSE", "tV", "tCONST",
-  "tGUILLEMETS", "$accept", "TestStart", "TestMessage", "Body", "Assign",
-  "Condition", "If", "Cond", "$@1", "$@2", "CondWhile", "$@3", "$@4",
-  "CompareToken", "CondValue", "ConditionWhile", "While", "$@5", "Print",
-  "Declar", "Val", "Expr", YY_NULLPTR
+  "tGUILLEMETS", "';'", "$accept", "TestStart", "TestMessage", "Body",
+  "Assign", "Condition", "If", "Cond", "$@1", "$@2", "CondWhile", "$@3",
+  "$@4", "CompareToken", "CondValue", "ConditionWhile", "While", "$@5",
+  "Print", "Declar", "Val", "Expr", YY_NULLPTR
 };
 #endif
 
@@ -591,14 +598,14 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287
+     285,   286,   287,    59
 };
 # endif
 
-#define YYPACT_NINF -55
+#define YYPACT_NINF -57
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-55)))
+  (!!((Yystate) == (-57)))
 
 #define YYTABLE_NINF -1
 
@@ -609,18 +616,18 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -19,   -55,    12,   -55,   -55,    24,   -55,    -5,    27,    -5,
-     -55,   -55,     2,    88,    70,    37,   -55,   -55,   -55,   -55,
-       1,    15,    34,    47,    52,    63,    17,   -55,    41,   -55,
-     -55,    10,    64,   -55,    58,    65,    -4,    21,    -2,    80,
-      86,   -55,    70,    96,   -55,     3,   -55,   -55,    -1,    91,
-      -1,    97,    99,   -55,    83,   -55,   -55,   101,    -2,   103,
-      88,    70,    92,    70,    10,   105,   106,    39,    -1,    67,
-     -55,   -55,   -55,    -1,    -1,    -1,    -1,   104,   108,   -55,
-       1,    40,    -1,    54,    -5,    -5,    39,   -55,    79,    79,
-     -55,   -55,   -55,    98,   -55,   -55,    39,   -55,   109,   110,
-     -55,   -55,   -55,   -55,   107,   112,    -2,    -2,   113,   114,
-     -55,   -55
+     -19,   -57,    12,   -57,   -57,    35,   -57,   -18,    -5,    25,
+     -57,    -5,   -57,   -57,    28,    88,    70,    37,   -57,   -57,
+     -57,   -57,     1,    15,    39,    44,    49,    63,    17,   -57,
+      41,   -57,   -57,    10,    53,   -57,    58,    65,    -4,    36,
+      -2,    80,    84,   -57,    70,    90,   -57,     3,   -57,   -57,
+      -1,    93,    -1,    98,    99,   -57,    83,   -57,   -57,   103,
+      -2,   104,    88,    70,   100,    70,    10,   106,   107,    86,
+      -1,    67,   -57,   -57,   -57,    -1,    -1,    -1,    -1,   105,
+     109,   -57,     1,    40,    -1,    54,    -5,    -5,    86,   -57,
+      51,    51,   -57,   -57,   -57,   101,   -57,   -57,    86,   -57,
+     110,   111,   -57,   -57,   -57,   -57,   113,   114,    -2,    -2,
+     115,   116,   -57,   -57
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -628,34 +635,34 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    32,     0,     2,     3,     0,     1,     0,     0,     0,
-      29,    30,     0,     0,     0,     0,    31,    26,    27,    28,
-       0,     0,     0,     0,     0,     0,     0,     8,     5,     6,
-       7,     4,     0,    21,    38,     0,     0,     0,     0,     0,
-       0,    33,     9,     0,    35,     0,    22,    24,     0,    42,
-       0,    44,    43,    50,     0,    44,    43,     0,     0,     0,
-       0,     0,    40,     0,    36,     0,     0,    37,     0,     0,
-      10,    11,    12,     0,     0,     0,     0,     0,     0,    13,
-       0,     0,     0,     0,     0,     0,    41,    49,    45,    46,
-      47,    48,    34,     0,    16,    15,    39,    14,     0,     0,
-      17,    19,    23,    25,     0,     0,     0,     0,     0,     0,
-      18,    20
+       0,    33,     0,     2,     3,     0,     1,     0,     0,     0,
+      32,     0,    29,    30,     0,     0,     0,     0,    31,    26,
+      27,    28,     0,     0,     0,     0,     0,     0,     0,     8,
+       5,     6,     7,     4,     0,    21,    39,     0,     0,     0,
+       0,     0,     0,    34,     9,     0,    36,     0,    22,    24,
+       0,    43,     0,    45,    44,    51,     0,    45,    44,     0,
+       0,     0,     0,     0,    41,     0,    37,     0,     0,    38,
+       0,     0,    10,    11,    12,     0,     0,     0,     0,     0,
+       0,    13,     0,     0,     0,     0,     0,     0,    42,    50,
+      46,    47,    48,    49,    35,     0,    16,    15,    40,    14,
+       0,     0,    17,    19,    23,    25,     0,     0,     0,     0,
+       0,     0,    18,    20
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -55,   -55,   -55,   -12,   -55,   -55,   -55,   -54,   -55,   -55,
-      -8,   -55,   -55,    68,   -20,   -55,   125,   -55,   -55,    84,
-      93,   -45
+     -57,   -57,   -57,   -14,   -57,   -57,   -57,   -56,   -57,   -57,
+     -10,   -57,   -57,    68,   -22,   -57,   127,   -57,   -57,    85,
+      92,   -47
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    42,    27,    39,    28,    59,   104,   105,
-      12,    65,    66,    20,    13,     8,    29,     5,    30,    31,
-      53,    54
+      -1,     2,     3,    44,    29,    41,    30,    61,   106,   107,
+      14,    67,    68,    22,    15,     9,    31,     5,    32,    33,
+      55,    56
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -663,67 +670,67 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      33,    15,    26,    67,    78,    69,    21,     9,    50,     1,
-      58,    50,     6,    10,    51,    16,    10,    55,    60,    10,
-      21,    11,    52,    86,    11,    56,    44,    11,    88,    89,
-      90,    91,    41,    34,    25,    22,     7,    96,    60,    55,
-      45,    14,    23,    21,    24,     1,    35,    56,    25,    81,
-      32,    83,   108,   109,    36,    95,    73,    21,    22,    37,
-      94,    74,    75,    76,    38,    23,    40,    24,     1,    97,
-      43,    25,    22,    21,    46,    47,    98,    99,    48,    23,
-      87,    24,     1,    49,    73,    25,    60,    60,    22,    74,
-      75,    76,    17,    18,    61,    23,    19,    24,     1,    72,
-      73,    25,    75,    76,    62,    74,    75,    76,   100,   101,
-      63,    68,    82,    70,    77,    71,    79,    84,    85,   106,
-      92,    93,   102,   103,   107,     4,   110,   111,    80,    64,
-      57
+      35,    17,    28,    69,    80,    71,    23,    11,    52,     1,
+      60,    52,     6,    12,    53,    10,    12,    57,    62,    12,
+      23,    13,    54,    88,    13,    58,    46,    13,    90,    91,
+      92,    93,    43,    36,    27,    24,     7,    98,    62,    16,
+      47,    18,    25,    23,    26,     1,    37,     8,    27,    83,
+      34,    85,   110,   111,    57,    97,    39,    23,    24,    38,
+      96,    40,    58,    48,    49,    25,    42,    26,     1,    99,
+      45,    27,    24,    23,    77,    78,   100,   101,    50,    25,
+      89,    26,     1,    51,    75,    27,    62,    62,    24,    76,
+      77,    78,    19,    20,    63,    25,    21,    26,     1,    74,
+      75,    27,    64,    75,    65,    76,    77,    78,    76,    77,
+      78,   102,   103,    70,    72,    73,    79,    81,    86,    87,
+      84,    94,    95,   104,   105,   108,   109,     4,   112,   113,
+      82,    59,    66
 };
 
 static const yytype_uint8 yycheck[] =
 {
-      20,     9,    14,    48,    58,    50,     3,    12,    12,    28,
-      12,    12,     0,    18,    18,    13,    18,    18,    38,    18,
-       3,    26,    26,    68,    26,    26,    16,    26,    73,    74,
-      75,    76,    15,    18,    31,    18,    12,    82,    58,    18,
-      30,    14,    25,     3,    27,    28,    31,    26,    31,    61,
-      13,    63,   106,   107,    20,    15,    17,     3,    18,    12,
-      80,    22,    23,    24,    12,    25,     3,    27,    28,    15,
-      29,    31,    18,     3,    10,    11,    84,    85,    20,    25,
-      13,    27,    28,    18,    17,    31,   106,   107,    18,    22,
+      22,    11,    16,    50,    60,    52,     3,    12,    12,    28,
+      12,    12,     0,    18,    18,    33,    18,    18,    40,    18,
+       3,    26,    26,    70,    26,    26,    16,    26,    75,    76,
+      77,    78,    15,    18,    31,    18,     1,    84,    60,    14,
+      30,    13,    25,     3,    27,    28,    31,    12,    31,    63,
+      13,    65,   108,   109,    18,    15,    12,     3,    18,    20,
+      82,    12,    26,    10,    11,    25,     3,    27,    28,    15,
+      29,    31,    18,     3,    23,    24,    86,    87,    20,    25,
+      13,    27,    28,    18,    17,    31,   108,   109,    18,    22,
       23,    24,     4,     5,    14,    25,     8,    27,    28,    16,
-      17,    31,    23,    24,    18,    22,    23,    24,    10,    11,
-      14,    20,    20,    16,    13,    16,    13,    12,    12,    12,
-      16,    13,    13,    13,    12,     0,    13,    13,    60,    45,
-      37
+      17,    31,    18,    17,    14,    22,    23,    24,    22,    23,
+      24,    10,    11,    20,    16,    16,    13,    13,    12,    12,
+      20,    16,    13,    13,    13,    12,    12,     0,    13,    13,
+      62,    39,    47
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    28,    34,    35,    49,    50,     0,    12,    48,    12,
-      18,    26,    43,    47,    14,    43,    13,     4,     5,     8,
-      46,     3,    18,    25,    27,    31,    36,    37,    39,    49,
-      51,    52,    13,    47,    18,    31,    20,    12,    12,    38,
-       3,    15,    36,    29,    16,    30,    10,    11,    20,    18,
-      12,    18,    26,    53,    54,    18,    26,    53,    12,    40,
-      47,    14,    18,    14,    52,    44,    45,    54,    20,    54,
-      16,    16,    16,    17,    22,    23,    24,    13,    40,    13,
-      46,    36,    20,    36,    12,    12,    54,    13,    54,    54,
-      54,    54,    16,    13,    47,    15,    54,    15,    43,    43,
-      10,    11,    13,    13,    41,    42,    12,    12,    40,    40,
-      13,    13
+       0,    28,    35,    36,    50,    51,     0,     1,    12,    49,
+      33,    12,    18,    26,    44,    48,    14,    44,    13,     4,
+       5,     8,    47,     3,    18,    25,    27,    31,    37,    38,
+      40,    50,    52,    53,    13,    48,    18,    31,    20,    12,
+      12,    39,     3,    15,    37,    29,    16,    30,    10,    11,
+      20,    18,    12,    18,    26,    54,    55,    18,    26,    54,
+      12,    41,    48,    14,    18,    14,    53,    45,    46,    55,
+      20,    55,    16,    16,    16,    17,    22,    23,    24,    13,
+      41,    13,    47,    37,    20,    37,    12,    12,    55,    13,
+      55,    55,    55,    55,    16,    13,    48,    15,    55,    15,
+      44,    44,    10,    11,    13,    13,    42,    43,    12,    12,
+      41,    41,    13,    13
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    33,    34,    35,    36,    36,    36,    36,    36,    36,
-      37,    37,    37,    38,    39,    39,    40,    41,    40,    42,
-      40,    43,    44,    43,    45,    43,    46,    46,    46,    47,
-      47,    48,    50,    49,    51,    52,    52,    52,    52,    52,
-      52,    52,    52,    53,    53,    54,    54,    54,    54,    54,
-      54
+       0,    34,    35,    36,    37,    37,    37,    37,    37,    37,
+      38,    38,    38,    39,    40,    40,    41,    42,    41,    43,
+      41,    44,    45,    44,    46,    44,    47,    47,    47,    48,
+      48,    49,    49,    51,    50,    52,    53,    53,    53,    53,
+      53,    53,    53,    53,    54,    54,    55,    55,    55,    55,
+      55,    55
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -732,9 +739,9 @@ static const yytype_uint8 yyr2[] =
        0,     2,     1,     1,     1,     1,     1,     1,     1,     2,
        4,     4,     4,     3,     5,     5,     3,     0,     8,     0,
        8,     3,     0,     8,     0,     8,     1,     1,     1,     1,
-       1,     3,     0,     6,     5,     2,     3,     4,     2,     5,
-       3,     5,     3,     1,     1,     3,     3,     3,     3,     3,
-       1
+       1,     3,     2,     0,     6,     5,     2,     3,     4,     2,
+       5,     3,     5,     3,     1,     1,     3,     3,     3,     3,
+       3,     1
 };
 
 
@@ -1411,13 +1418,13 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 120 "analysGram.yacc" /* yacc.c:1646  */
+#line 127 "analysGram.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1417 "y.tab.c" /* yacc.c:1646  */
+#line 1424 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 138 "analysGram.yacc" /* yacc.c:1646  */
+#line 145 "analysGram.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) != -1 && lookupType((yyvsp[-1].variable)) != -1 ) //Both variables exist
 										{									
@@ -1435,11 +1442,11 @@ yyreduce:
 											ce++;
 										}	
 									}
-#line 1439 "y.tab.c" /* yacc.c:1646  */
+#line 1446 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 155 "analysGram.yacc" /* yacc.c:1646  */
+#line 162 "analysGram.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) != -1 ) 	
 										{									
@@ -1458,11 +1465,11 @@ yyreduce:
 											ce++;
 										}	
 									}
-#line 1462 "y.tab.c" /* yacc.c:1646  */
+#line 1469 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 173 "analysGram.yacc" /* yacc.c:1646  */
+#line 180 "analysGram.yacc" /* yacc.c:1646  */
     {
 										if(lookupType((yyvsp[-3].variable)) != -1)	
 										{									
@@ -1480,11 +1487,11 @@ yyreduce:
 											ce++;
 										}
 									}
-#line 1484 "y.tab.c" /* yacc.c:1646  */
+#line 1491 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 192 "analysGram.yacc" /* yacc.c:1646  */
+#line 199 "analysGram.yacc" /* yacc.c:1646  */
     {
 									(yyval.nb) = cp;
 									cp++;
@@ -1494,20 +1501,20 @@ yyreduce:
 									else_iter_stack = push(else_begin_count, else_iter_stack);	//store else begin iterations to later assign if begin line
 									else_begin_count = 0;
 								}
-#line 1498 "y.tab.c" /* yacc.c:1646  */
+#line 1505 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 203 "analysGram.yacc" /* yacc.c:1646  */
+#line 210 "analysGram.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp);									//Obtain else body end
 													insert_Instruction( "JMP", snum, "", "", "", (yyvsp[-4].nb)-1 );		//If ended, jump to else body end
 												}
-#line 1507 "y.tab.c" /* yacc.c:1646  */
+#line 1514 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 207 "analysGram.yacc" /* yacc.c:1646  */
+#line 214 "analysGram.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
 													insert_Instruction( "JMF", "RESULTADO", snum, "", "", (yyvsp[-3].nb) );				//If statement is false jump to else body
@@ -1519,9 +1526,9 @@ yyreduce:
 
 													if(if_iter_stack.top != -1)	//If there is one jmp to if begin
 													{
-														if_begin_count = if_iter_stack.stk[if_iter_stack.top];	//take if label value from the stack	
+														auxNum = if_iter_stack.stk[if_iter_stack.top];	//take if label value from the stack	
 														if_iter_stack = pop(if_iter_stack);						//pop the value		
-														for(int i=0  ; i<if_begin_count ; i++)	
+														for(int i=0  ; i<auxNum ; i++)	
 														{ 										
 															sprintf(snum , "%d", (yyvsp[-3].nb)+1);									//If begin	
 															strcpy( labTab[if_stack.stk[if_stack.top]].param1, snum );	//put if begin on second parameter of jmp instruct
@@ -1529,12 +1536,11 @@ yyreduce:
 														}
 													}													
 
-													printf("Else stack : %d \n", else_iter_stack.top);
 													if(else_iter_stack.top != -1)	//If there is one jmp to else begin
 													{
-														else_begin_count = else_iter_stack.stk[else_iter_stack.top];	//take if label value from the stack	
+														auxNum = else_iter_stack.stk[else_iter_stack.top];	//take if label value from the stack	
 														else_iter_stack = pop(else_iter_stack);							//pop the value		
-														for(int i=0  ; i<else_begin_count ; i++)	
+														for(int i=0  ; i<auxNum ; i++)	
 														{ 										
 															sprintf(snum , "%d", cp);										//Else begin	
 															strcpy( labTab[else_stack.stk[else_stack.top]].param2, snum );	//put if begin on second parameter of jmp instruct
@@ -1542,20 +1548,20 @@ yyreduce:
 														}
 													}
 												}
-#line 1546 "y.tab.c" /* yacc.c:1646  */
+#line 1552 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 247 "analysGram.yacc" /* yacc.c:1646  */
+#line 253 "analysGram.yacc" /* yacc.c:1646  */
     {						
 																insert_Instruction( (yyvsp[-1].variable), "@X", (yyvsp[-2].variable), (yyvsp[0].variable), "", cp );	//COMPARISSON	$1 and $3 not working
 																cp++;
 														}
-#line 1555 "y.tab.c" /* yacc.c:1646  */
+#line 1561 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 251 "analysGram.yacc" /* yacc.c:1646  */
+#line 257 "analysGram.yacc" /* yacc.c:1646  */
     {									
 											sprintf(snum , "%d", cp+2);	
 											insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1566,11 +1572,11 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1570 "y.tab.c" /* yacc.c:1646  */
+#line 1576 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 261 "analysGram.yacc" /* yacc.c:1646  */
+#line 267 "analysGram.yacc" /* yacc.c:1646  */
     {
 											sprintf(snum , "%d", cp+2);	
 					 						insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1581,155 +1587,118 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1585 "y.tab.c" /* yacc.c:1646  */
+#line 1591 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 271 "analysGram.yacc" /* yacc.c:1646  */
+#line 277 "analysGram.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;
 										}
-#line 1596 "y.tab.c" /* yacc.c:1646  */
+#line 1602 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 277 "analysGram.yacc" /* yacc.c:1646  */
+#line 283 "analysGram.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;											
 										}
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 1613 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 288 "analysGram.yacc" /* yacc.c:1646  */
+#line 294 "analysGram.yacc" /* yacc.c:1646  */
     {						
-															insert_Instruction( (yyvsp[-1].variable), "@X", (yyvsp[-2].variable), (yyvsp[0].variable), "", cp );	//COMPARISSON	$1 and $3 not working
+															insert_Instruction( (yyvsp[-1].variable), "@X", (yyvsp[-2].variable), (yyvsp[0].variable), "", cp );			//COMPARISSON	$1 and $3 not working
 															cp++;
 														}
-#line 1616 "y.tab.c" /* yacc.c:1646  */
+#line 1622 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 292 "analysGram.yacc" /* yacc.c:1646  */
-    {												
-												/**If true jump to while_Begin**/
+#line 298 "analysGram.yacc" /* yacc.c:1646  */
+    {											
+												sprintf(snum , "%d", cp+2);										
+												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
+												cp++;	
 
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );			
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+												while_begin_count++;
+												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
+												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1631 "y.tab.c" /* yacc.c:1646  */
+#line 1637 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 302 "analysGram.yacc" /* yacc.c:1646  */
-    {
-						 						/**If true jump to while_Begin**/
-
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );				
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
+#line 308 "analysGram.yacc" /* yacc.c:1646  */
+    {											
+												sprintf(snum , "%d", cp+2);										
+												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
 												cp++;	
 
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
+												while_begin_count++;
+												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
+												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
-
-												(yyval.variable)=last_while_type;	//return last if 
 											}
-#line 1657 "y.tab.c" /* yacc.c:1646  */
+#line 1652 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 323 "analysGram.yacc" /* yacc.c:1646  */
-    {											
-												/**If true jump to next if**/
-
-												//create string if_lbl_n for if lbl
-												strcpy( auxString, "$+4" );			
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
-												cp++;
-
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
-												cp++;
-										}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
+#line 318 "analysGram.yacc" /* yacc.c:1646  */
+    {		
+												while_end_count++;
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
+												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
+												cp++;	
+											}
+#line 1663 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 340 "analysGram.yacc" /* yacc.c:1646  */
-    {
-						 						/**If true jump to while_Begin**/
-
-												//create string while_BEG_lbl_n 
-												strcpy( auxString, "while_BEG_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );				
-												insert_Instruction( last_while_type, auxString, "", "", "", cp );	//IF	
-												cp++;
-
-												//If false, exit the loop 				
-				 						
-												//create string while_END_lbl_n 
-												strcpy( auxString, "while_END_lbl_" );										
-												sprintf(snum , "%d", while_lbl_count);	
-												strcat( auxString, snum );		
-												insert_Instruction( "JMP", auxString, "", "", "", cp );	//JMP
-												cp++;
-
-												(yyval.variable)=last_while_type;	//return last if 
-										}
-#line 1705 "y.tab.c" /* yacc.c:1646  */
+#line 324 "analysGram.yacc" /* yacc.c:1646  */
+    {			
+												while_end_count++;
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
+												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
+												cp++;	
+											}
+#line 1674 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 366 "analysGram.yacc" /* yacc.c:1646  */
+#line 335 "analysGram.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="9";	//INF
 						}
-#line 1713 "y.tab.c" /* yacc.c:1646  */
+#line 1682 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 369 "analysGram.yacc" /* yacc.c:1646  */
+#line 338 "analysGram.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="A";	//SUP
 						}
-#line 1721 "y.tab.c" /* yacc.c:1646  */
+#line 1690 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 372 "analysGram.yacc" /* yacc.c:1646  */
+#line 341 "analysGram.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="B";	//EQU
 						}
-#line 1729 "y.tab.c" /* yacc.c:1646  */
+#line 1698 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 378 "analysGram.yacc" /* yacc.c:1646  */
+#line 347 "analysGram.yacc" /* yacc.c:1646  */
     {			
 								if(lookup((yyvsp[0].variable)) != -1)
 								{									
@@ -1745,63 +1714,99 @@ yyreduce:
 									ce++;
 								}	
 							}
-#line 1749 "y.tab.c" /* yacc.c:1646  */
+#line 1718 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 393 "analysGram.yacc" /* yacc.c:1646  */
+#line 362 "analysGram.yacc" /* yacc.c:1646  */
     {								
 								sprintf(snum , "%d", (yyvsp[0].nb));	
 								(yyval.variable)=snum;
 							}
-#line 1758 "y.tab.c" /* yacc.c:1646  */
+#line 1727 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 399 "analysGram.yacc" /* yacc.c:1646  */
+#line 368 "analysGram.yacc" /* yacc.c:1646  */
     {											
-											while_begin = push(cp, while_begin);	//Store while begin
-											cp++;		
+											while_last_cond = push(cp, while_last_cond);	//Store while begin
+											cp++;	
+
+											while_begin_iter_stack = push(while_begin_count, while_begin_iter_stack);	//store while begin iterations to later assign while begin line
+											while_begin_count = 0;
+
+											while_end_iter_stack = push(while_end_count, while_end_iter_stack);			//store while end iterations to later assign while end line
+											while_end_count = 0;	
 										}
-#line 1767 "y.tab.c" /* yacc.c:1646  */
+#line 1742 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 405 "analysGram.yacc" /* yacc.c:1646  */
+#line 378 "analysGram.yacc" /* yacc.c:1646  */
+    { printf("ERROR!!!\n");  yyerrok; }
+#line 1748 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 381 "analysGram.yacc" /* yacc.c:1646  */
     {	
 														(yyvsp[0].nb)=cp;										//Save while begin
 			
 													}
-#line 1776 "y.tab.c" /* yacc.c:1646  */
+#line 1757 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 409 "analysGram.yacc" /* yacc.c:1646  */
+  case 34:
+#line 385 "analysGram.yacc" /* yacc.c:1646  */
     {				
-														auxNum = while_begin.stk[while_begin.top];
-														while_begin = pop(while_begin);							//pop the value		
+														int whileBegin = while_last_cond.stk[while_last_cond.top];
+														while_last_cond = pop(while_last_cond);							//pop the value		
 
 														sprintf(snum , "%d", cp+1);										
-														insert_Instruction( "JMF", snum, "", "", "",  auxNum);	//Jump to while end in case condition is not met
+														insert_Instruction( "JMF", snum, "", "", "",  whileBegin);	//Jump to while end in case condition is not met
 
 														sprintf(snum , "%d", (yyvsp[-5].nb));												
 														insert_Instruction( "JMP", snum, "", "", "", cp );	//JMP to while begin
 														cp++;
+
+														if(while_begin_iter_stack.top != -1)	//If there is one jmp to if begin
+														{
+															auxNum = while_begin_iter_stack.stk[while_begin_iter_stack.top];	//take if label value from the stack	
+															while_begin_iter_stack = pop(while_begin_iter_stack);						//pop the value		
+															for(int i=0  ; i<auxNum ; i++)	
+															{ 										
+																sprintf(snum , "%d", whileBegin);									//while begin	
+																strcpy( labTab[while_begin_stack.stk[while_begin_stack.top]].param1, snum );	//put while begin on second parameter of jmp instruct
+																while_begin_stack = pop(while_begin_stack);				
+															}
+														}													
+
+														if(while_end_iter_stack.top != -1)	//If there is one jmp to else begin
+														{
+															auxNum = while_end_iter_stack.stk[while_end_iter_stack.top];	//take if label value from the stack	
+															while_end_iter_stack = pop(while_end_iter_stack);							//pop the value		
+															for(int i=0  ; i<auxNum ; i++)	
+															{ 										
+																sprintf(snum , "%d", cp);										//while end	
+																strcpy( labTab[while_end_stack.stk[while_end_stack.top]].param2, snum );	//put while end on second parameter of jmp instruct
+																while_end_stack = pop(while_end_stack);				
+															}
+														}
 													}
-#line 1792 "y.tab.c" /* yacc.c:1646  */
+#line 1797 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 34:
+  case 35:
 #line 422 "analysGram.yacc" /* yacc.c:1646  */
     {	
 											sprintf(snum, "%d", (yyvsp[-2].nb));
 											insert_Instruction( "C", snum, "", "", "", cp );	//PRI @result
 											cp++;
 										}
-#line 1802 "y.tab.c" /* yacc.c:1646  */
+#line 1807 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 37:
+  case 38:
 #line 432 "analysGram.yacc" /* yacc.c:1646  */
     {				
 											if(lookup((yyvsp[-2].variable)) == -1)
@@ -1814,10 +1819,10 @@ yyreduce:
 												ce++;
 											}
 										}
-#line 1818 "y.tab.c" /* yacc.c:1646  */
+#line 1823 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 38:
+  case 39:
 #line 443 "analysGram.yacc" /* yacc.c:1646  */
     {
 											if(lookup((yyvsp[0].variable)) == -1)
@@ -1830,10 +1835,10 @@ yyreduce:
 												ce++;
 											}
 										}
-#line 1834 "y.tab.c" /* yacc.c:1646  */
+#line 1839 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 39:
+  case 40:
 #line 454 "analysGram.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[-2].variable)) == -1)
@@ -1846,10 +1851,10 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1850 "y.tab.c" /* yacc.c:1646  */
+#line 1855 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 40:
+  case 41:
 #line 465 "analysGram.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[0].variable)) == -1)
@@ -1862,10 +1867,10 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1866 "y.tab.c" /* yacc.c:1646  */
+#line 1871 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 41:
+  case 42:
 #line 476 "analysGram.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[-2].variable)) == -1)
@@ -1878,10 +1883,10 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1882 "y.tab.c" /* yacc.c:1646  */
+#line 1887 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 42:
+  case 43:
 #line 487 "analysGram.yacc" /* yacc.c:1646  */
     {
 												if(lookup((yyvsp[0].variable)) == -1)
@@ -1894,10 +1899,10 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1898 "y.tab.c" /* yacc.c:1646  */
+#line 1903 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 43:
+  case 44:
 #line 511 "analysGram.yacc" /* yacc.c:1646  */
     {
 								if( tempCounter == 1 )
@@ -1924,10 +1929,10 @@ yyreduce:
 								//sprintf(snum , "%d", $1);	
 								//$$=snum;
 							}
-#line 1928 "y.tab.c" /* yacc.c:1646  */
+#line 1933 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 44:
+  case 45:
 #line 536 "analysGram.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)
@@ -1944,10 +1949,10 @@ yyreduce:
 									ce++;
 								}
 							 }
-#line 1948 "y.tab.c" /* yacc.c:1646  */
+#line 1953 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 45:
+  case 46:
 #line 553 "analysGram.yacc" /* yacc.c:1646  */
     { 		
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
@@ -1957,10 +1962,10 @@ yyreduce:
 
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en 0temp2
 									}
-#line 1961 "y.tab.c" /* yacc.c:1646  */
+#line 1966 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 46:
+  case 47:
 #line 561 "analysGram.yacc" /* yacc.c:1646  */
     {	
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
@@ -1969,10 +1974,10 @@ yyreduce:
 
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
 									}
-#line 1973 "y.tab.c" /* yacc.c:1646  */
+#line 1978 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 47:
+  case 48:
 #line 568 "analysGram.yacc" /* yacc.c:1646  */
     {								
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
@@ -1982,10 +1987,10 @@ yyreduce:
 
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
 									}
-#line 1986 "y.tab.c" /* yacc.c:1646  */
+#line 1991 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 48:
+  case 49:
 #line 576 "analysGram.yacc" /* yacc.c:1646  */
     { 
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
@@ -1994,11 +1999,11 @@ yyreduce:
 
 										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
 									}
-#line 1998 "y.tab.c" /* yacc.c:1646  */
+#line 2003 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2002 "y.tab.c" /* yacc.c:1646  */
+#line 2007 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2230,7 +2235,8 @@ yyreturn:
 
 
 void yyerror(char *s) {
-	fprintf(stderr, "%s\n", s);
+	printf("%s\n", s);
+	//fprintf(stderr, "%s\n", s);
 }
 
 /*Error management*/
@@ -2251,11 +2257,11 @@ void print_Error_Table()
 void print_Label_Table()
 {
   	fprintf(fp,"\nLabel Table :\n----------------------------------------------------- \n");
-	fprintf(fp, " Instruction | param1 | param2 | param 3 | comments |\n");
+	fprintf(fp, " \tInstruction | param1 | param2 | param 3 | comments |\n");
   	fprintf(fp,"----------------------------------------------------- \n");
 	for (int i = 0 ; i < cp; i++)
 	{
-		fprintf(fp, " %-14s %-12s %-12s %-12s ;%-s \n", labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3, labTab[i].comments );
+		fprintf(fp, "%-3d:  %-14s %-12s %-12s %-12s ;%-s \n", i, labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3, labTab[i].comments );
 	}
 }
 
@@ -2277,9 +2283,6 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 	strcpy( labTab[counter].comments, comment );
 }
 /*End of label Table Management*/
-
-
-
 
 
 
@@ -2322,9 +2325,6 @@ int main(void) {
 	insert("d", 0);
 	insert("e", 1);
 	insert("g", 1);
-	insert("arnold", 0);
-	insert("arnoldo", 0);
-	lookup("arnold");
 	lookup("e");*/
 
 
