@@ -71,10 +71,10 @@ extern int yydebug;
     tNUM = 281,
     tIF = 282,
     tWHILE = 283,
-    tV = 284,
-    tCONST = 285,
-    tGUILLEMETS = 286,
-    tELSE = 287
+    tELSE = 284,
+    tV = 285,
+    tCONST = 286,
+    tGUILLEMETS = 287
   };
 #endif
 /* Tokens.  */
@@ -104,17 +104,17 @@ extern int yydebug;
 #define tNUM 281
 #define tIF 282
 #define tWHILE 283
-#define tV 284
-#define tCONST 285
-#define tGUILLEMETS 286
-#define tELSE 287
+#define tELSE 284
+#define tV 285
+#define tCONST 286
+#define tGUILLEMETS 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 68 "analysGram.yacc" /* yacc.c:1909  */
+#line 73 "analysGram.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
