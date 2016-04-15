@@ -25,19 +25,19 @@ use IEEE.numeric_std.all;
 
 entity ModDiv is
 	port(
-		INS : in std_logic_vector(31 downto 0);
-		A : out std_logic_vector(7 downto 0);
-		B : out std_logic_vector(7 downto 0);
-		C : out std_logic_vector(7 downto 0);
-		D : out std_logic_vector(7 downto 0)
+		INS 	: in std_logic_vector(31 downto 0);
+		A 		: out std_logic_vector(7 downto 0);
+		OP		: out std_logic_vector(7 downto 0);
+		B 		: out std_logic_vector(7 downto 0);
+		C 		: out std_logic_vector(7 downto 0)
 		);
 end ModDiv;
 
 architecture Behavioral of ModDiv is
 begin
-	D <= INS(7 downto 0);
-	C <= INS(15 downto 8);
-	B <= INS(23 downto 16);
+	C <= INS(7 downto 0);
+	B <= INS(15 downto 8);
+	OP<= INS(23 downto 16);
 	A <= INS(31 downto 24);
 end Behavioral;
 

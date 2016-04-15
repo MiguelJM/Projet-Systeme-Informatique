@@ -38,17 +38,31 @@ entity BancReg is
 end BancReg;
 
 architecture Behavioral of BancReg is
-signal Qp,Qn : std_logic_vector(7 downto 0);
+signal QAp,QBn : std_logic_vector(7 downto 0);
+signal QAp,QBn : std_logic_vector(7 downto 0);
+type Reg is array (3 downto 0) of std_logic_vector(7 downto 0);
 begin
 	Secuential: process(RST,CLK)
 	begin
 		if(RST = '0') then
-			Qp <= (others => '0');
+			QAp <= (others => '0');
+			QBp <= (others => '0');
 		elsif(CLK'event and CLK = '1') then
-			Qp <= Qn;
+			QAp <= QAn;
+			QBp <= QBn;
 		end if;
 	end process Secuential;
-
-
+	
+	Combinatoire: process(W,QAp,QBp,AA,AB,AW)
+		case W is 0
+			when '0' =>			--Lecture
+				QAn <= Reg(AA);
+				QBn <= Reg(AB);
+			when others =>		--Ecriture
+				Reg(AW) <= DATA;
+		end case;
+	end process Combinatoire;
+	QA <= QAp;
+	QB <= QBp;
 end Behavioral;
 
