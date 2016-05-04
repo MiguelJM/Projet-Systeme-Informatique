@@ -56,13 +56,12 @@ begin
 	Combinatoire: process(W,QAp,QBp,AA,AB,AW)
 		case W is 0
 			when '0' =>			--Lecture
-				QAn <= Reg(AA);
-				QBn <= Reg(AB);
+				QAn <= Reg(to_integer(unsigned(AA)));
+				QBn <= Reg(to_integer(unsigned(AB)));
 			when others =>		--Ecriture
-				Reg(AW) <= DATA;
+				Reg(to_integer(unsigned(AW))); <= DATA;
 		end case;
 	end process Combinatoire;
 	QA <= QAp;
 	QB <= QBp;
 end Behavioral;
-

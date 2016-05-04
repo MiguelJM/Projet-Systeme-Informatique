@@ -40,4 +40,3 @@ begin
 	OP<= INS(23 downto 16);
 	A <= INS(31 downto 24);
 end Behavioral;
-
