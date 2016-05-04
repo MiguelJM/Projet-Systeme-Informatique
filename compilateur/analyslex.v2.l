@@ -17,6 +17,7 @@
 ")"  return(tPF);
 "||" return(tOR);
 "&&" return(tAND);
+"&" return(tAMPERSAND);
 "{"  return(tCO);
 "}"  return(tCF);
 ";"  return(tPV);

@@ -369,8 +369,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 31
-#define YY_END_OF_BUFFER 32
+#define YY_NUM_RULES 32
+#define YY_END_OF_BUFFER 33
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -380,13 +380,13 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[63] =
     {   0,
-       30,   30,   32,   31,   30,   31,   27,   31,    8,    9,
-       17,   15,   20,   16,   18,   28,   14,    2,   19,    3,
-       29,   29,   29,   29,   29,   29,   29,   12,   31,   13,
-       30,    7,   11,   28,    4,    6,    5,   29,   29,   29,
-       23,   29,   29,   29,   29,   10,   29,   29,    1,   29,
-       29,   29,   29,   26,   21,   29,   29,   25,   29,   24,
-       22,    0
+       31,   31,   33,   32,   31,   32,   28,   12,    8,    9,
+       18,   16,   21,   17,   19,   29,   15,    2,   20,    3,
+       30,   30,   30,   30,   30,   30,   30,   13,   32,   14,
+       31,    7,   11,   29,    4,    6,    5,   30,   30,   30,
+       24,   30,   30,   30,   30,   10,   30,   30,    1,   30,
+       30,   30,   30,   27,   22,   30,   30,   26,   30,   25,
+       23,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -839,113 +839,118 @@ return(tAND);
 case 12:
 YY_RULE_SETUP
 #line 20 "analyslex.v2.l"
-return(tCO);
+return(tAMPERSAND);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 21 "analyslex.v2.l"
-return(tCF);
+return(tCO);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 22 "analyslex.v2.l"
-return(tPV);
+return(tCF);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 23 "analyslex.v2.l"
-return(tPLUS);
+return(tPV);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 24 "analyslex.v2.l"
-return(tSOU);
+return(tPLUS);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 25 "analyslex.v2.l"
-return(tMUL);
+return(tSOU);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 26 "analyslex.v2.l"
-return(tDIV);
+return(tMUL);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 27 "analyslex.v2.l"
-return(tE);
+return(tDIV);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 28 "analyslex.v2.l"
-return(tV);
+return(tE);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 30 "analyslex.v2.l"
-return(tMAIN);
+#line 29 "analyslex.v2.l"
+return(tV);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 31 "analyslex.v2.l"
-return(tPRINT);
+return(tMAIN);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 32 "analyslex.v2.l"
-return(tIF);
+return(tPRINT);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 33 "analyslex.v2.l"
-return(tWHILE);
+return(tIF);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 34 "analyslex.v2.l"
-return(tCONST);
+return(tWHILE);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 35 "analyslex.v2.l"
-return(tELSE);
+return(tCONST);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 36 "analyslex.v2.l"
-return(tGUILLEMETS);
+return(tELSE);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 37 "analyslex.v2.l"
+return(tGUILLEMETS);
+	YY_BREAK
+case 29:
+YY_RULE_SETUP
+#line 38 "analyslex.v2.l"
 {
 							yylval.nb = atof(yytext); 
 							return(tNUM);
 						}	
 	YY_BREAK
-case 29:
+case 30:
 YY_RULE_SETUP
-#line 41 "analyslex.v2.l"
+#line 42 "analyslex.v2.l"
 {
 							yylval.variable = strdup(yytext); 
 							return(tVAR);
 						}	
 	YY_BREAK
-case 30:
+case 31:
 YY_RULE_SETUP
-#line 45 "analyslex.v2.l"
+#line 46 "analyslex.v2.l"
 {
 							yylval.variable = strdup(yytext); 
 							return(tSTRING);
 						}
 	YY_BREAK
-case 31:
+case 32:
 YY_RULE_SETUP
-#line 49 "analyslex.v2.l"
+#line 50 "analyslex.v2.l"
 ECHO;
 	YY_BREAK
-#line 949 "lex.yy.c"
+#line 954 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1940,7 +1945,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 48 "analyslex.v2.l"
+#line 49 "analyslex.v2.l"
 
 
 /*

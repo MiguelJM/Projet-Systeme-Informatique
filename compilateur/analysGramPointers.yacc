@@ -41,8 +41,6 @@
 	int cp = 0; //instruction counter
 	int cp_Offset = 0; //Offset of the instruction counter
 
-  	int tempCounter = 1; //Counter to determine if 0temp1 and 0temp2 are used
-
 	struct stack if_iter_stack;			//Keep count of number of ifs to correct
 	struct stack if_stack;				//Allows to assign if begin code lines to jump instructions
 	struct stack else_iter_stack;		//Keep count of number of else to correct
@@ -63,6 +61,12 @@
 
 	struct stack while_stack;		//Keeps count of while statements to create labels
   	int while_lbl_count = 0; 		//Counter to determine the while labels to use
+
+  	bool pointer_value_flag = false;	//Used to verify if pointer value was initialized or was true
+  	bool pointer_value_flag2 = false;	//turns pointer value to false (because a = b + a OR a = &var + &var2 where a,b are pointers is not permited)
+  	bool pointer_value = false;			//Used to verify if a val i used for a pointer assignation
+
+  	bool temp1_flag = false;		//Used to indicate if temp1 is beinf used (in that case, use temp2)
 
 	char snum[5];		//To convert numbers to strings
 	char snum2[5];		//To convert numbers to strings
@@ -112,7 +116,7 @@
 %token tGUILLEMETS
 
 %type <variable> Cond CondWhile CompareToken CondValue
-%type <nb> If Val Expr Condition
+%type <nb> If Val Expr Condition 
 
 %right tE
 %left tPLUS tSOU
@@ -148,6 +152,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 										{		
 											sprintf(snum, "%d", lookup($1));
 											sprintf(snum2, "%d", lookup($3));
+											setValueByName($1, getValueByName($3)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 										    cp++;			
 										}
@@ -157,6 +162,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 											{	
 												sprintf(snum, "%d", lookup($1));
 												sprintf(snum2, "%d", lookup($3));
+												setValueByName($1, getValueByName($3)); 	//Sets the value
 												insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 											    cp++;
 											}
@@ -170,10 +176,10 @@ Assign 		:	tVAR tE tVAR tPV	{
 									}
 			|	tVAR tE tNUM tPV	{
 										if( lookupType($1) == 0 ) 	//Variable exists and is integer
-										{				
+										{			
 											sprintf(snum, "%d", lookup($1));
 											sprintf(snum2, "%d", $3);
-
+											setValueByName($1, $3); 	//Sets the value
 										    insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result constant 
 										    cp++;			
 										}
@@ -185,27 +191,89 @@ Assign 		:	tVAR tE tVAR tPV	{
 										}	
 									}
 			|	tVAR tE Expr tPV	{
-										if(lookupType($1) == 0)	//Variable exists and is integer
+										if(lookupType($1) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
 											sprintf(snum, "%d", lookup($1));
-											sprintf(snum2, "%d", $3);
+											sprintf(snum2, "%d", lookup("0temp1"));
+											setValueByName($1, getValueByName("0temp1")); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 										    cp++;			
 										}
 										else
 										{
-											strcpy( errTab[ce].error, "Trying to assign number value to a constant, pointer or variable that doesn't exist.\n" );
-											errTab[ce].line = ce;
-											ce++;
+											if(lookupType($1) == 2) //Variable exists and is pointer
+											{
+												if(	pointer_value ) //The expression is correct for the pointer
+												{
+													sprintf(snum, "%d", lookup($1));
+													sprintf(snum2, "%d", lookup("0temp1"));
+													setValueByName($1, getValueByName("0temp1")); 	//Sets the value
+													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+												    cp++;	
+												}
+												else
+												{
+													strcpy( errTab[ce].error, "Invalid pointer convertion.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "Trying to assign number value to a constant or variable that doesn't exist.\n" );
+												errTab[ce].line = ce;
+												ce++;
+											}
 										}
+										pointer_value_flag = false; //reset variable
+										pointer_value_flag2 = false; //reset variable
 									}
+			|	tVAR tE tMUL tVAR tPV 		{
+												if(lookupType($1) != 2 && lookupType($1) != -1 && lookupType($4) == 2)	//Variables exist, first variable is not a pointer, and second var is a pointer
+												{	
+													if( lookupAddress(getValueByName($4)) != -1 ) //Pointed address is valid
+													{
+														sprintf(snum, "%d", lookup($1));
+														sprintf(snum2, "%d", lookup($4));	
+														setValueByName($1, getValueByName(lookupName(getValueByName($4)))); 	//Sets the value	
+														insert_Instruction( "D", snum, snum2, "", "", cp ); //PCOP @result @operand1 copies the value stored at @operand1.value to @result
+													    cp++;		
+													}
+													else
+													{
+														strcpy( errTab[ce].error, "The pointer '" );
+														strcat( errTab[ce].error, $4 );
+														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
+														errTab[ce].line = ce;
+														ce++;
+													}
+												}
+												else
+												{
+													strcpy( errTab[ce].error, "Invalid pointer assignment.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
+											}
 			|	tMUL tVAR tE tVAR tPV 		{
 												if(lookupType($2) == 2 && lookupType($4) != -1 && lookupType($4) != 2)	//Variables exist, first variable is a pointer, and second var is not pointer
 												{														
-													sprintf(snum, "%d", lookup($2));
-													sprintf(snum2, "%d", lookup($4));
-													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-												    cp++;	
+													if( lookupAddress(getValueByName($2)) != -1 ) //Pointed address is valid
+													{
+														sprintf(snum, "%d", lookup($2));		
+														sprintf(snum2, "%d", lookup($4));	
+														setValueByName(lookupName(getValueByName($2)), getValueByName($4)); 	//Sets the value	
+														insert_Instruction( "E", snum, snum2, "", "", cp ); //IPCOP @result @operand1 copies the value stored at @operand1 to @result.value
+													    cp++;		
+													}
+													else
+													{
+														strcpy( errTab[ce].error, "The pointer '" );
+														strcat( errTab[ce].error, $2 );
+														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
+														errTab[ce].line = ce;
+														ce++;
+													}
 												}
 												else
 												{
@@ -216,11 +284,29 @@ Assign 		:	tVAR tE tVAR tPV	{
 											}
 			|	tMUL tVAR tE tNUM tPV 		{
 												if(lookupType($2) == 2 )	//Variable exists and is pointer
-												{														
-													sprintf(snum, "%d", lookup($2));
-													sprintf(snum2, "%d", $4);
-													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-												    cp++;	
+												{			
+													if( lookupAddress(getValueByName($2)) != -1 ) //Pointed address is valid
+													{
+														sprintf(snum, "%d", lookup("0temp1"));
+														sprintf(snum2, "%d", $4);	
+														setValueByName("0temp1", $4); 	//Sets the value	
+														insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num 
+													    cp++;	
+
+														sprintf(snum, "%d", lookup($2));		
+														sprintf(snum2, "%d", lookup("0temp1"));
+														setValueByName(lookupName(getValueByName($2)), getValueByName("0temp1")); 	//Sets the value
+														insert_Instruction( "E", snum, snum2, "", "", cp ); //IPCOP @result @operand1 copies the value stored at @operand1 to @result.value
+													    cp++;		
+													}
+													else
+													{
+														strcpy( errTab[ce].error, "The pointer '" );
+														strcat( errTab[ce].error, $2 );
+														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
+														errTab[ce].line = ce;
+														ce++;
+													}
 												}
 												else
 												{
@@ -230,10 +316,17 @@ Assign 		:	tVAR tE tVAR tPV	{
 												}
 											}
 			|	tVAR tE tAMPERSAND tVAR tPV {
-												if(lookupType($2) == 2 && lookupType($4) != -1 && lookupType($4) != 2)	//Both variable exist, the first is pointer, and the second is not pointer
-												{														
-													sprintf(snum, "%d", lookup($2));
-													sprintf(snum2, "%d", lookup($4));
+												if(lookupType($1) == 2 && lookupType($4) != -1 && lookupType($4) != 2)	//Both variable exist, the first is pointer, and the second is not pointer
+												{						
+													sprintf(snum, "%d", lookup("0temp1"));
+													sprintf(snum2, "%d", lookup($4));	
+													setValueByName("0temp1", lookup($4)); 	//Sets the value	
+													insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num Copy address to result
+												    cp++;	
+
+													sprintf(snum, "%d", lookup($1));
+													sprintf(snum2, "%d", lookup("0temp1"));
+													setValueByName($1, getValueByName("0temp1")); 										//Sets the value of the pointer		
 													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 												    cp++;	
 												}
@@ -263,7 +356,7 @@ If			:	If tELSE tCO Body tCF			{
 												}
 			| 	tIF Condition tCO Body tCF		{
 													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
-													insert_Instruction( "JMF", "RESULTADO", snum, "", "", $2 );				//If statement is false jump to else body
+													insert_Instruction( "JMF", "@X", snum, "", "", $2 );				//If statement is false jump to else body
 
 													sprintf(snum , "%d", cp+1);									//Obtain if end
 													insert_Instruction( "JMP", snum, "", "", "", cp );			//If ended, jump to else body end (If there is an else instruction, will be overwritten)
@@ -296,13 +389,11 @@ If			:	If tELSE tCO Body tCF			{
 												}
 			;
 
-
-
-//TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
-
-Cond		:	CondValue CompareToken CondValue 		{						
-																insert_Instruction( $2, "@X", $1, $3, "", cp );	//COMPARISSON	$1 and $3 not working
-																cp++;
+Cond		:	CondValue CompareToken CondValue 		{					
+															sprintf(snum, "%d", lookup("0temp1"));
+															sprintf(snum2, "%d", lookup("0temp2"));	
+															insert_Instruction( $2, "@X", snum, snum2, "", cp );			//COMPARISSON
+															cp++;
 														}
 				|  	tPO Cond tPF tOR  	{									
 											sprintf(snum , "%d", cp+2);	
@@ -341,8 +432,10 @@ Cond		:	CondValue CompareToken CondValue 		{
 
 //TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
 
-CondWhile		:	CondValue CompareToken CondValue 	{						
-															insert_Instruction( $2, "@X", $1, $3, "", cp );			//COMPARISSON	$1 and $3 not working
+CondWhile		:	CondValue CompareToken CondValue 	{					
+															sprintf(snum, "%d", lookup("0temp1"));
+															sprintf(snum2, "%d", lookup("0temp2"));	
+															insert_Instruction( $2, "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
 				|  tPO CondWhile tPF tOR  	{											
@@ -395,22 +488,96 @@ CompareToken :	tMIN 	{
 
 
 CondValue 	 :	tVAR 		{			
-								if(lookup($1) != -1)
-								{									
-									sprintf(snum , "%d", lookup($1));	
-									$$=snum;	
+								if( lookup($1) != -1 && lookupType($1) != 2	)		//var exists and is not pointer
+								{	
+									if( !temp1_flag )
+									{
+										temp1_flag = true;
+										strcpy( auxString, "0temp1" );
+									}
+									else{
+										temp1_flag = false;		
+										strcpy( auxString, "0temp2" );
+									}
+
+									sprintf(snum, "%d", lookup(auxString));
+									sprintf(snum2, "%d", lookup($1));		
+									setValueByName(auxString, getValueByName($1)); 	//Sets the value	
+									insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+									cp++;
+		
+									sprintf(snum, "%d", lookup(auxString));
+									$$=snum;
 								}
 								else
 								{
-									strcpy( errTab[ce].error, "The variable " );
+									strcpy( errTab[ce].error, "The variable '" );
 									strcat( errTab[ce].error, $1 );
-									strcat( errTab[ce].error, " does not exist.\n" );		
+									strcat( errTab[ce].error, "' does not exist or is invalid.\n" );		
 									errTab[ce].line = ce;
 									ce++;
 								}	
 							}
-				|	tNUM	{								
-								sprintf(snum , "%d", $1);	
+				|	tMUL tVAR	{			
+									if(lookup($2) != -1 && lookup($2) == 2	)		//var exists and is a pointer
+									{	
+										if( lookupAddress(getValueByName($2)) != -1 ) //Pointed address is valid
+										{
+											if( !temp1_flag )
+											{
+												temp1_flag = true;
+												strcpy( auxString, "0temp1" );
+											}
+											else{
+												temp1_flag = false;		
+												strcpy( auxString, "0temp2" );
+											}
+
+											sprintf(snum, "%d", lookup(auxString));
+											sprintf(snum2, "%d", lookup($2));	
+											setValueByName(auxString, getValueByName(lookupName(getValueByName($2)))); 	//Sets the value	
+											insert_Instruction( "D", snum, snum2, "", "", cp ); //PCOP @result @operand1 copies the value stored at @operand1.value to @result 
+											cp++;
+				
+											sprintf(snum, "%d", lookup(auxString));
+											$$=snum;			
+										}
+										else
+										{
+											strcpy( errTab[ce].error, "The pointer '" );
+											strcat( errTab[ce].error, $2 );
+											strcat( errTab[ce].error, "' points to an invalid address.\n" );		
+											errTab[ce].line = ce;
+											ce++;
+										}										
+									}
+									else
+									{
+										strcpy( errTab[ce].error, "The variable " );
+										strcat( errTab[ce].error, $2 );
+										strcat( errTab[ce].error, " does not exist.\n" );		
+										errTab[ce].line = ce;
+										ce++;
+									}	
+								}
+				|	tNUM	{	
+								if( !temp1_flag )
+								{
+									temp1_flag = true;
+									strcpy( auxString, "0temp1" );
+								}
+								else{
+									temp1_flag = false;		
+									strcpy( auxString, "0temp2" );
+								}
+
+								sprintf(snum, "%d", lookup(auxString));
+								sprintf(snum2, "%d", $1);	
+								setValueByName(auxString, $1); 	//Sets the value	
+								insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num 
+								cp++;
+	
+								sprintf(snum, "%d", lookup(auxString));
 								$$=snum;
 							}
 				;
@@ -436,7 +603,7 @@ While		:	tWHILE 								{
 														while_last_cond = pop(while_last_cond);							//pop the value		
 
 														sprintf(snum , "%d", cp+1);										
-														insert_Instruction( "JMF", snum, "", "", "",  whileBegin);	//Jump to while end in case condition is not met
+														insert_Instruction( "JMF", "@X", snum, "", "",  whileBegin);	//Jump to while end in case condition is not met
 
 														sprintf(snum , "%d", $1);												
 														insert_Instruction( "JMP", snum, "", "", "", cp );	//JMP to while begin
@@ -472,6 +639,8 @@ Print 		:	tPRINT tPO Val tPF tPV	{
 											sprintf(snum, "%d", $3);
 											insert_Instruction( "C", snum, "", "", "", cp );	//PRI @result
 											cp++;
+											pointer_value_flag = false; //reset variable
+											pointer_value_flag2 = false; //reset variable
 										}		
 			;
 
@@ -479,15 +648,32 @@ Print 		:	tPRINT tPO Val tPF tPV	{
 Declar		: 	Declar tPV 				
 				| Declar tV Declar 		
 				| tINT tVAR tE Expr 	{				
-											if(lookup($2) == -1)
+											if(lookup($2) == -1 && !pointer_value)	//Variable doesn't exist and the expr is not for pointers
 											{
 												insert($2, 0);		//new int
+
+												sprintf(snum, "%d", lookup($2));
+												sprintf(snum2, "%d", lookup("0temp1"));
+												setValueByName($2, getValueByName("0temp1")); 	//Sets the value
+												insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+											    cp++;											    		
 											}else
-											{												
-												strcpy( errTab[ce].error, "Variable %s already exists.\n" );
-												errTab[ce].line = ce;
-												ce++;
+											{	
+												if(pointer_value)	
+												{						
+													strcpy( errTab[ce].error, "Invalid convertion.\n" );
+													errTab[ce].line = ce;
+													ce++;													
+												}	
+												else
+												{									
+													strcpy( errTab[ce].error, "Variable already exists.\n" );
+													errTab[ce].line = ce;
+													ce++;
+												}
 											}
+											pointer_value_flag = false; //reset variable
+											pointer_value_flag2 = false; //reset variable
 										}
 				| tINT tVAR				{
 											if(lookup($2) == -1)
@@ -500,16 +686,32 @@ Declar		: 	Declar tPV
 												ce++;
 											}
 										}
-				| tINT tMUL tVAR tE Expr 	{				
-												if(lookup($3) == -1)
+				| tINT tMUL tVAR tE Expr	{				
+												if(lookup($3) == -1 && pointer_value) //Variable exists and the expression is correct
 												{
 													insert($3, 2);		//new pointer
+
+													sprintf(snum, "%d", lookup($3));
+													sprintf(snum2, "%d", lookup("0temp1"));		
+													setValueByName($3, getValueByName("0temp1")); 	//Sets the value
+													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+												    cp++;		
 												}else
-												{												
-													strcpy( errTab[ce].error, "Variable %s already exists.\n", );
-													errTab[ce].line = ce;
-													ce++;
+												{				
+													if(!pointer_value)
+													{				
+														strcpy( errTab[ce].error, "Invalid expression.\n" );
+														errTab[ce].line = ce;
+														ce++;
+													}else
+													{							
+														strcpy( errTab[ce].error, "Variable %s already exists.\n" );
+														errTab[ce].line = ce;
+														ce++;
+													}
 												}
+												pointer_value_flag = false; //reset variable
+												pointer_value_flag2 = false; //reset variable
 											}
 				| tINT tMUL tVAR		{
 											if(lookup($3) == -1)
@@ -522,16 +724,34 @@ Declar		: 	Declar tPV
 												ce++;
 											}
 										}
-				| tCONST tVAR tE Expr	{
-												if(lookup($2) == -1)
+				| tCONST tVAR tE Expr		{
+												if(lookup($2) == -1 && !pointer_value) //Variable exists and the expression is correct
 												{
-													insert($2, 1);		//new const
+													insert($2, 1);		//new const													
+
+													sprintf(snum, "%d", lookup($2));
+													sprintf(snum2, "%d", lookup("0temp1"));		
+													setValueByName($2, getValueByName("0temp1")); 	//Sets the value
+													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+												    cp++;		
 												}else
-												{												
-													strcpy( errTab[ce].error, "Variable already exists.\n" );
-													errTab[ce].line = ce;
-													ce++;
+												{											
+													
+													if(pointer_value)	
+													{						
+														strcpy( errTab[ce].error, "Invalid convertion.\n" );
+														errTab[ce].line = ce;
+														ce++;													
+													}	
+													else
+													{									
+														strcpy( errTab[ce].error, "Variable %s already exists.\n" );
+														errTab[ce].line = ce;
+														ce++;
+													}
 												}
+												pointer_value_flag = false; //reset variable
+												pointer_value_flag2 = false; //reset variable
 											}
 				| tCONST tVAR				{
 												if(lookup($2) == -1)
@@ -546,47 +766,55 @@ Declar		: 	Declar tPV
 											}
 			;
 
-Main		: 	tMAIN tPO tPF	{												
-									 insert_Instruction( "section", ".text", "", "", "", cp );
-									 cp++;										
-									 insert_Instruction( "global", "_start", "", "", "", cp );
-									 cp++;									
-									 insert_Instruction( "_start:", "", "", "", "", cp );
-									 cp++;		
-								}
-				tCO Body tCF
+Main		: 	tMAIN tPO tPF tCO Body tCF
 			;
 
 Val			:	tNUM		{
-								if( tempCounter == 1 )
+								if( !pointer_value_flag )	//pointer value hasn't been initialized
 								{
-									sprintf(snum, "%d", lookup("0temp1"));
-									sprintf(snum2, "%d", $1);
-									insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @temp1 @num	
-									cp++;
-
-									tempCounter = 2;
-									$$=lookup("0temp1");
-								}		
-								else
-								{
-									sprintf(snum, "%d", lookup("0temp2"));
-									sprintf(snum2, "%d", $1);
-									insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @temp2 @num	
-									cp++;
-
-									tempCounter = 1;
-									$$=lookup("0temp2");	
+									pointer_value_flag = true;
+									pointer_value = false; 			//not a pointer expression
 								}
 
-								//sprintf(snum , "%d", $1);	
-								//$$=snum;
+								temp1_flag = false;
+
+								sprintf(snum, "%d", lookup("0temp2"));
+								sprintf(snum2, "%d", $1);
+								setValueByName("0temp2", $1); 	//Sets the value
+								insert_Instruction( "6", snum, snum2, "", "", cp ); //COP @result @operand1 
+								cp++;
+
+								$$ = lookup("0temp2");
 							}
 				| tVAR		{	
-								if(lookup($1) != -1)
+								if(lookup($1) != -1)	//var exists
 								{
-									$$=lookup($1);
-									//$$=address_Concat($1);			
+									if(lookupType($1) != 2)	//not pointer
+									{
+										if( !pointer_value_flag )	//pointer value hasn't been initialized
+										{
+											pointer_value_flag = true;
+											pointer_value = false; 			//not a pointer expression
+										}
+										$$ = lookup($1);				//Address of the variable
+									}
+									else
+									{
+										if(	pointer_value_flag2 )
+										{
+											pointer_value = false; //pointer expression wrong
+										}
+										else{
+											if( !pointer_value_flag || !pointer_value )	//pointer value hasn't been initialized or pointer value was false
+											{
+												pointer_value_flag = true;
+												pointer_value = true; //pointer expression
+												pointer_value_flag2 = true;
+											}
+										}										
+
+										$$ = lookup($1);		//Address of the pointer(to print the address of the pointed variable)
+									}
 								}
 								else
 								{
@@ -596,43 +824,140 @@ Val			:	tNUM		{
 									errTab[ce].line = ce;
 									ce++;
 								}
-							 }
+							}
+				| tMUL tVAR	{	
+								if( lookupType($2) == 2 )	//var exists and is pointer
+								{
+									if( lookupAddress(getValueByName($2)) != -1 ) //Pointed address is valid
+									{
+										if( !pointer_value_flag )	//pointer value hasn't been initialized
+										{
+											pointer_value_flag = true;
+											pointer_value = false; 			//not a pointer expression
+										}
+																			
+										temp1_flag = false;
+
+										sprintf(snum, "%d", lookup("0temp2"));
+										sprintf(snum2, "%d", lookup($2));		//Address of the pointer 
+										setValueByName("0temp2", getValueByName(lookupName(getValueByName($2)))); 	//Sets the value
+										insert_Instruction( "D", snum, snum2, "", "", cp ); //PCOP @result @operand1 
+										cp++;
+
+										$$ = lookup("0temp2");	//Address of the variable (to print value of the pointed variable)		
+									}
+									else
+									{
+										strcpy( errTab[ce].error, "The pointer '" );
+										strcat( errTab[ce].error, $2 );
+										strcat( errTab[ce].error, "' points to an invalid address.\n" );		
+										errTab[ce].line = ce;
+										ce++;
+									}
+								}
+								else
+								{
+									strcpy( errTab[ce].error, "The pointer " );
+									strcat( errTab[ce].error, $2 );
+									strcat( errTab[ce].error, " does not exist.\n" );		
+									errTab[ce].line = ce;
+									ce++;
+								}
+							}
+				| tAMPERSAND tVAR	{	
+										if( lookupType($2) != -1 )	//var exists
+										{
+											if(	pointer_value_flag2 )
+											{
+												pointer_value = false; //pointer expression wrong
+											}
+											else{
+												if( !pointer_value_flag || !pointer_value )	//pointer value hasn't been initialized or pointer value was false
+												{
+													pointer_value_flag = true;
+													pointer_value = true; //pointer expression
+													pointer_value_flag2 = true;
+												}
+											}
+
+											if( !temp1_flag )
+											{
+												temp1_flag = true;
+
+												sprintf(snum, "%d", lookup("0temp1"));
+												sprintf(snum2, "%d", lookup($2));		//Address of the pointer 
+												setValueByName("0temp1", lookup($2)); 	//Sets the value
+												insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num Copy address to result
+												cp++;
+
+												$$ = lookup("0temp1");
+											}else
+											{
+												temp1_flag = false;
+
+												sprintf(snum, "%d", lookup("0temp2"));
+												sprintf(snum2, "%d", lookup($2));		//Address of the pointer 
+												setValueByName("0temp2", lookup($2)); 	//Sets the value
+												insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num Copy address to result
+												cp++;
+
+												$$ = lookup("0temp2");
+											}
+										}
+										else
+										{
+											strcpy( errTab[ce].error, "The variable " );
+											strcat( errTab[ce].error, $2 );
+											strcat( errTab[ce].error, " does not exist.\n" );		
+											errTab[ce].line = ce;
+											ce++;
+										}
+									}
 			;
 
 Expr			:	Expr tPLUS Expr	{ 		
 										 sprintf(snum, "%d", $1);
 										 sprintf(snum2, "%d", $3);
-										 insert_Instruction( "1", snum, snum, snum2, "", cp ); //ADD @result @operand1 @operand2
+										 sprintf(auxString, "%d", lookup("0temp1"));
+										 setValueByName( "0temp1", getValueByName(lookupName($1))+getValueByName(lookupName($3)) );
+										 insert_Instruction( "1", auxString, snum, snum2, "", cp ); //ADD @result @operand1 @operand2
 									     cp++;
 
-										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en 0temp2
+									     $$=lookup("0temp1");
 									}
 				|	Expr tSOU Expr	{	
 										 sprintf(snum, "%d", $1);
 										 sprintf(snum2, "%d", $3);
-										 insert_Instruction( "3", snum, snum, snum2, "", cp ); //SOU @result @operand1 @operand2
+										 sprintf(auxString, "%d", lookup("0temp1"));
+										 setValueByName( "0temp1", getValueByName(lookupName($1))-getValueByName(lookupName($3)) );
+										 insert_Instruction( "3", auxString, snum, snum2, "", cp ); //SOU @result @operand1 @operand2
+									     cp++;
 
-										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
+									     $$=lookup("0temp1");
 									}
 				|	Expr tMUL Expr	{								
 										 sprintf(snum, "%d", $1);
 										 sprintf(snum2, "%d", $3);
-										 insert_Instruction( "2", snum, snum, snum2, "", cp ); //MUL @result @operand1 @operand2
+										 sprintf(auxString, "%d", lookup("0temp1"));
+										 setValueByName( "0temp1", getValueByName(lookupName($1))*getValueByName(lookupName($3)) );
+										 insert_Instruction( "2", auxString, snum, snum2, "", cp ); //MUL @result @operand1 @operand2
 									     cp++;
 
-										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
+									     $$=lookup("0temp1");
 									}
 				|	Expr tDIV Expr	{ 
 										 sprintf(snum, "%d", $1);
 										 sprintf(snum2, "%d", $3);
-										 insert_Instruction( "4", snum, snum, snum2, "", cp ); //DIV @result @operand1 @operand2
+										 sprintf(auxString, "%d", lookup("0temp1"));
+										 setValueByName( "0temp1", getValueByName(lookupName($1))/getValueByName(lookupName($3)) );
+										 insert_Instruction( "4", auxString, snum, snum2, "", cp ); //DIV @result @operand1 @operand2
+									     cp++;
 
-										tempCounter = 2;					//Como se evaluaron dos expresiones, se coloca en temp2 
+									     $$=lookup("0temp1");
 									}
 				|	tPO Expr tPF
 				|	Val
 			;
-
 
 /*TODO:
 
@@ -644,7 +969,7 @@ Expr			:	Expr tPLUS Expr	{
 								errTab[ce].line = ce;
 								ce++;
       						}
-*/																												!!!!!!!!!!!!!!
+*/																												
 
 
 
@@ -704,6 +1029,7 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 
 int main(void) {
 
+	initializeSymtab(); //Sets parameters like temporal variables, etc..
 
 	//Instruction (label) table
 	int **lableTable = malloc(instSIZE * 4 * sizeof(int));
@@ -719,29 +1045,22 @@ int main(void) {
 	fp = fopen("assOutput.out","w");
 
 
-	insert("0temp1", 0);	//Temp variables inserted with number before to avoid conflict with user create variables	
-	insert("0temp2", 0);
+	fprintf(fp, "%d", lookup("0temp1") );
 
-
-
-
-	/*insertSymbol("a", 1, 10);
-	insertSymbol("a", 0, 10);
-	assignValue("a", 11);*/
-
-
-	//lookup("a");
 	insert("a", 0);
+	setValueByName("a", 30);
 	insert("b", 0);
-	/*lookup("a");
-	insert("a", 0);
-	lookupType("a");
-	insert("b", 0);
+	setValueByName("b", 40);
+	insert("Pa", 2);
+	setValueByName("Pa", lookup("a"));
+	insert("Pb", 2);
+	insert("Pc", 2);
+	setValueByName("Pc", 16);
+
 	insert("c", 1);
 	insert("d", 0);
 	insert("e", 1);
 	insert("g", 1);
-	lookup("e");*/
 
 
 	yyparse();
@@ -756,4 +1075,17 @@ int main(void) {
 
 
 
-/*TODO: Users can't name a variable 0temp1 nor 0temp2*/
+/*TODO: 
+	Symbol table: Addresses sare sometimes repeated
+	Pointers:
+		- On CondValue	 Pointer comparisson is not implemented
+		- Los valores de las variables son alterados siempre, aunque haya un if, si existe a=2 esa asignacion se hace, a nivel de codigo ensamblador, los apuntadores son los unicos afectados (getValue se utiliza directamente en codigo para recuperar las direcciones de sus variables apuntadas)
+	If: 	
+			- Conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
+	While:
+			- Conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
+	Users can't name a variable 0temp1 nor 0temp2	
+
+
+
+*/
