@@ -37,6 +37,7 @@ end Processor;
 architecture Behavioral of Processor is
 
 --U01
+--Memoria de Instrucciones
 component MemIns is
 	port(
 		Adr : in  std_logic_vector(7 downto 0);
@@ -46,6 +47,7 @@ component MemIns is
 end component;
 
 --U02
+--Modulo de Division
 component ModDiv is
 	port(
 		INS 	: in std_logic_vector(31 downto 0);
@@ -57,6 +59,7 @@ component ModDiv is
 end component;
 
 --U03
+--Pipeline LI/DI
 component LI_DI is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -71,6 +74,7 @@ component LI_DI is
 end component;
 
 --U04
+--Banco de Registros
 component BancReg is
 	port(
 		RST 	: in  std_logic;
@@ -85,10 +89,19 @@ component BancReg is
 		);
 end component;
 
---Mulitplexor
 --U05
+--Multiplexor 1
+component Mult1 is
+	port(
+		OP 	: in  std_logic_vector(7 downto 0);
+		B  	: in  std_logic_vector(7 downto 0);
+		QA 	: in  std_logic_vector(7 downto 0);
+		OutB 	: out std_logic_vector(7 downto 0)
+		);
+end component;
 
 --U06
+--Pipeline DI/EX
 component DI_EX is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -105,8 +118,16 @@ end component;
 --Modified ALU
 --U07
 
---Multiplexor
 --U08
+--Multiplexor 2
+component Mult2 is
+	port(
+		OP 	: in  std_logic_vector(7 downto 0);
+		B  	: in  std_logic_vector(7 downto 0);
+		ALU 	: in  std_logic_vector(7 downto 0);
+		OutB 	: out std_logic_vector(7 downto 0)
+		);
+end component;
 
 --U09
 component EX_Mem is
@@ -145,13 +166,29 @@ component Mem_RE is
 		OtOP	: out std_logic_vector(7 downto 0);
 		OtB	: out std_logic_vector(7 downto 0)
 		);
-end component;		
+end component;
+
+signal SOUTs : std_logic_vector(31 downto 0);
+signal SA,SOP,SB,SC : std_logic_vector(7 downto 0);
+signal PA,POP,PB,PC : std_logic_vector(7 downto 0);
+signal BROA, BROB : std_logic_vector(7 downto 0);
+signal MO1,MO2 : std_logic_vector(7 downto 0);		
 
 begin
 
 --Unit Declaration
 
-	U01 : MemIns port map
-	U01 : MemIns port map
+	U01 : MemIns port map(Adr, CLK, SOUTs);
+	U02 : ModDIv port map(SOUTs, SA, SOP, SB, SC);
+	U03 : LI_DI port map(SA, SOP, SB, SC, PA, POP, PB, PC);
+	U04 : BancReg port map(RST, CLK, PB, PC, PA, /*FROM END*/, /*FROM END*/, BROA, BROB);
+	U05 : Mult1 port map(POP, PB, BROA, MO1);
+	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
+	--U07 : ALU
+	U08 : Mult2 port map(POP, PB, /*SALIDA ALU*/, MO2);
+	
+	
+	QAp <= BROA;
+	QBP <= BROB;
 
 end Behavioral;
