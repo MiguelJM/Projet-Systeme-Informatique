@@ -43,7 +43,10 @@ typedef struct HashRec {
 static Node hashTable[SIZE];
 
 static int hash(char *key);
+int hashPrevious(char *key);
+int hashForInsert(char *key);
 void insert(char *name, int type, int depth);
+void delete(char *name);
 int lookup(char *name);
 int lookupAddress(int address);
 int setValueByName(char *name, int value);
@@ -80,14 +83,6 @@ void initializeSymtab()
   l->st_initialized=0; 
   l->next = NULL;
   hashTable[temp2_position] = l;
- /* //l =  hashTable[SIZE];
-  //l = (Node) malloc(sizeof(struct HashRec));
-
-  //Temporal variable 2
-  strcmp(hashTable[SIZE-1]->st_name, "0temp2");
-  hashTable[SIZE-1]->st_address = SIZE-1;
-  hashTable[SIZE-1]->st_type = 0;
-  hashTable[SIZE-1]->next = NULL;  */
 }
 
 /* the hash function */
@@ -114,43 +109,90 @@ static int hash ( char * key )
       temp++;
   }
 
+    printf("Temp is: %d and looked var is: %s\n", temp, key);
   return temp;
 }
 
+/* Used to obtain the previous node to key */
+int hashPrevious ( char * key )
+{ 
+  /* Temporal variables should not be seen by the outside*/
+  if(strcmp(key,"0temp1") == 0)
+  {
+    printf("Error: Temporal variable");
+    return -1;  
+  }
+  if(strcmp(key,"0temp2") == 0) 
+  {
+    printf("Error: Temporal variable");
+    return -1; 
+  } 
+
+  int temp = 0;
+  Node l =  hashTable[temp];
+  Node aux = l;
+  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  {
+      aux = l;
+      l = l->next;
+      temp++;
+  }
+
+  if( aux != l ) //There is no previous var
+    return aux->st_address;
+  else 
+    return -1;
+}
+
+/* the hash function to insert variables */
+int hashForInsert ( char * key )
+{ 
+  if(strcmp(key,"0temp1") == 0)
+    return temp1_position;  
+  if(strcmp(key,"0temp2") == 0)
+    return temp2_position;  
+
+  int temp = 0;
+  Node l =  hashTable[temp];
+  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  {
+      if( l->st_address != temp )
+          return temp;
+      l = l->next;
+      temp++;
+  }
+
+  printf("eso3 in: %d for: %s.\n", temp, key);
+    printf("Temp is: %d and looked var is: %s\n", temp, key);
+  return temp;
+}
 
  /* insert an entry with its line number - if entry
   *  already exists just add its reference line no.  
   */
 void insert( char * name, int type, int depth )
 { 
-  /* ADDED */
-  //int h = hash(name);
-  int h = hash(name);
+  int h = hashForInsert(name);
   Node l =  hashTable[h];
-  /*while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-    l = l->next;
-*/
+  
+  printf("eso3 in: %d for: %s.\n", h, name);
   if (l == NULL && h < temp1_position) /* variable not yet in table and there is space on the table */
   { 
     l = (Node) malloc(sizeof(struct HashRec));
     strcpy(l->st_name, name);  
     /* ADDED */
     l->st_type = type;
-    //l->lines = (RefList) malloc(sizeof(struct RefListRec));
-    //l->lines->lineno = lineno;
-    //l->lines->next = NULL;
-
     l->st_depth = depth;
     l->st_initialized = 0; 
     l->st_address = h;
-    //l->next = hashTable[h];
-    //hashTable[h] = l; 
-    hashTable[h] = l; //new
 
-    if( h > 0 ) //new
-    {
-      hashTable[h-1]->next = hashTable[h]; //new
-      hashTable[h]->next = NULL; //new
+    hashTable[h] = l; 
+
+    if( h > 0 ) //It is not the first insertion 
+    { 
+      l->next = hashTable[h-1]->next;
+      hashTable[h-1]->next = l; 
+      hashTable[h] = l;
     }    
 
     //printf("Var inserted. \n");
@@ -158,22 +200,62 @@ void insert( char * name, int type, int depth )
   else /* found in table, so just add line number */
   { 
     printf("Var already exists or the table is full.\n");
-    /*
-    RefList t = l->lines;
-    while (t->next != NULL) t = t->next;
-    t->next = (RefList) malloc(sizeof(struct RefListRec));
-    t->next->lineno = lineno;
-    t->next->next = NULL;*/
   }
 } 
 
+/* Delete a node */
+void delete( char * name )
+{  
+  int h = hash(name);
+  Node l =  hashTable[h];
+
+  if (l == NULL && h < temp1_position) /* variable is not in table, avoids deleting temporals */
+  { 
+    printf("Error: Var not found.\n");    
+  }
+  else
+  {
+    int hP = hashPrevious(name);
+    if(hP != -1) //It is not the first node on the list or a temporal variable
+    {
+      if( l->next != NULL ) //There is a node after
+      {
+        hashTable[hP]->next = l->next;
+        l = NULL;           
+        hashTable[h] = l;   //RELEASE MEMORY?
+    printf("eso1.\n");
+        //free(l);  //Delete node (erease from memory)
+      }
+      else
+      {
+        hashTable[hP]->next = NULL;
+        l = NULL;       
+        hashTable[h] = l;   //RELEASE MEMORY?
+    printf("eso2.\n");
+        //free(l);  //Delete node (erease from memory)
+      }
+    }
+    else
+    {
+        int deletedAddres = l->next->st_address;
+
+        l = l->next;
+        l->st_address = 0;
+        hashTable[0] = l;
+        hashTable[deletedAddres] = NULL; //RELEASE MEMORY?
+
+      printf("eso3 in: %d.\n next: %d/n", h, l->next->st_address);
+        //free(l);  //Delete node (erease from memory)     
+    } 
+  }
+}
+
 /* return address of symbol if found or -1 if not found  BY NAME*/
-int lookup ( char * name )
+int lookup( char * name )
 { 
   int h = hash(name);
   Node l =  hashTable[h];
-  /*while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-    l = l->next;*/
+
   if (l == NULL){ 
     //printf("Var not found.\n");
      return -1;
@@ -206,8 +288,7 @@ int setValueByName( char * name, int value )
 { 
   int h = hash(name);
   Node l =  hashTable[h];
-  /*while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-    l = l->next;*/
+
   if (l == NULL){ 
     //printf("Var not found.\n");
      return -1;
@@ -226,8 +307,7 @@ int getValueByName( char * name )
 { 
   int h = hash(name);
   Node l =  hashTable[h];
- /* while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-    l = l->next;*/
+
   if (l == NULL){ 
     //printf("Var not found.\n");
      return -1;
@@ -244,8 +324,7 @@ int lookupType( char * name )
 {
   int h = hash(name);
   Node l =  hashTable[h];
- /* while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-    l = l->next;*/
+
   if (l == NULL) {
    // printf("Variable not found.\n");
     return -1;
@@ -285,19 +364,6 @@ bool varInitialized( char *name ) //Returns true if the variable has been initia
   }
   return false;
 }
-/* set datatype of symbol returns 0 if symbol not found 
-int setType( char * name, int t )
-{
-   int h = hash(name);
-   Node l =  hashTable[h];
-   while ((l != NULL) && (strcmp(name,l->st_name) != 0))
-     l = l->next;
-   if (l == NULL) return -1;
-   else {
-     l->st_type = t;
-     return 0;
-   }
-}*/
 
 /* print to stdout by default */ 
 void symtab_print(FILE * of) {  
@@ -305,36 +371,17 @@ void symtab_print(FILE * of) {
   fprintf(of,"\n----------  ------   ----------  ---------  -------  ------------- \n");
   fprintf(of,"Name         Type     Position     Value     Depth    Initialized\n");
   fprintf(of,"----------  ------   ----------  ---------  -------  -------------\n");
- // for (i=0; i < SIZE; ++i)
- // { 
-    //if (hashTable[i] != NULL) //If there is a value on the list
-    //{ 
-    Node l = hashTable[0];
-    while (l != NULL)
-    { 
-      //RefList t = l->lines;
-      fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
 
-      /*if (l->st_type == INT_TYPE)
-         fprintf(of,"%-7s","int ");
-      if (l->st_type == REAL_TYPE)
-         fprintf(of,"%-7s","real");
-      if (l->st_type == STR_TYPE)
-         fprintf(of,"%-7s","string");*/
-
-
-      /*while (t != NULL)
-      { fprintf(of,"%4d ",t->lineno);
-        t = t->next;
-      }*/
-      l = l->next;
-    }
-
-    /* Print temporal variables */
-    l = hashTable[temp1_position];
+  Node l = hashTable[0];
+  while (l != NULL)
+  { 
     fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
-    l = hashTable[temp2_position];
-    fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
-    //}
- // }
+    l = l->next;
+  }
+
+  /* Print temporal variables */
+  l = hashTable[temp1_position];
+  fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
+  l = hashTable[temp2_position];
+  fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
 } 

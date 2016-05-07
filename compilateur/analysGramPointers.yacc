@@ -1190,18 +1190,21 @@ int main(void) {
 	fprintf(fp, "%d", lookup("0temp1") );
 
 	insert("a", 0, 0);
-	setValueByName("a", 30);
+	//setValueByName("a", 30);
 	insert("b", 0, 0);
-	setValueByName("b", 40);
+	delete("b");
+	//setValueByName("b", 40);
 	insert("Pa", 2, 0);
-	setValueByName("Pa", lookup("a"));
+	//setValueByName("Pa", lookup("a"));
 	insert("Pb", 2, 0);
 	insert("Pc", 2, 0);
-	setValueByName("Pc", 16);
+	//setValueByName("Pc", 16);
 
+	delete("a");
 	insert("c", 1, 0);
 	insert("d", 0, 0);
 	insert("e", 1, 0);
+	delete("c");
 	insert("g", 1, 0);
 
 
