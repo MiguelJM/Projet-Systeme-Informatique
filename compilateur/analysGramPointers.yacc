@@ -192,6 +192,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 										}	
 									}
 			|	tVAR tE Expr tPV	{
+  printf("look1 for :%s\n", $1);
 										if(lookupType($1) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
 											if( temp1_flag )	//value is in temp1
@@ -203,6 +204,7 @@ Assign 		:	tVAR tE tVAR tPV	{
 											sprintf(snum2, "%d", lookup(auxString));
 											setValueByName($1, getValueByName(auxString)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+  printf("look2 for :%s\n", $1);
 										    cp++;			
 										}
 										else
@@ -1190,21 +1192,21 @@ int main(void) {
 	fprintf(fp, "%d", lookup("0temp1") );
 
 	insert("a", 0, 0);
-	//setValueByName("a", 30);
+	setValueByName("a", 30);
 	insert("b", 0, 0);
-	delete("b");
-	//setValueByName("b", 40);
+	//delete("b");
+	setValueByName("b", 40);
 	insert("Pa", 2, 0);
-	//setValueByName("Pa", lookup("a"));
+	setValueByName("Pa", lookup("a"));
 	insert("Pb", 2, 0);
 	insert("Pc", 2, 0);
-	//setValueByName("Pc", 16);
+	setValueByName("Pc", 16);
 
 	delete("a");
 	insert("c", 1, 0);
 	insert("d", 0, 0);
 	insert("e", 1, 0);
-	delete("c");
+	//delete("c");
 	insert("g", 1, 0);
 
 

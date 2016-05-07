@@ -109,7 +109,6 @@ static int hash ( char * key )
       temp++;
   }
 
-    printf("Temp is: %d and looked var is: %s\n", temp, key);
   return temp;
 }
 
@@ -162,8 +161,6 @@ int hashForInsert ( char * key )
       temp++;
   }
 
-  printf("eso3 in: %d for: %s.\n", temp, key);
-    printf("Temp is: %d and looked var is: %s\n", temp, key);
   return temp;
 }
 
@@ -175,7 +172,6 @@ void insert( char * name, int type, int depth )
   int h = hashForInsert(name);
   Node l =  hashTable[h];
   
-  printf("eso3 in: %d for: %s.\n", h, name);
   if (l == NULL && h < temp1_position) /* variable not yet in table and there is space on the table */
   { 
     l = (Node) malloc(sizeof(struct HashRec));
@@ -223,7 +219,7 @@ void delete( char * name )
         hashTable[hP]->next = l->next;
         l = NULL;           
         hashTable[h] = l;   //RELEASE MEMORY?
-    printf("eso1.\n");
+
         //free(l);  //Delete node (erease from memory)
       }
       else
@@ -231,7 +227,7 @@ void delete( char * name )
         hashTable[hP]->next = NULL;
         l = NULL;       
         hashTable[h] = l;   //RELEASE MEMORY?
-    printf("eso2.\n");
+
         //free(l);  //Delete node (erease from memory)
       }
     }
@@ -244,7 +240,6 @@ void delete( char * name )
         hashTable[0] = l;
         hashTable[deletedAddres] = NULL; //RELEASE MEMORY?
 
-      printf("eso3 in: %d.\n next: %d/n", h, l->next->st_address);
         //free(l);  //Delete node (erease from memory)     
     } 
   }
@@ -271,8 +266,11 @@ int lookup( char * name )
 /* return address of symbol if found or -1 if not found  BY ADDRESS*/
 int lookupAddress ( int address )
 { 
+  if( address >= SIZE )
+     return -1;
+
   Node l =  hashTable[address];
-  if (l == NULL || address >= SIZE ){ 
+  if (l == NULL ){ 
     //printf("Var not found.\n");
      return -1;
    }
@@ -338,8 +336,12 @@ int lookupType( char * name )
 /* return name of symbol or -1 if symbol not found */
 char* lookupName( int address )
 {
+  if( address >= SIZE )
+     return "NULL";
+
   Node l =  hashTable[address];
-  if (l == NULL || address >= SIZE ) {
+
+  if (l == NULL ) {
    // printf("Variable not found.\n");
     return "NULL";
   }

@@ -573,12 +573,12 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,   130,   130,   133,   143,   144,   145,   146,   147,   148,
-     151,   178,   194,   242,   269,   296,   334,   363,   376,   380,
-     417,   423,   423,   443,   443,   460,   466,   466,   486,   486,
-     503,   506,   509,   515,   546,   588,   610,   622,   622,   666,
-     675,   676,   677,   680,   681,   682,   720,   739,   740,   741,
-     778,   797,   798,   799,   838,   860,   886,   942,   989,  1040,
-    1055,  1070,  1085,  1100,  1101
+     151,   178,   194,   244,   271,   298,   336,   365,   378,   382,
+     419,   425,   425,   445,   445,   462,   468,   468,   488,   488,
+     505,   508,   511,   517,   548,   590,   612,   624,   624,   668,
+     677,   678,   679,   682,   683,   684,   722,   741,   742,   743,
+     780,   799,   800,   801,   840,   862,   888,   944,   991,  1042,
+    1057,  1072,  1087,  1102,  1103
 };
 #endif
 
@@ -1506,6 +1506,7 @@ yyreduce:
   case 12:
 #line 194 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
+  printf("look1 for :%s\n", (yyvsp[-3].variable));
 										if(lookupType((yyvsp[-3].variable)) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
 											if( temp1_flag )	//value is in temp1
@@ -1517,6 +1518,7 @@ yyreduce:
 											sprintf(snum2, "%d", lookup(auxString));
 											setValueByName((yyvsp[-3].variable), getValueByName(auxString)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+  printf("look2 for :%s\n", (yyvsp[-3].variable));
 										    cp++;			
 										}
 										else
@@ -1553,11 +1555,11 @@ yyreduce:
 										pointer_value_flag = false; //reset variable
 										pointer_value_flag2 = false; //reset variable
 									}
-#line 1557 "y.tab.c" /* yacc.c:1646  */
+#line 1559 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 242 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 244 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) != 2 && lookupType((yyvsp[-4].variable)) != -1 && lookupType((yyvsp[-1].variable)) == 2)	//Variables exist, first variable is not a pointer, and second var is a pointer
 												{	
@@ -1585,11 +1587,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1589 "y.tab.c" /* yacc.c:1646  */
+#line 1591 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 269 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 271 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Variables exist, first variable is a pointer, and second var is not pointer
 												{														
@@ -1617,11 +1619,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1621 "y.tab.c" /* yacc.c:1646  */
+#line 1623 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 296 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 298 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 )	//Variable exists and is pointer
 												{			
@@ -1660,11 +1662,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1664 "y.tab.c" /* yacc.c:1646  */
+#line 1666 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 334 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 336 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Both variable exist, the first is pointer, and the second is not pointer
 												{				
@@ -1692,11 +1694,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1698 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 363 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 365 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									depth++;	//Used for variable creation
 
@@ -1708,20 +1710,20 @@ yyreduce:
 									else_iter_stack = push(else_begin_count, else_iter_stack);	//store else begin iterations to later assign if begin line
 									else_begin_count = 0;
 								}
-#line 1712 "y.tab.c" /* yacc.c:1646  */
+#line 1714 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 376 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 378 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp);									//Obtain else body end
 													insert_Instruction( "JMP", snum, "", "", "", (yyvsp[-4].nb)-1 );		//If ended, jump to else body end
 												}
-#line 1721 "y.tab.c" /* yacc.c:1646  */
+#line 1723 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 380 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 382 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
 													insert_Instruction( "JMF", "@X", snum, "", "", (yyvsp[-3].nb) );				//If statement is false jump to else body
@@ -1757,22 +1759,22 @@ yyreduce:
 
 													depth--;	//Used for variable creation
 												}
-#line 1761 "y.tab.c" /* yacc.c:1646  */
+#line 1763 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 417 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 419 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1772 "y.tab.c" /* yacc.c:1646  */
+#line 1774 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 423 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 425 "analysGramPointers.yacc" /* yacc.c:1646  */
     {									
 											sprintf(snum , "%d", cp+2);	
 											insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1783,11 +1785,11 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1787 "y.tab.c" /* yacc.c:1646  */
+#line 1789 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 433 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 435 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											sprintf(snum , "%d", cp+2);	
 					 						insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1798,44 +1800,44 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1802 "y.tab.c" /* yacc.c:1646  */
+#line 1804 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 443 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 445 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;
 										}
-#line 1813 "y.tab.c" /* yacc.c:1646  */
+#line 1815 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 449 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 451 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;											
 										}
-#line 1824 "y.tab.c" /* yacc.c:1646  */
+#line 1826 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 460 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 462 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1835 "y.tab.c" /* yacc.c:1646  */
+#line 1837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 466 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 468 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1846,11 +1848,11 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1850 "y.tab.c" /* yacc.c:1646  */
+#line 1852 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 476 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 478 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1861,57 +1863,57 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1865 "y.tab.c" /* yacc.c:1646  */
+#line 1867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 486 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 488 "analysGramPointers.yacc" /* yacc.c:1646  */
     {		
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1878 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 492 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 494 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1887 "y.tab.c" /* yacc.c:1646  */
+#line 1889 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 503 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 505 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="9";	//INF
 						}
-#line 1895 "y.tab.c" /* yacc.c:1646  */
+#line 1897 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 506 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 508 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="A";	//SUP
 						}
-#line 1903 "y.tab.c" /* yacc.c:1646  */
+#line 1905 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 509 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 511 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="B";	//EQU
 						}
-#line 1911 "y.tab.c" /* yacc.c:1646  */
+#line 1913 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 515 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 517 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 								if( lookup((yyvsp[0].variable)) != -1 && lookupType((yyvsp[0].variable)) != 2	)		//var exists and is not pointer
 								{	
@@ -1943,11 +1945,11 @@ yyreduce:
 									ce++;
 								}	
 							}
-#line 1947 "y.tab.c" /* yacc.c:1646  */
+#line 1949 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 546 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 548 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 									if(lookup((yyvsp[0].variable)) != -1 && lookup((yyvsp[0].variable)) == 2	)		//var exists and is a pointer
 									{	
@@ -1990,11 +1992,11 @@ yyreduce:
 										ce++;
 									}	
 								}
-#line 1994 "y.tab.c" /* yacc.c:1646  */
+#line 1996 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 588 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 590 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( !temp1_flag )
 								{
@@ -2015,11 +2017,11 @@ yyreduce:
 								sprintf(snum, "%d", lookup(auxString));
 								(yyval.variable)=snum;
 							}
-#line 2019 "y.tab.c" /* yacc.c:1646  */
+#line 2021 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 610 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 612 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 											while_last_cond = push(cp, while_last_cond);	//Store while begin
 											cp++;	
@@ -2030,21 +2032,21 @@ yyreduce:
 											while_end_iter_stack = push(while_end_count, while_end_iter_stack);			//store while end iterations to later assign while end line
 											while_end_count = 0;	
 										}
-#line 2034 "y.tab.c" /* yacc.c:1646  */
+#line 2036 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 622 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 624 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 														depth++;	//Used for variable creation
 														(yyvsp[0].nb)=cp;										//Save while begin
 			
 													}
-#line 2044 "y.tab.c" /* yacc.c:1646  */
+#line 2046 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 627 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 629 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 														int whileBegin = while_last_cond.stk[while_last_cond.top];
 														while_last_cond = pop(while_last_cond);							//pop the value		
@@ -2082,11 +2084,11 @@ yyreduce:
 
 														depth--;	//Used for variable creation
 													}
-#line 2086 "y.tab.c" /* yacc.c:1646  */
+#line 2088 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 666 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 668 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 											sprintf(snum, "%d", (yyvsp[-2].nb));
 											insert_Instruction( "C", snum, "", "", "", cp );	//PRI @result
@@ -2094,11 +2096,11 @@ yyreduce:
 											pointer_value_flag = false; //reset variable
 											pointer_value_flag2 = false; //reset variable
 										}
-#line 2098 "y.tab.c" /* yacc.c:1646  */
+#line 2100 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 682 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 684 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value)	//Variable doesn't exist and the expr is not for pointers
 									{
@@ -2137,11 +2139,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2141 "y.tab.c" /* yacc.c:1646  */
+#line 2143 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 720 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 722 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2159,11 +2161,11 @@ yyreduce:
 										ce++;
 									}
 								}
-#line 2163 "y.tab.c" /* yacc.c:1646  */
+#line 2165 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 741 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 743 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 									if(lookup((yyvsp[-2].variable)) == -1 && pointer_value) //Variable exists and the expression is correct
 									{
@@ -2201,11 +2203,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2205 "y.tab.c" /* yacc.c:1646  */
+#line 2207 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 778 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 780 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2223,11 +2225,11 @@ yyreduce:
 										ce++;
 									}	
 								}
-#line 2227 "y.tab.c" /* yacc.c:1646  */
+#line 2229 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 799 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 801 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value) //Variable exists and the expression is correct
 									{
@@ -2267,11 +2269,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2271 "y.tab.c" /* yacc.c:1646  */
+#line 2273 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 838 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 840 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2289,11 +2291,11 @@ yyreduce:
 										ce++;
 									}
 								}
-#line 2293 "y.tab.c" /* yacc.c:1646  */
+#line 2295 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 860 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 862 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 								if( !pointer_value_flag )	//pointer value hasn't been initialized
 								{
@@ -2320,11 +2322,11 @@ yyreduce:
 
 								(yyval.nb) = lookup(auxString);
 							}
-#line 2324 "y.tab.c" /* yacc.c:1646  */
+#line 2326 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 886 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 888 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)	//var exists
 								{
@@ -2381,11 +2383,11 @@ yyreduce:
 									ce++;
 								}
 							}
-#line 2385 "y.tab.c" /* yacc.c:1646  */
+#line 2387 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 942 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 944 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( lookupType((yyvsp[0].variable)) == 2 )	//var exists and is pointer
 								{
@@ -2433,11 +2435,11 @@ yyreduce:
 									ce++;
 								}
 							}
-#line 2437 "y.tab.c" /* yacc.c:1646  */
+#line 2439 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 989 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 991 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 										if( lookupType((yyvsp[0].variable)) != -1 )	//var exists
 										{
@@ -2487,11 +2489,11 @@ yyreduce:
 											ce++;
 										}
 									}
-#line 2491 "y.tab.c" /* yacc.c:1646  */
+#line 2493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 1040 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 1042 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 		
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2507,11 +2509,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2511 "y.tab.c" /* yacc.c:1646  */
+#line 2513 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 1055 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 1057 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2527,11 +2529,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2531 "y.tab.c" /* yacc.c:1646  */
+#line 2533 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 1070 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 1072 "analysGramPointers.yacc" /* yacc.c:1646  */
     {								
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2547,11 +2549,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2551 "y.tab.c" /* yacc.c:1646  */
+#line 2553 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 1085 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 1087 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 
 										if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2567,11 +2569,18 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2571 "y.tab.c" /* yacc.c:1646  */
+#line 2573 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 1103 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+  printf("look1 for :%d\n", (yyvsp[0].nb));}
+#line 2580 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2575 "y.tab.c" /* yacc.c:1646  */
+#line 2584 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2799,7 +2808,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1118 "analysGramPointers.yacc" /* yacc.c:1906  */
+#line 1121 "analysGramPointers.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
@@ -2875,21 +2884,21 @@ int main(void) {
 	fprintf(fp, "%d", lookup("0temp1") );
 
 	insert("a", 0, 0);
-	//setValueByName("a", 30);
+	setValueByName("a", 30);
 	insert("b", 0, 0);
-	delete("b");
-	//setValueByName("b", 40);
+	//delete("b");
+	setValueByName("b", 40);
 	insert("Pa", 2, 0);
-	//setValueByName("Pa", lookup("a"));
+	setValueByName("Pa", lookup("a"));
 	insert("Pb", 2, 0);
 	insert("Pc", 2, 0);
-	//setValueByName("Pc", 16);
+	setValueByName("Pc", 16);
 
 	delete("a");
 	insert("c", 1, 0);
 	insert("d", 0, 0);
 	insert("e", 1, 0);
-	delete("c");
+	//delete("c");
 	insert("g", 1, 0);
 
 
