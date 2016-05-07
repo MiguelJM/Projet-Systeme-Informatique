@@ -6,7 +6,6 @@
 
 %%
 "int" return(tINT);
-
 "<"  return(tMIN);
 ">"  return(tMAY);
 "<=" return(tMINEQU);
@@ -35,6 +34,10 @@
 "const"			return(tCONST);
 "else"			return(tELSE);
 "\""				return(tGUILLEMETS);
+
+\n      ;    /*  ignore end of line */
+[ \t]+ 	;    /*  ignore end of line */
+
 [0-9]+ 					{
 							yylval.nb = atof(yytext); 
 							return(tNUM);

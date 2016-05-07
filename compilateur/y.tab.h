@@ -116,7 +116,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 84 "analysGramPointers.yacc" /* yacc.c:1909  */
+#line 85 "analysGramPointers.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;

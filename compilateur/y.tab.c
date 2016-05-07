@@ -131,7 +131,7 @@
   	bool pointer_value_flag2 = false;	//turns pointer value to false (because a = b + a OR a = &var + &var2 where a,b are pointers is not permited)
   	bool pointer_value = false;			//Used to verify if a val i used for a pointer assignation
 
-  	bool temp1_flag = false;		//Used to indicate if temp1 is beinf used (in that case, use temp2)
+  	bool temp1_flag = false;		//Used to indicate if temp1 is being used (in that case, use temp2)
 
 	char snum[5];		//To convert numbers to strings
 	char snum2[5];		//To convert numbers to strings
@@ -141,11 +141,12 @@
 	char last_while_type[8]; //Returns the last type of while retrieved
 
 	int auxNum;	
+	int depth = 0;				//Allows to determine how deep a variable is
 
 	char retrievedString[64]; //Used to store user input in the printf instructions.
 	char stringPrinter[4]; 	//Used to create the printf instructions.
 
-#line 149 "y.tab.c" /* yacc.c:339  */
+#line 150 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -251,12 +252,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 84 "analysGramPointers.yacc" /* yacc.c:355  */
+#line 85 "analysGramPointers.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 260 "y.tab.c" /* yacc.c:355  */
+#line 261 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -271,7 +272,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 275 "y.tab.c" /* yacc.c:358  */
+#line 276 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -513,16 +514,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   155
+#define YYLAST   173
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  34
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  22
+#define YYNNTS  25
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  57
+#define YYNRULES  64
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  130
+#define YYNSTATES  144
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -571,12 +572,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   129,   129,   132,   142,   143,   144,   145,   146,   147,
-     150,   177,   193,   231,   258,   285,   318,   342,   353,   357,
-     392,   398,   398,   418,   418,   435,   441,   441,   461,   461,
-     478,   481,   484,   490,   521,   563,   585,   597,   597,   638,
-     648,   649,   650,   678,   689,   716,   727,   756,   772,   789,
-     828,   867,   918,   928,   938,   948,   958,   959
+       0,   130,   130,   133,   143,   144,   145,   146,   147,   148,
+     151,   178,   194,   242,   269,   296,   334,   363,   376,   380,
+     417,   423,   423,   443,   443,   460,   466,   466,   486,   486,
+     503,   506,   509,   515,   546,   588,   610,   622,   622,   666,
+     675,   676,   677,   680,   681,   682,   720,   739,   740,   741,
+     778,   797,   798,   799,   838,   860,   886,   942,   989,  1040,
+    1055,  1070,  1085,  1100,  1101
 };
 #endif
 
@@ -592,7 +594,7 @@ static const char *const yytname[] =
   "tGUILLEMETS", "$accept", "TestStart", "TestMessage", "Body", "Assign",
   "Condition", "If", "Cond", "$@1", "$@2", "CondWhile", "$@3", "$@4",
   "CompareToken", "CondValue", "ConditionWhile", "While", "$@5", "Print",
-  "Declar", "Val", "Expr", YY_NULLPTR
+  "Declar", "DeclarInt", "DeclarPtr", "DeclarCnst", "Val", "Expr", YY_NULLPTR
 };
 #endif
 
@@ -608,10 +610,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -66
+#define YYPACT_NINF -75
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-66)))
+  (!!((Yystate) == (-75)))
 
 #define YYTABLE_NINF -1
 
@@ -622,19 +624,21 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -24,   -66,    12,   -66,   -66,     2,   -66,    59,     3,    59,
-     -66,    -2,   -66,    20,    89,    80,    30,   -66,   -66,   -66,
-     -66,   -66,   -11,    22,     5,    28,    36,    45,    32,    24,
-     -66,    58,   -66,   -66,    -7,    57,   -66,    75,    78,     6,
-      79,    52,    92,    86,    93,   -66,    80,    95,   -66,    -1,
-     -66,   -66,     8,    94,    88,     8,   101,   110,   116,   -66,
-     103,    -5,   115,   -66,   117,   -66,   121,    92,   123,    89,
-      80,     8,    80,    -7,   125,   126,   107,     8,   124,    99,
-     -66,   127,   -66,   -66,     8,     8,     8,     8,   128,   129,
-     -66,   -66,   130,   134,   -66,   -11,    38,   107,    61,    59,
-      59,   107,   -66,   -66,   -66,    50,    50,   -66,   -66,   -66,
-     -66,   -66,    70,   -66,   -66,   -66,   135,   136,   -66,   -66,
-     -66,   -66,   138,   139,    92,    92,   140,   141,   -66,   -66
+     -12,   -75,     7,   -75,   -75,     3,   -75,   101,    32,   101,
+     -75,     0,   -75,    28,    77,    69,    43,   -75,   -75,   -75,
+     -75,   -75,    50,     4,    58,    73,    87,    98,    29,     5,
+     -75,    82,   -75,   -75,   -75,    90,    99,   107,     2,   -75,
+       8,    92,    11,   -11,    72,   119,   100,   110,   124,   123,
+       1,   -75,    69,   130,     8,    11,    29,   -75,   -75,    91,
+     122,   126,    23,   -75,   129,    91,   132,   131,   134,   -75,
+     118,    22,   133,   -75,   135,   -75,   139,   110,   141,    77,
+      69,    91,   -75,    69,    90,    99,   107,   143,   144,    84,
+      91,   -75,   142,   108,   -75,   145,   -75,   -75,    91,    91,
+      91,    91,   146,   147,   -75,   -75,   148,   152,   -75,    50,
+      34,    84,    52,   101,   101,    84,   -75,   -75,   -75,    27,
+      27,   -75,   -75,   -75,   -75,   -75,    78,   -75,   -75,   -75,
+     153,   154,   -75,   -75,   -75,   -75,   156,   157,   110,   110,
+     158,   159,   -75,   -75
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -644,33 +648,35 @@ static const yytype_uint8 yydefact[] =
 {
        0,    37,     0,     2,     3,     0,     1,     0,     0,     0,
       33,     0,    35,     0,     0,     0,     0,    34,    36,    30,
-      31,    32,     0,     0,     0,     0,     0,     0,     0,     0,
-       8,     5,     6,     7,     4,     0,    25,    43,     0,     0,
-       0,     0,     0,     0,    47,    38,     9,     0,    40,     0,
-      26,    28,     0,    45,     0,     0,    49,     0,    48,    57,
-       0,     0,     0,    49,     0,    48,     0,     0,     0,     0,
-       0,     0,     0,    41,     0,     0,    42,     0,    51,     0,
-      10,    50,    11,    12,     0,     0,     0,     0,     0,     0,
-      51,    50,     0,     0,    17,     0,     0,    46,     0,     0,
-       0,    44,    16,    56,    13,    52,    53,    54,    55,    14,
-      15,    39,     0,    20,    19,    18,     0,     0,    21,    23,
-      27,    29,     0,     0,     0,     0,     0,     0,    22,    24
+      31,    32,     0,     0,    46,     0,     0,     0,     0,     0,
+       8,     5,     6,     7,     4,    40,    41,    42,     0,    25,
+       0,    46,     0,     0,     0,     0,     0,     0,     0,    54,
+       0,    38,     9,     0,     0,     0,     0,    26,    28,     0,
+       0,    50,     0,    43,     0,     0,    56,     0,    55,    64,
+      45,     0,     0,    56,     0,    55,     0,     0,     0,     0,
+       0,     0,    51,     0,    44,    48,    52,     0,     0,    45,
+       0,    47,    58,     0,    10,    57,    11,    12,     0,     0,
+       0,     0,     0,     0,    58,    57,     0,     0,    17,     0,
+       0,    53,     0,     0,     0,    49,    16,    63,    13,    59,
+      60,    61,    62,    14,    15,    39,     0,    20,    19,    18,
+       0,     0,    21,    23,    27,    29,     0,     0,     0,     0,
+       0,     0,    22,    24
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -66,   -66,   -66,    -9,   -66,   -66,   -66,   -65,   -66,   -66,
-      -8,   -66,   -66,    71,   -22,   -66,   142,   -66,   -66,   104,
-     102,   -48
+     -75,   -75,   -75,   -13,   -75,   -75,   -75,   -74,   -75,   -75,
+      -8,   -75,   -75,    79,   -22,   -75,   160,   -75,   -75,   -75,
+     -18,    17,   -17,   115,   -55
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,     3,    46,    30,    43,    31,    68,   122,   123,
-      13,    74,    75,    22,    14,     8,    32,     5,    33,    34,
-      59,    60
+      -1,     2,     3,    52,    30,    48,    31,    78,   136,   137,
+      13,    87,    88,    22,    14,     8,    32,     5,    33,    34,
+      35,    36,    37,    69,    70
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -678,42 +684,46 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      36,    16,    93,    23,    76,     1,    29,    79,    10,    54,
-      48,    62,     6,    11,    88,     7,    12,    17,    15,    55,
-      69,    55,    89,    97,    49,    56,    39,    63,    23,   101,
-      57,    28,    64,    58,    18,    65,   105,   106,   107,   108,
-      45,    37,    23,    24,    35,    69,    38,    40,    25,    41,
-      26,    44,    27,     1,   114,    62,    28,    24,    42,   126,
-     127,    96,    25,    98,    26,    23,    27,     1,    50,    51,
-      28,    63,     9,   113,    86,    87,    64,   115,    10,    65,
-      24,   118,   119,    11,    23,    25,    12,    26,    47,    27,
-       1,   116,   117,    28,    19,    20,    52,    53,    21,    24,
-      61,    70,    69,    69,    25,    67,    26,    78,    27,     1,
-      72,    10,    28,   103,    71,    77,    11,    84,    80,    12,
-      83,    84,    85,    86,    87,    84,    85,    86,    87,    81,
-      85,    86,    87,    82,    90,    92,    91,    94,    99,   100,
-      95,   102,     4,    66,   104,   109,   110,   111,   112,   120,
-     121,   124,   125,    73,   128,   129
+      39,    16,    29,   107,    89,    43,    63,     6,    40,    23,
+      93,    50,    40,    57,    58,    60,     7,     1,    82,    17,
+      54,    51,    43,    41,    24,    79,   111,    41,    42,    25,
+      61,    26,    56,    27,     1,   115,    84,    28,    23,    86,
+      91,   102,    18,   119,   120,   121,   122,    15,    49,   103,
+     128,   100,   101,    24,    55,    79,    23,    38,    25,    62,
+      26,    28,    27,     1,   140,   141,    28,   110,   129,    10,
+     112,    24,    85,    23,    11,    64,    25,    12,    26,    44,
+      27,     1,    19,    20,    28,    65,    21,   127,    24,   132,
+     133,    66,    45,    25,    72,    26,    67,    27,     1,    68,
+      46,    28,    98,    72,    65,   130,   131,    99,   100,   101,
+      73,    47,    53,    59,     9,    74,    79,    79,    75,    73,
+      10,    54,   117,    77,    74,    11,    98,    75,    12,    10,
+      55,    99,   100,   101,    11,    97,    98,    12,    56,    80,
+      71,    99,   100,   101,    81,    83,    42,    90,    92,    94,
+      95,    96,   104,   106,   105,   108,   113,   114,   109,   116,
+       4,    76,   118,   123,   124,   125,   126,   134,   135,   138,
+     139,     0,   142,   143
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-      22,     9,    67,     4,    52,    29,    15,    55,    19,     3,
-      17,     3,     0,    24,    19,    13,    27,    19,    15,    13,
-      42,    13,    27,    71,    31,    19,    21,    19,     4,    77,
-      24,    32,    24,    27,    14,    27,    84,    85,    86,    87,
-      16,    19,     4,    19,    14,    67,    24,    19,    24,    13,
-      26,    19,    28,    29,    16,     3,    32,    19,    13,   124,
-     125,    70,    24,    72,    26,     4,    28,    29,    11,    12,
-      32,    19,    13,    95,    24,    25,    24,    16,    19,    27,
-      19,    11,    12,    24,     4,    24,    27,    26,    30,    28,
-      29,    99,   100,    32,     5,     6,    21,    19,     9,    19,
-      21,    15,   124,   125,    24,    13,    26,    19,    28,    29,
-      15,    19,    32,    14,    21,    21,    24,    18,    17,    27,
-      17,    18,    23,    24,    25,    18,    23,    24,    25,    19,
-      23,    24,    25,    17,    19,    14,    19,    14,    13,    13,
-      69,    17,     0,    41,    17,    17,    17,    17,    14,    14,
-      14,    13,    13,    49,    14,    14
+      22,     9,    15,    77,    59,    23,    17,     0,     4,     4,
+      65,    28,     4,    11,    12,     4,    13,    29,    17,    19,
+      31,    16,    40,    19,    19,    47,    81,    19,    24,    24,
+      19,    26,    31,    28,    29,    90,    54,    32,     4,    56,
+      17,    19,    14,    98,    99,   100,   101,    15,    19,    27,
+      16,    24,    25,    19,    31,    77,     4,    14,    24,    42,
+      26,    32,    28,    29,   138,   139,    32,    80,    16,    19,
+      83,    19,    55,     4,    24,     3,    24,    27,    26,    21,
+      28,    29,     5,     6,    32,    13,     9,   109,    19,    11,
+      12,    19,    19,    24,     3,    26,    24,    28,    29,    27,
+      13,    32,    18,     3,    13,   113,   114,    23,    24,    25,
+      19,    13,    30,    21,    13,    24,   138,   139,    27,    19,
+      19,    31,    14,    13,    24,    24,    18,    27,    27,    19,
+      31,    23,    24,    25,    24,    17,    18,    27,    31,    15,
+      21,    23,    24,    25,    21,    15,    24,    21,    19,    17,
+      19,    17,    19,    14,    19,    14,    13,    13,    79,    17,
+       0,    46,    17,    17,    17,    17,    14,    14,    14,    13,
+      13,    -1,    14,    14
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -723,16 +733,18 @@ static const yytype_uint8 yystos[] =
        0,    29,    35,    36,    50,    51,     0,    13,    49,    13,
       19,    24,    27,    44,    48,    15,    44,    19,    14,     5,
        6,     9,    47,     4,    19,    24,    26,    28,    32,    37,
-      38,    40,    50,    52,    53,    14,    48,    19,    24,    21,
-      19,    13,    13,    39,    19,    16,    37,    30,    17,    31,
-      11,    12,    21,    19,     3,    13,    19,    24,    27,    54,
-      55,    21,     3,    19,    24,    27,    54,    13,    41,    48,
-      15,    21,    15,    53,    45,    46,    55,    21,    19,    55,
-      17,    19,    17,    17,    18,    23,    24,    25,    19,    27,
-      19,    19,    14,    41,    14,    47,    37,    55,    37,    13,
-      13,    55,    17,    14,    17,    55,    55,    55,    55,    17,
-      17,    17,    14,    48,    16,    16,    44,    44,    11,    12,
-      14,    14,    42,    43,    13,    13,    41,    41,    14,    14
+      38,    40,    50,    52,    53,    54,    55,    56,    14,    48,
+       4,    19,    24,    54,    21,    19,    13,    13,    39,    19,
+      56,    16,    37,    30,    31,    31,    31,    11,    12,    21,
+       4,    19,    55,    17,     3,    13,    19,    24,    27,    57,
+      58,    21,     3,    19,    24,    27,    57,    13,    41,    48,
+      15,    21,    17,    15,    54,    55,    56,    45,    46,    58,
+      21,    17,    19,    58,    17,    19,    17,    17,    18,    23,
+      24,    25,    19,    27,    19,    19,    14,    41,    14,    47,
+      37,    58,    37,    13,    13,    58,    17,    14,    17,    58,
+      58,    58,    58,    17,    17,    17,    14,    48,    16,    16,
+      44,    44,    11,    12,    14,    14,    42,    43,    13,    13,
+      41,    41,    14,    14
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -742,8 +754,9 @@ static const yytype_uint8 yyr1[] =
       38,    38,    38,    38,    38,    38,    38,    39,    40,    40,
       41,    42,    41,    43,    41,    44,    45,    44,    46,    44,
       47,    47,    47,    48,    48,    48,    49,    51,    50,    52,
-      53,    53,    53,    53,    53,    53,    53,    53,    54,    54,
-      54,    54,    55,    55,    55,    55,    55,    55
+      53,    53,    53,    54,    54,    54,    54,    55,    55,    55,
+      55,    56,    56,    56,    56,    57,    57,    57,    57,    58,
+      58,    58,    58,    58,    58
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -753,8 +766,9 @@ static const yytype_uint8 yyr2[] =
        4,     4,     4,     5,     5,     5,     5,     3,     5,     5,
        3,     0,     8,     0,     8,     3,     0,     8,     0,     8,
        1,     1,     1,     1,     2,     1,     3,     0,     6,     5,
-       2,     3,     4,     2,     5,     3,     4,     2,     1,     1,
-       2,     2,     3,     3,     3,     3,     3,     1
+       1,     1,     1,     3,     3,     3,     1,     4,     3,     3,
+       1,     3,     3,     3,     1,     1,     1,     2,     2,     3,
+       3,     3,     3,     3,     1
 };
 
 
@@ -1431,13 +1445,13 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 132 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 133 "analysGramPointers.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1437 "y.tab.c" /* yacc.c:1646  */
+#line 1451 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 150 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 151 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) == 0 && lookupType((yyvsp[-1].variable)) == 0 ) //Both variables exist and are integers
 										{		
@@ -1460,16 +1474,16 @@ yyreduce:
 											else
 											{
 												strcpy( errTab[ce].error, "Invalid assignation.\n" );
-												errTab[ce].line = ce;
+												errTab[ce].line = cp;
 												ce++;
 											}
 										}
 									}
-#line 1469 "y.tab.c" /* yacc.c:1646  */
+#line 1483 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 177 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 178 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) == 0 ) 	//Variable exists and is integer
 										{			
@@ -1482,21 +1496,26 @@ yyreduce:
 										else
 										{
 											strcpy( errTab[ce].error, "Trying to assign value to a constant, pointer or variable that doesn't exist.\n" );
-											errTab[ce].line = ce;
+											errTab[ce].line = cp;
 											ce++;
 										}	
 									}
-#line 1490 "y.tab.c" /* yacc.c:1646  */
+#line 1504 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 193 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 194 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 										if(lookupType((yyvsp[-3].variable)) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
+											if( temp1_flag )	//value is in temp1
+												sprintf(auxString, "0temp1");	
+											else
+												sprintf(auxString, "0temp2");	
+
 											sprintf(snum, "%d", lookup((yyvsp[-3].variable)));
-											sprintf(snum2, "%d", lookup("0temp1"));
-											setValueByName((yyvsp[-3].variable), getValueByName("0temp1")); 	//Sets the value
+											sprintf(snum2, "%d", lookup(auxString));
+											setValueByName((yyvsp[-3].variable), getValueByName(auxString)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 										    cp++;			
 										}
@@ -1505,35 +1524,40 @@ yyreduce:
 											if(lookupType((yyvsp[-3].variable)) == 2) //Variable exists and is pointer
 											{
 												if(	pointer_value ) //The expression is correct for the pointer
-												{
+												{	
+													if( temp1_flag )	//value is in temp1
+														sprintf(auxString, "0temp1");	
+													else
+														sprintf(auxString, "0temp2");	
+
 													sprintf(snum, "%d", lookup((yyvsp[-3].variable)));
-													sprintf(snum2, "%d", lookup("0temp1"));
-													setValueByName((yyvsp[-3].variable), getValueByName("0temp1")); 	//Sets the value
+													sprintf(snum2, "%d", lookup(auxString));
+													setValueByName((yyvsp[-3].variable), getValueByName(auxString)); 	//Sets the value
 													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 												    cp++;	
 												}
 												else
 												{
 													strcpy( errTab[ce].error, "Invalid pointer convertion.\n" );
-													errTab[ce].line = ce;
+													errTab[ce].line = cp;
 													ce++;
 												}
 											}
 											else
 											{
 												strcpy( errTab[ce].error, "Trying to assign number value to a constant or variable that doesn't exist.\n" );
-												errTab[ce].line = ce;
+												errTab[ce].line = cp;
 												ce++;
 											}
 										}
 										pointer_value_flag = false; //reset variable
 										pointer_value_flag2 = false; //reset variable
 									}
-#line 1533 "y.tab.c" /* yacc.c:1646  */
+#line 1557 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 231 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 242 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) != 2 && lookupType((yyvsp[-4].variable)) != -1 && lookupType((yyvsp[-1].variable)) == 2)	//Variables exist, first variable is not a pointer, and second var is a pointer
 												{	
@@ -1550,22 +1574,22 @@ yyreduce:
 														strcpy( errTab[ce].error, "The pointer '" );
 														strcat( errTab[ce].error, (yyvsp[-1].variable) );
 														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
-														errTab[ce].line = ce;
+														errTab[ce].line = cp;
 														ce++;
 													}
 												}
 												else
 												{
 													strcpy( errTab[ce].error, "Invalid pointer assignment.\n" );
-													errTab[ce].line = ce;
+													errTab[ce].line = cp;
 													ce++;
 												}
 											}
-#line 1565 "y.tab.c" /* yacc.c:1646  */
+#line 1589 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 258 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 269 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Variables exist, first variable is a pointer, and second var is not pointer
 												{														
@@ -1582,36 +1606,41 @@ yyreduce:
 														strcpy( errTab[ce].error, "The pointer '" );
 														strcat( errTab[ce].error, (yyvsp[-3].variable) );
 														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
-														errTab[ce].line = ce;
+														errTab[ce].line = cp;
 														ce++;
 													}
 												}
 												else
 												{
 													strcpy( errTab[ce].error, "Invalid pointer assignment.\n" );
-													errTab[ce].line = ce;
+													errTab[ce].line = cp;
 													ce++;
 												}
 											}
-#line 1597 "y.tab.c" /* yacc.c:1646  */
+#line 1621 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 285 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 296 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 )	//Variable exists and is pointer
 												{			
 													if( lookupAddress(getValueByName((yyvsp[-3].variable))) != -1 ) //Pointed address is valid
 													{
-														sprintf(snum, "%d", lookup("0temp1"));
+														if( temp1_flag )	//value is in temp1
+															sprintf(auxString, "0temp1");	
+														else
+															sprintf(auxString, "0temp2");	
+
+														sprintf(snum, "%d", lookup(auxString));
 														sprintf(snum2, "%d", (yyvsp[-1].nb));	
-														setValueByName("0temp1", (yyvsp[-1].nb)); 	//Sets the value	
+														setValueByName(auxString, (yyvsp[-1].nb)); 	//Sets the value	
 														insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num 
 													    cp++;	
 
 														sprintf(snum, "%d", lookup((yyvsp[-3].variable)));		
-														sprintf(snum2, "%d", lookup("0temp1"));
-														setValueByName(lookupName(getValueByName((yyvsp[-3].variable))), getValueByName("0temp1")); 	//Sets the value
+														sprintf(snum2, "%d", lookup(auxString));
+														setValueByName(lookupName(getValueByName((yyvsp[-3].variable))), getValueByName(auxString)); 	//Sets the value
 														insert_Instruction( "E", snum, snum2, "", "", cp ); //IPCOP @result @operand1 copies the value stored at @operand1 to @result.value
 													    cp++;		
 													}
@@ -1620,50 +1649,57 @@ yyreduce:
 														strcpy( errTab[ce].error, "The pointer '" );
 														strcat( errTab[ce].error, (yyvsp[-3].variable) );
 														strcat( errTab[ce].error, "' points to an invalid address.\n" );		
-														errTab[ce].line = ce;
+														errTab[ce].line = cp;
 														ce++;
 													}
 												}
 												else
 												{
 													strcpy( errTab[ce].error, "The pointer doesn't exist.\n" );
-													errTab[ce].line = ce;
+													errTab[ce].line = cp;
 													ce++;
 												}
 											}
-#line 1635 "y.tab.c" /* yacc.c:1646  */
+#line 1664 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 318 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 334 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Both variable exist, the first is pointer, and the second is not pointer
-												{						
-													sprintf(snum, "%d", lookup("0temp1"));
+												{				
+													if( temp1_flag )	//value is in temp1
+														sprintf(auxString, "0temp1");	
+													else
+														sprintf(auxString, "0temp2");	
+
+													sprintf(snum, "%d", lookup(auxString));
 													sprintf(snum2, "%d", lookup((yyvsp[-1].variable)));	
-													setValueByName("0temp1", lookup((yyvsp[-1].variable))); 	//Sets the value	
+													setValueByName(auxString, lookup((yyvsp[-1].variable))); 	//Sets the value	
 													insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num Copy address to result
 												    cp++;	
 
 													sprintf(snum, "%d", lookup((yyvsp[-4].variable)));
-													sprintf(snum2, "%d", lookup("0temp1"));
-													setValueByName((yyvsp[-4].variable), getValueByName("0temp1")); 										//Sets the value of the pointer		
+													sprintf(snum2, "%d", lookup(auxString));
+													setValueByName((yyvsp[-4].variable), getValueByName(auxString)); 										//Sets the value of the pointer		
 													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
 												    cp++;	
 												}
 												else
 												{
 													strcpy( errTab[ce].error, "The pointer doesn't exist.\n" );
-													errTab[ce].line = ce;
+													errTab[ce].line = cp;
 													ce++;
 												}
 											}
-#line 1662 "y.tab.c" /* yacc.c:1646  */
+#line 1696 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 342 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 363 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
+									depth++;	//Used for variable creation
+
 									(yyval.nb) = cp;
 									cp++;
 									if_iter_stack = push(if_begin_count, if_iter_stack);	//store if begin iterations to later assign if begin line
@@ -1672,20 +1708,20 @@ yyreduce:
 									else_iter_stack = push(else_begin_count, else_iter_stack);	//store else begin iterations to later assign if begin line
 									else_begin_count = 0;
 								}
-#line 1676 "y.tab.c" /* yacc.c:1646  */
+#line 1712 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 353 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 376 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp);									//Obtain else body end
 													insert_Instruction( "JMP", snum, "", "", "", (yyvsp[-4].nb)-1 );		//If ended, jump to else body end
 												}
-#line 1685 "y.tab.c" /* yacc.c:1646  */
+#line 1721 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 357 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 380 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
 													insert_Instruction( "JMF", "@X", snum, "", "", (yyvsp[-3].nb) );				//If statement is false jump to else body
@@ -1718,23 +1754,25 @@ yyreduce:
 															else_stack = pop(else_stack);				
 														}
 													}
+
+													depth--;	//Used for variable creation
 												}
-#line 1723 "y.tab.c" /* yacc.c:1646  */
+#line 1761 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 392 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 417 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1734 "y.tab.c" /* yacc.c:1646  */
+#line 1772 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 398 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 423 "analysGramPointers.yacc" /* yacc.c:1646  */
     {									
 											sprintf(snum , "%d", cp+2);	
 											insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1745,11 +1783,11 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1749 "y.tab.c" /* yacc.c:1646  */
+#line 1787 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 408 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 433 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											sprintf(snum , "%d", cp+2);	
 					 						insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1760,44 +1798,44 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1764 "y.tab.c" /* yacc.c:1646  */
+#line 1802 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 418 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 443 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;
 										}
-#line 1775 "y.tab.c" /* yacc.c:1646  */
+#line 1813 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 424 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 449 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;											
 										}
-#line 1786 "y.tab.c" /* yacc.c:1646  */
+#line 1824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 435 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 460 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1797 "y.tab.c" /* yacc.c:1646  */
+#line 1835 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 441 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 466 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1808,11 +1846,11 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1812 "y.tab.c" /* yacc.c:1646  */
+#line 1850 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 451 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 476 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1823,57 +1861,57 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1827 "y.tab.c" /* yacc.c:1646  */
+#line 1865 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 461 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 486 "analysGramPointers.yacc" /* yacc.c:1646  */
     {		
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1838 "y.tab.c" /* yacc.c:1646  */
+#line 1876 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 467 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 492 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1887 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 478 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 503 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="9";	//INF
 						}
-#line 1857 "y.tab.c" /* yacc.c:1646  */
+#line 1895 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 481 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 506 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="A";	//SUP
 						}
-#line 1865 "y.tab.c" /* yacc.c:1646  */
+#line 1903 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 484 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 509 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="B";	//EQU
 						}
-#line 1873 "y.tab.c" /* yacc.c:1646  */
+#line 1911 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 490 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 515 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 								if( lookup((yyvsp[0].variable)) != -1 && lookupType((yyvsp[0].variable)) != 2	)		//var exists and is not pointer
 								{	
@@ -1901,15 +1939,15 @@ yyreduce:
 									strcpy( errTab[ce].error, "The variable '" );
 									strcat( errTab[ce].error, (yyvsp[0].variable) );
 									strcat( errTab[ce].error, "' does not exist or is invalid.\n" );		
-									errTab[ce].line = ce;
+									errTab[ce].line = cp;
 									ce++;
 								}	
 							}
-#line 1909 "y.tab.c" /* yacc.c:1646  */
+#line 1947 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 521 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 546 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 									if(lookup((yyvsp[0].variable)) != -1 && lookup((yyvsp[0].variable)) == 2	)		//var exists and is a pointer
 									{	
@@ -1939,7 +1977,7 @@ yyreduce:
 											strcpy( errTab[ce].error, "The pointer '" );
 											strcat( errTab[ce].error, (yyvsp[0].variable) );
 											strcat( errTab[ce].error, "' points to an invalid address.\n" );		
-											errTab[ce].line = ce;
+											errTab[ce].line = cp;
 											ce++;
 										}										
 									}
@@ -1948,15 +1986,15 @@ yyreduce:
 										strcpy( errTab[ce].error, "The variable " );
 										strcat( errTab[ce].error, (yyvsp[0].variable) );
 										strcat( errTab[ce].error, " does not exist.\n" );		
-										errTab[ce].line = ce;
+										errTab[ce].line = cp;
 										ce++;
 									}	
 								}
-#line 1956 "y.tab.c" /* yacc.c:1646  */
+#line 1994 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 563 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 588 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( !temp1_flag )
 								{
@@ -1977,11 +2015,11 @@ yyreduce:
 								sprintf(snum, "%d", lookup(auxString));
 								(yyval.variable)=snum;
 							}
-#line 1981 "y.tab.c" /* yacc.c:1646  */
+#line 2019 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 585 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 610 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 											while_last_cond = push(cp, while_last_cond);	//Store while begin
 											cp++;	
@@ -1992,20 +2030,21 @@ yyreduce:
 											while_end_iter_stack = push(while_end_count, while_end_iter_stack);			//store while end iterations to later assign while end line
 											while_end_count = 0;	
 										}
-#line 1996 "y.tab.c" /* yacc.c:1646  */
+#line 2034 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 597 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 622 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
+														depth++;	//Used for variable creation
 														(yyvsp[0].nb)=cp;										//Save while begin
 			
 													}
-#line 2005 "y.tab.c" /* yacc.c:1646  */
+#line 2044 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 601 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 627 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 														int whileBegin = while_last_cond.stk[while_last_cond.top];
 														while_last_cond = pop(while_last_cond);							//pop the value		
@@ -2040,12 +2079,14 @@ yyreduce:
 																while_end_stack = pop(while_end_stack);				
 															}
 														}
+
+														depth--;	//Used for variable creation
 													}
-#line 2045 "y.tab.c" /* yacc.c:1646  */
+#line 2086 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 638 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 666 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 											sprintf(snum, "%d", (yyvsp[-2].nb));
 											insert_Instruction( "C", snum, "", "", "", cp );	//PRI @result
@@ -2053,180 +2094,237 @@ yyreduce:
 											pointer_value_flag = false; //reset variable
 											pointer_value_flag2 = false; //reset variable
 										}
-#line 2057 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 42:
-#line 650 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {				
-											if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value)	//Variable doesn't exist and the expr is not for pointers
-											{
-												insert((yyvsp[-2].variable), 0);		//new int
-
-												sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
-												sprintf(snum2, "%d", lookup("0temp1"));
-												setValueByName((yyvsp[-2].variable), getValueByName("0temp1")); 	//Sets the value
-												insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-											    cp++;											    		
-											}else
-											{	
-												if(pointer_value)	
-												{						
-													strcpy( errTab[ce].error, "Invalid convertion.\n" );
-													errTab[ce].line = ce;
-													ce++;													
-												}	
-												else
-												{									
-													strcpy( errTab[ce].error, "Variable already exists.\n" );
-													errTab[ce].line = ce;
-													ce++;
-												}
-											}
-											pointer_value_flag = false; //reset variable
-											pointer_value_flag2 = false; //reset variable
-										}
-#line 2090 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 43:
-#line 678 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {
-											if(lookup((yyvsp[0].variable)) == -1)
-											{
-												insert((yyvsp[0].variable), 0);		//new int
-											}else
-											{												
-												strcpy( errTab[ce].error, "Variable already exists.\n" );
-												errTab[ce].line = ce;
-												ce++;
-											}
-										}
-#line 2106 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 44:
-#line 689 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {				
-												if(lookup((yyvsp[-2].variable)) == -1 && pointer_value) //Variable exists and the expression is correct
-												{
-													insert((yyvsp[-2].variable), 2);		//new pointer
-
-													sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
-													sprintf(snum2, "%d", lookup("0temp1"));		
-													setValueByName((yyvsp[-2].variable), getValueByName("0temp1")); 	//Sets the value
-													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-												    cp++;		
-												}else
-												{				
-													if(!pointer_value)
-													{				
-														strcpy( errTab[ce].error, "Invalid expression.\n" );
-														errTab[ce].line = ce;
-														ce++;
-													}else
-													{							
-														strcpy( errTab[ce].error, "Variable %s already exists.\n" );
-														errTab[ce].line = ce;
-														ce++;
-													}
-												}
-												pointer_value_flag = false; //reset variable
-												pointer_value_flag2 = false; //reset variable
-											}
-#line 2138 "y.tab.c" /* yacc.c:1646  */
+#line 2098 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 716 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {
-											if(lookup((yyvsp[0].variable)) == -1)
-											{
-												insert((yyvsp[0].variable), 2);			//new pointer
-											}else
-											{												
-												strcpy( errTab[ce].error, "Variable already exists.\n" );
-												errTab[ce].line = ce;
-												ce++;
-											}
+#line 682 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {				
+									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value)	//Variable doesn't exist and the expr is not for pointers
+									{
+										insert((yyvsp[-2].variable), 0, depth);		//new int
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[-2].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[-2].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;
+
+									    if( temp1_flag )	//Last value was stored in temp1
+											strcpy( auxString, "0temp1");
+										else
+											strcpy( auxString, "0temp2");
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookup(auxString));
+										setValueByName((yyvsp[-2].variable), getValueByName(auxString)); 	//Sets the value
+										insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+									    cp++;											    		
+									}else
+									{	
+										if(pointer_value)	
+										{						
+											strcpy( errTab[ce].error, "Invalid convertion.\n" );
+											errTab[ce].line = cp;
+											ce++;													
+										}	
+										else
+										{									
+											strcpy( errTab[ce].error, "Variable already exists.\n" );
+											errTab[ce].line = cp;
+											ce++;
 										}
-#line 2154 "y.tab.c" /* yacc.c:1646  */
+									}
+									pointer_value_flag = false; //reset variable
+									pointer_value_flag2 = false; //reset variable
+								}
+#line 2141 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 727 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 720 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
-												if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value) //Variable exists and the expression is correct
-												{
-													insert((yyvsp[-2].variable), 1);		//new const													
+									if(lookup((yyvsp[0].variable)) == -1)
+									{
+										insert((yyvsp[0].variable), 0, depth);		//new int
 
-													sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
-													sprintf(snum2, "%d", lookup("0temp1"));		
-													setValueByName((yyvsp[-2].variable), getValueByName("0temp1")); 	//Sets the value
-													insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-												    cp++;		
-												}else
-												{											
-													
-													if(pointer_value)	
-													{						
-														strcpy( errTab[ce].error, "Invalid convertion.\n" );
-														errTab[ce].line = ce;
-														ce++;													
-													}	
-													else
-													{									
-														strcpy( errTab[ce].error, "Variable %s already exists.\n" );
-														errTab[ce].line = ce;
-														ce++;
-													}
-												}
-												pointer_value_flag = false; //reset variable
-												pointer_value_flag2 = false; //reset variable
-											}
-#line 2188 "y.tab.c" /* yacc.c:1646  */
+										sprintf(snum, "%d", lookup((yyvsp[0].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[0].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[0].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;
+
+									}else
+									{												
+										strcpy( errTab[ce].error, "Variable already exists.\n" );
+										errTab[ce].line = cp;
+										ce++;
+									}
+								}
+#line 2163 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 47:
-#line 756 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {
-												if(lookup((yyvsp[0].variable)) == -1)
-												{
-													insert((yyvsp[0].variable), 1);		//new const
-												}else
-												{												
-													strcpy( errTab[ce].error, "Variable already exists.\n" );
-													errTab[ce].line = ce;
-													ce++;
-												}
-											}
-#line 2204 "y.tab.c" /* yacc.c:1646  */
+  case 49:
+#line 741 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {				
+									if(lookup((yyvsp[-2].variable)) == -1 && pointer_value) //Variable exists and the expression is correct
+									{
+										insert((yyvsp[-2].variable), 2, depth);		//new pointer
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[-2].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[-2].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;
+
+									    if( temp1_flag )	//temp1 is not being used
+											sprintf(auxString, "0temp1");	
+										else
+											sprintf(auxString, "0temp2");		
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookup(auxString));		
+										setValueByName((yyvsp[-2].variable), getValueByName(auxString)); 	//Sets the value
+										insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+									    cp++;		
+									}else
+									{				
+										if(!pointer_value)
+										{				
+											strcpy( errTab[ce].error, "Invalid expression.\n" );
+											errTab[ce].line = cp;
+											ce++;
+										}else
+										{							
+											strcpy( errTab[ce].error, "Variable %s already exists.\n" );
+											errTab[ce].line = cp;
+											ce++;
+										}
+									}
+									pointer_value_flag = false; //reset variable
+									pointer_value_flag2 = false; //reset variable
+								}
+#line 2205 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 48:
-#line 772 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 50:
+#line 778 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+									if(lookup((yyvsp[0].variable)) == -1)
+									{
+										insert((yyvsp[0].variable), 2, depth);			//new pointer
+
+										sprintf(snum, "%d", lookup((yyvsp[0].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[0].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[0].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;
+
+									}else
+									{												
+										strcpy( errTab[ce].error, "Variable already exists.\n" );
+										errTab[ce].line = cp;
+										ce++;
+									}	
+								}
+#line 2227 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 799 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value) //Variable exists and the expression is correct
+									{
+										insert((yyvsp[-2].variable), 1, depth);		//new const		
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[-2].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[-2].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;											
+
+									    if( temp1_flag )	//temp1 is not being used
+											sprintf(auxString, "0temp1");	
+										else
+											sprintf(auxString, "0temp2");	
+
+										sprintf(snum, "%d", lookup((yyvsp[-2].variable)));
+										sprintf(snum2, "%d", lookup(auxString));		
+										setValueByName((yyvsp[-2].variable), getValueByName(auxString)); 	//Sets the value
+										insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+									    cp++;		
+									}else
+									{											
+												
+										if(pointer_value)	
+										{						
+											strcpy( errTab[ce].error, "Invalid convertion.\n" );
+											errTab[ce].line = cp;
+											ce++;													
+										}	
+										else
+										{									
+											strcpy( errTab[ce].error, "Variable %s already exists.\n" );
+											errTab[ce].line = cp;
+											ce++;
+										}
+									}
+									pointer_value_flag = false; //reset variable
+									pointer_value_flag2 = false; //reset variable
+								}
+#line 2271 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 838 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+									if(lookup((yyvsp[0].variable)) == -1)
+									{
+										insert((yyvsp[0].variable), 1, depth);		//new const
+
+										sprintf(snum, "%d", lookup((yyvsp[0].variable)));
+										sprintf(snum2, "%d", lookupType((yyvsp[0].variable)));
+										insert_Instruction( "ALLOUER", snum, (yyvsp[0].variable), snum2, "", cp ); //ALLOUER @var varName varType 
+									    cp++;
+
+									}else
+									{												
+										strcpy( errTab[ce].error, "Variable already exists.\n" );
+										errTab[ce].line = cp;
+										ce++;
+									}
+								}
+#line 2293 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 860 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 								if( !pointer_value_flag )	//pointer value hasn't been initialized
 								{
 									pointer_value_flag = true;
 									pointer_value = false; 			//not a pointer expression
 								}
+												
+								if( !temp1_flag )	//temp1 is not being used
+								{
+									temp1_flag = true;
+									sprintf(auxString, "0temp1");	
+								}else
+								{
+									temp1_flag = false;
+									sprintf(auxString, "0temp2");	
+								}	
 
-								temp1_flag = false;
 
-								sprintf(snum, "%d", lookup("0temp2"));
+								sprintf(snum, "%d", lookup(auxString));
 								sprintf(snum2, "%d", (yyvsp[0].nb));
-								setValueByName("0temp2", (yyvsp[0].nb)); 	//Sets the value
+								setValueByName(auxString, (yyvsp[0].nb)); 	//Sets the value
 								insert_Instruction( "6", snum, snum2, "", "", cp ); //COP @result @operand1 
 								cp++;
 
-								(yyval.nb) = lookup("0temp2");
+								(yyval.nb) = lookup(auxString);
 							}
-#line 2226 "y.tab.c" /* yacc.c:1646  */
+#line 2324 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 789 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 56:
+#line 886 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)	//var exists
 								{
@@ -2237,7 +2335,24 @@ yyreduce:
 											pointer_value_flag = true;
 											pointer_value = false; 			//not a pointer expression
 										}
-										(yyval.nb) = lookup((yyvsp[0].variable));				//Address of the variable
+
+										if( !temp1_flag )	//temp1 is not being used
+										{
+											temp1_flag = true;
+											sprintf(auxString, "0temp1");	
+										}else
+										{
+											temp1_flag = false;
+											sprintf(auxString, "0temp2");	
+										}	
+
+										sprintf(snum, "%d", lookup(auxString));
+										sprintf(snum2, "%d", lookup((yyvsp[0].variable)));
+										setValueByName(auxString, getValueByName((yyvsp[0].variable))); 	//Sets the value
+										insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
+										cp++;
+
+										(yyval.nb) = lookup(auxString);	//temp contains Address of the pointer(to print the address of the pointed variable)
 									}
 									else
 									{
@@ -2252,9 +2367,9 @@ yyreduce:
 												pointer_value = true; //pointer expression
 												pointer_value_flag2 = true;
 											}
-										}										
+										}	
 
-										(yyval.nb) = lookup((yyvsp[0].variable));		//Address of the pointer(to print the address of the pointed variable)
+										(yyval.nb) = lookup((yyvsp[0].variable));	//Address of the pointer(to print the address of the pointed variable)
 									}
 								}
 								else
@@ -2262,15 +2377,15 @@ yyreduce:
 									strcpy( errTab[ce].error, "The variable " );
 									strcat( errTab[ce].error, (yyvsp[0].variable) );
 									strcat( errTab[ce].error, " does not exist.\n" );		
-									errTab[ce].line = ce;
+									errTab[ce].line = cp;
 									ce++;
 								}
 							}
-#line 2270 "y.tab.c" /* yacc.c:1646  */
+#line 2385 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 828 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 57:
+#line 942 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( lookupType((yyvsp[0].variable)) == 2 )	//var exists and is pointer
 								{
@@ -2281,23 +2396,31 @@ yyreduce:
 											pointer_value_flag = true;
 											pointer_value = false; 			//not a pointer expression
 										}
-																			
-										temp1_flag = false;
+												
+										if( !temp1_flag )	//temp1 is not being used
+										{
+											temp1_flag = true;
+											sprintf(auxString, "0temp1");	
+										}else
+										{
+											temp1_flag = false;
+											sprintf(auxString, "0temp2");	
+										}						
 
-										sprintf(snum, "%d", lookup("0temp2"));
+										sprintf(snum, "%d", lookup(auxString));
 										sprintf(snum2, "%d", lookup((yyvsp[0].variable)));		//Address of the pointer 
-										setValueByName("0temp2", getValueByName(lookupName(getValueByName((yyvsp[0].variable))))); 	//Sets the value
+										setValueByName(auxString, getValueByName(lookupName(getValueByName((yyvsp[0].variable))))); 	//Sets the value
 										insert_Instruction( "D", snum, snum2, "", "", cp ); //PCOP @result @operand1 
 										cp++;
 
-										(yyval.nb) = lookup("0temp2");	//Address of the variable (to print value of the pointed variable)		
+										(yyval.nb) = lookup(auxString);	//Address of the variable (to print value of the pointed variable)		
 									}
 									else
 									{
 										strcpy( errTab[ce].error, "The pointer '" );
 										strcat( errTab[ce].error, (yyvsp[0].variable) );
 										strcat( errTab[ce].error, "' points to an invalid address.\n" );		
-										errTab[ce].line = ce;
+										errTab[ce].line = cp;
 										ce++;
 									}
 								}
@@ -2306,15 +2429,15 @@ yyreduce:
 									strcpy( errTab[ce].error, "The pointer " );
 									strcat( errTab[ce].error, (yyvsp[0].variable) );
 									strcat( errTab[ce].error, " does not exist.\n" );		
-									errTab[ce].line = ce;
+									errTab[ce].line = cp;
 									ce++;
 								}
 							}
-#line 2314 "y.tab.c" /* yacc.c:1646  */
+#line 2437 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 51:
-#line 867 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 58:
+#line 989 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 										if( lookupType((yyvsp[0].variable)) != -1 )	//var exists
 										{
@@ -2360,75 +2483,95 @@ yyreduce:
 											strcpy( errTab[ce].error, "The variable " );
 											strcat( errTab[ce].error, (yyvsp[0].variable) );
 											strcat( errTab[ce].error, " does not exist.\n" );		
-											errTab[ce].line = ce;
+											errTab[ce].line = cp;
 											ce++;
 										}
 									}
-#line 2368 "y.tab.c" /* yacc.c:1646  */
+#line 2491 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 52:
-#line 918 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 59:
+#line 1040 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 		
+										 if( temp1_flag )	//value is in temp1
+											sprintf(auxString, "%d", lookup("0temp1"));
+										else
+											sprintf(auxString, "%d", lookup("0temp2"));
+										sscanf(auxString, "%d", &auxNum);
+
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
-										 sprintf(snum2, "%d", (yyvsp[0].nb));
-										 sprintf(auxString, "%d", lookup("0temp1"));
-										 setValueByName( "0temp1", getValueByName(lookupName((yyvsp[-2].nb)))+getValueByName(lookupName((yyvsp[0].nb))) );
+										 sprintf(snum2, "%d", (yyvsp[0].nb));;
+										 setValueByName( lookupName(auxNum), getValueByName(lookupName((yyvsp[-2].nb)))+getValueByName(lookupName((yyvsp[0].nb))) );
 										 insert_Instruction( "1", auxString, snum, snum2, "", cp ); //ADD @result @operand1 @operand2
 									     cp++;
 
-									     (yyval.nb)=lookup("0temp1");
+									     (yyval.nb)=auxNum;
 									}
-#line 2383 "y.tab.c" /* yacc.c:1646  */
+#line 2511 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 53:
-#line 928 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 60:
+#line 1055 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
+										 if( temp1_flag )	//value is in temp1
+											sprintf(auxString, "%d", lookup("0temp1"));
+										else
+											sprintf(auxString, "%d", lookup("0temp2"));
+										sscanf(auxString, "%d", &auxNum);
+
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
 										 sprintf(snum2, "%d", (yyvsp[0].nb));
-										 sprintf(auxString, "%d", lookup("0temp1"));
-										 setValueByName( "0temp1", getValueByName(lookupName((yyvsp[-2].nb)))-getValueByName(lookupName((yyvsp[0].nb))) );
+										 setValueByName( lookupName(auxNum), getValueByName(lookupName((yyvsp[-2].nb)))-getValueByName(lookupName((yyvsp[0].nb))) );
 										 insert_Instruction( "3", auxString, snum, snum2, "", cp ); //SOU @result @operand1 @operand2
 									     cp++;
 
-									     (yyval.nb)=lookup("0temp1");
+									     (yyval.nb)=auxNum;
 									}
-#line 2398 "y.tab.c" /* yacc.c:1646  */
+#line 2531 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 54:
-#line 938 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 61:
+#line 1070 "analysGramPointers.yacc" /* yacc.c:1646  */
     {								
+										 if( temp1_flag )	//value is in temp1
+											sprintf(auxString, "%d", lookup("0temp1"));
+										else
+											sprintf(auxString, "%d", lookup("0temp2"));
+										sscanf(auxString, "%d", &auxNum);
+
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
-										 sprintf(snum2, "%d", (yyvsp[0].nb));
-										 sprintf(auxString, "%d", lookup("0temp1"));
-										 setValueByName( "0temp1", getValueByName(lookupName((yyvsp[-2].nb)))*getValueByName(lookupName((yyvsp[0].nb))) );
+										 sprintf(snum2, "%d", (yyvsp[0].nb));;
+										 setValueByName( lookupName(auxNum), getValueByName(lookupName((yyvsp[-2].nb)))*getValueByName(lookupName((yyvsp[0].nb))) );
 										 insert_Instruction( "2", auxString, snum, snum2, "", cp ); //MUL @result @operand1 @operand2
 									     cp++;
 
-									     (yyval.nb)=lookup("0temp1");
+									     (yyval.nb)=auxNum;
 									}
-#line 2413 "y.tab.c" /* yacc.c:1646  */
+#line 2551 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 55:
-#line 948 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 62:
+#line 1085 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 
+										if( temp1_flag )	//value is in temp1
+											sprintf(auxString, "%d", lookup("0temp1"));
+										else
+											sprintf(auxString, "%d", lookup("0temp2"));
+										sscanf(auxString, "%d", &auxNum);
+
 										 sprintf(snum, "%d", (yyvsp[-2].nb));
 										 sprintf(snum2, "%d", (yyvsp[0].nb));
-										 sprintf(auxString, "%d", lookup("0temp1"));
-										 setValueByName( "0temp1", getValueByName(lookupName((yyvsp[-2].nb)))/getValueByName(lookupName((yyvsp[0].nb))) );
+										 setValueByName( lookupName(auxNum), getValueByName(lookupName((yyvsp[-2].nb)))/getValueByName(lookupName((yyvsp[0].nb))) );
 										 insert_Instruction( "4", auxString, snum, snum2, "", cp ); //DIV @result @operand1 @operand2
 									     cp++;
 
-									     (yyval.nb)=lookup("0temp1");
+									     (yyval.nb)=auxNum;
 									}
-#line 2428 "y.tab.c" /* yacc.c:1646  */
+#line 2571 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2432 "y.tab.c" /* yacc.c:1646  */
+#line 2575 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2656,7 +2799,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 976 "analysGramPointers.yacc" /* yacc.c:1906  */
+#line 1118 "analysGramPointers.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
@@ -2731,20 +2874,20 @@ int main(void) {
 
 	fprintf(fp, "%d", lookup("0temp1") );
 
-	insert("a", 0);
+	insert("a", 0, 0);
 	setValueByName("a", 30);
-	insert("b", 0);
+	insert("b", 0, 0);
 	setValueByName("b", 40);
-	insert("Pa", 2);
+	insert("Pa", 2, 0);
 	setValueByName("Pa", lookup("a"));
-	insert("Pb", 2);
-	insert("Pc", 2);
+	insert("Pb", 2, 0);
+	insert("Pc", 2, 0);
 	setValueByName("Pc", 16);
 
-	insert("c", 1);
-	insert("d", 0);
-	insert("e", 1);
-	insert("g", 1);
+	insert("c", 1, 0);
+	insert("d", 0, 0);
+	insert("e", 1, 0);
+	insert("g", 1, 0);
 
 
 	yyparse();
@@ -2760,16 +2903,20 @@ int main(void) {
 
 
 /*TODO: 
-	Symbol table: Addresses sare sometimes repeated
 	Pointers:
 		- On CondValue	 Pointer comparisson is not implemented
-		- Los valores de las variables son alterados siempre, aunque haya un if, si existe a=2 esa asignacion se hace, a nivel de codigo ensamblador, los apuntadores son los unicos afectados (getValue se utiliza directamente en codigo para recuperar las direcciones de sus variables apuntadas)
 	If: 	
 			- Conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
 	While:
 			- Conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
-	Users can't name a variable 0temp1 nor 0temp2	
+	Errors:
+		- When two errors arecommited one next to the other, the marker will say they were commited on the same line (because cp wasn't updated)
+		- Error lines are taken from ASM code and not from the input code
+
+	Whitespaces interfer with some tokens for example: int a; will detect the token "int " instead of "int"
 
 
 
+NOTE:
+	Temp variables are called: 0temp1 nor 0temp2	
 */
