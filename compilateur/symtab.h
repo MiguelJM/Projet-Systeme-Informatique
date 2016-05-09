@@ -46,7 +46,8 @@ static int hash(char *key);
 int hashPrevious(char *key);
 int hashForInsert(char *key);
 void insert(char *name, int type, int depth);
-void delete(char *name);
+Node delete(char *name);
+void deleteByDepth(int depth);
 int lookup(char *name);
 int lookupAddress(int address);
 int setValueByName(char *name, int value);
@@ -60,7 +61,19 @@ bool varInitialized(char *name);
 /*Funtion that initializes the Symtable*/
 void initializeSymtab()
 {
-  Node l =  hashTable[temp1_position];
+  Node l =  hashTable[temp1_position-1];
+  l = (Node) malloc(sizeof(struct HashRec));
+
+  //Used to recover from function calls
+  strcpy(l->st_name, "0funct_line");
+  l->st_address = temp1_position-1;
+  l->st_type = 0;
+  l->st_depth = 0;
+  l->st_initialized=0; 
+  l->next = hashTable[temp1_position];
+  hashTable[temp1_position-1] = l;
+
+  l =  hashTable[temp1_position];
   l = (Node) malloc(sizeof(struct HashRec));
 
   //Temporal variable 1
@@ -96,6 +109,8 @@ static int hash ( char * key )
     ++i;
   }
   return temp;*/
+  if(strcmp(key,"0funct_line") == 0)
+    return temp1_position-1;  
   if(strcmp(key,"0temp1") == 0)
     return temp1_position;  
   if(strcmp(key,"0temp2") == 0)
@@ -116,6 +131,11 @@ static int hash ( char * key )
 int hashPrevious ( char * key )
 { 
   /* Temporal variables should not be seen by the outside*/
+  if(strcmp(key,"0funct_line") == 0)
+  {
+    printf("Error: reserved variable");
+    return -1;  
+  }
   if(strcmp(key,"0temp1") == 0)
   {
     printf("Error: Temporal variable");
@@ -146,6 +166,8 @@ int hashPrevious ( char * key )
 /* the hash function to insert variables */
 int hashForInsert ( char * key )
 { 
+  if(strcmp(key,"0funct_line") == 0)
+    return temp1_position-1;  
   if(strcmp(key,"0temp1") == 0)
     return temp1_position;  
   if(strcmp(key,"0temp2") == 0)
@@ -172,7 +194,7 @@ void insert( char * name, int type, int depth )
   int h = hashForInsert(name);
   Node l =  hashTable[h];
   
-  if (l == NULL && h < temp1_position) /* variable not yet in table and there is space on the table */
+  if (l == NULL && h < temp1_position-1) /* variable not yet in table and there is space on the table */
   { 
     l = (Node) malloc(sizeof(struct HashRec));
     strcpy(l->st_name, name);  
@@ -181,7 +203,6 @@ void insert( char * name, int type, int depth )
     l->st_depth = depth;
     l->st_initialized = 0; 
     l->st_address = h;
-
     hashTable[h] = l; 
 
     if( h > 0 ) //It is not the first insertion 
@@ -189,59 +210,83 @@ void insert( char * name, int type, int depth )
       l->next = hashTable[h-1]->next;
       hashTable[h-1]->next = l; 
       hashTable[h] = l;
-    }    
+    }   
 
     //printf("Var inserted. \n");
   }
   else /* found in table, so just add line number */
   { 
-    printf("Var already exists or the table is full.\n");
+    printf("Var '%s' already exists or the table is full.\n", name);
   }
 } 
 
-/* Delete a node */
-void delete( char * name )
+/* Delete a node returns the next node to the deleted one */
+Node delete( char * name )
 {  
   int h = hash(name);
   Node l =  hashTable[h];
 
-  if (l == NULL && h < temp1_position) /* variable is not in table, avoids deleting temporals */
+  if (l == NULL && h < temp1_position-1) /* variable is not in table, avoids deleting temporals */
   { 
     printf("Error: Var not found.\n");    
   }
   else
   {
     int hP = hashPrevious(name);
-    if(hP != -1) //It is not the first node on the list or a temporal variable
+    if(hP != -1) //It is not the first node on the list
     {
-      if( l->next != NULL ) //There is a node after
-      {
-        hashTable[hP]->next = l->next;
-        l = NULL;           
-        hashTable[h] = l;   //RELEASE MEMORY?
+        if( l->next != NULL ) //There is a node after (move next node to this position to erease this one)
+        {
+          int previousNode = hashPrevious(name);
+          Node aux = l->next;     //Next node
 
-        //free(l);  //Delete node (erease from memory)
-      }
-      else
-      {
-        hashTable[hP]->next = NULL;
-        l = NULL;       
-        hashTable[h] = l;   //RELEASE MEMORY?
+          l->next = aux->next;        //Point to next of next
+          hashTable[aux->st_address] = NULL;
+          l = aux;                    //Copy next node to this position
+          l->st_address = h;
+          hashTable[h] = l;      
 
-        //free(l);  //Delete node (erease from memory)
-      }
+          hashTable[previousNode]->next = hashTable[h]; //Last node points to this one
+
+          return l;
+          //free(l);  //Delete node (erease from memory)
+        }
+        else
+        {
+          hashTable[hP]->next = NULL;     //Node before points to end
+          hashTable[h] = NULL;            //This node is released
+          return NULL;
+
+          //free(l);  //Delete node (erease from memory)
+        }
     }
     else
     {
-        int deletedAddres = l->next->st_address;
+        //Puts the next node on the position 0
+        int nextAddress = l->next->st_address;
 
         l = l->next;
         l->st_address = 0;
         hashTable[0] = l;
-        hashTable[deletedAddres] = NULL; //RELEASE MEMORY?
+        hashTable[nextAddress] = NULL; //RELEASE MEMORY?
+        return l;
 
         //free(l);  //Delete node (erease from memory)     
     } 
+  }
+}
+
+void deleteByDepth(int depth)
+{
+  Node l =  hashTable[0];
+  while ( l != NULL )
+  {
+      while( l != NULL && l->st_depth == depth )  //Delete this var
+      {
+        l = delete( l->st_name );
+      }
+      if( l != NULL )
+        l = l->next;
   }
 }
 
@@ -370,6 +415,7 @@ bool varInitialized( char *name ) //Returns true if the variable has been initia
 /* print to stdout by default */ 
 void symtab_print(FILE * of) {  
   int i;
+  fprintf(of,"\n                        Symbol Table                               \n");
   fprintf(of,"\n----------  ------   ----------  ---------  -------  ------------- \n");
   fprintf(of,"Name         Type     Position     Value     Depth    Initialized\n");
   fprintf(of,"----------  ------   ----------  ---------  -------  -------------\n");
@@ -382,6 +428,8 @@ void symtab_print(FILE * of) {
   }
 
   /* Print temporal variables */
+  l = hashTable[temp1_position-1];
+  fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
   l = hashTable[temp1_position];
   fprintf(of,"%-13s %-10i %-10i %-10i %-10i %-10i\n",l->st_name, l->st_type, l->st_address, l->st_value, l->st_depth, l->st_initialized);
   l = hashTable[temp2_position];

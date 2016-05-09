@@ -1,170 +1,76 @@
 253
+               Function Table        
+
+----------  ---------    ------    --------
+Name         Address      Type       Line
+----------  ---------    ------    --------
+make            0          0          2         
+al              1          0          9         
+ma              2          0          13        
+mak             3          1          17        
+ap              4          0          25        
+
+                        Symbol Table                               
+
 ----------  ------   ----------  ---------  -------  ------------- 
 Name         Type     Position     Value     Depth    Initialized
 ----------  ------   ----------  ---------  -------  -------------
-b             0          0          10         0          1         
-c             1          1          0          0          0         
+a             0          0          30         0          1         
+b             0          1          40         0          1         
 Pa            2          2          0          0          1         
-Pb            2          3          0          0          1         
+Pb            2          3          0          0          0         
 Pc            2          4          16         0          1         
-d             0          5          0          0          0         
-e             1          6          0          0          0         
-g             1          7          0          0          0         
-eso           0          8          0          1          0         
-Neso          2          9          0          2          0         
-a             0          10         3          2          1         
-Nneso         2          11         0          3          0         
-Reso          1          12         0          2          0         
-ola           0          13         0          1          0         
-0temp1        0          253        0          0          1         
-0temp2        0          254        10         0          1         
+c             1          5          0          0          0         
+d             0          6          0          0          0         
+e             1          7          0          0          0         
+g             1          8          0          0          0         
+0funct_line   0          252        0          0          0         
+0temp1        0          253        30         0          1         
+0temp2        0          254        0          0          0         
 
 Label Table :
 ----------------------------------------------------- 
  	Instruction | param1 | param2 | param 3 | comments |
 ----------------------------------------------------- 
-0  :  5              253          0                         ; 
-1  :  9              @X           253          254          ; 
-2  :  JMF            @X           115                       ; 
-3  :  5              254          0                         ; 
-4  :  9              @X           253          254          ; 
-5  :  JMF            @X           115                       ; 
-6  :  5              253          0                         ; 
-7  :  B              @X           253          254          ; 
-8  :  JMF            @X           115                       ; 
-9  :  5              254          0                         ; 
-10 :  A              @X           253          254          ; 
-11 :  JMF            @X           115                       ; 
-12 :  JMF            @X           115                       ; 
-13 :  JMF            @X           115                       ; 
-14 :  JMF            @X           115                       ; 
-15 :  ALLOUER        8            eso          0            ; 
-16 :  6              253          10                        ; 
-17 :  B              @X           253          254          ; 
-18 :  JMF            @X           20                        ; 
-19 :  JMP            30                                     ; 
-20 :  6              254          10                        ; 
-21 :  9              @X           253          254          ; 
-22 :  JMF            @X           24                        ; 
-23 :  JMP            30                                     ; 
-24 :  JMF            @X           26                        ; 
-25 :  JMP            30                                     ; 
-26 :  5              253          0                         ; 
-27 :  A              @X           253          254          ; 
-28 :  JMF            @X           30                        ; 
-29 :  JMP            30                                     ; 
-30 :  JMF            @X           70                        ; 
-31 :  ALLOUER        9            Neso         2            ; 
-32 :  5              0            0                         ; 
-33 :  ALLOUER        10           a            0            ; 
-34 :  5              254          10                        ; 
-35 :  6              253          1                         ; 
-36 :  1              253          254          253          ; 
-37 :  5              10           253                       ; 
-38 :  6              253          0                         ; 
-39 :  5              3            253                       ; 
-40 :  6              253          10                        ; 
-41 :  E              3            253                       ; 
-42 :  5              254          10                        ; 
-43 :  6              253          10                        ; 
-44 :  9              @X           253          254          ; 
-45 :  JMF            @X           68                        ; 
-46 :  ALLOUER        11           Nneso        2            ; 
-47 :  6              253          10                        ; 
-48 :  5              2            253                       ; 
-49 :  6              253          0                         ; 
-50 :  5              3            253                       ; 
-51 :  5              254          7                         ; 
-52 :  5              253          1                         ; 
-53 :  1              253          254          253          ; 
-54 :  D              254          2                         ; 
-55 :  1              254          253          254          ; 
-56 :  D              253          2                         ; 
-57 :  1              253          254          253          ; 
-58 :  6              254          2                         ; 
-59 :  1              254          253          254          ; 
-60 :  6              253          3                         ; 
-61 :  1              253          254          253          ; 
-62 :  6              254          5                         ; 
-63 :  1              254          253          254          ; 
-64 :  D              253          3                         ; 
-65 :  1              253          254          253          ; 
-66 :  5              10           253                       ; 
-67 :  JMP            42                                     ; 
-68 :  ALLOUER        12           Reso         1            ; 
-69 :  JMP            16                                     ; 
-70 :  5              254          10                        ; 
-71 :  6              253          10                        ; 
-72 :  B              @X           253          254          ; 
-73 :  JMF            @X           86                        ; 
-74 :  5              254          10                        ; 
-75 :  6              253          10                        ; 
-76 :  9              @X           253          254          ; 
-77 :  JMF            @X           86                        ; 
-78 :  JMF            @X           86                        ; 
-79 :  5              254          10                        ; 
-80 :  5              253          0                         ; 
-81 :  A              @X           253          254          ; 
-82 :  JMF            @X           86                        ; 
-83 :  JMF            @X           86                        ; 
-84 :  6              10           2                         ; 
-85 :  JMP            70                                     ; 
-86 :  5              254          10                        ; 
-87 :  6              253          10                        ; 
-88 :  B              @X           253          254          ; 
-89 :  JMF            @X           113                       ; 
-90 :  5              254          10                        ; 
-91 :  6              253          10                        ; 
-92 :  9              @X           253          254          ; 
-93 :  JMF            @X           113                       ; 
-94 :  JMF            @X           113                       ; 
-95 :  6              10           3                         ; 
-96 :  5              254          10                        ; 
-97 :  6              253          10                        ; 
-98 :  B              @X           253          254          ; 
-99 :  JMF            @X           101                       ; 
-100:  JMP            107                                    ; 
-101:  5              254          10                        ; 
-102:  6              253          10                        ; 
-103:  9              @X           253          254          ; 
-104:  JMF            @X           106                       ; 
-105:  JMP            107                                    ; 
-106:  JMF            @X           110                       ; 
-107:  6              253          0                         ; 
-108:  5              2            253                       ; 
-109:  JMP            110                                    ; 
-110:  D              254          2                         ; 
-111:  C              254                                    ; 
-112:  JMP            86                                     ; 
-113:  ALLOUER        13           ola          0            ; 
-114:  JMP            0                                      ; 
+0  :  JMP            28                                     ; 
+1  :  ALLOUER        FONCTION     make                      ; 
+2  :  ALLOUER        9            estos        0            ; 
+3  :  DESALLOUER     VARS in Depth 1                         ; 
+4  :  JMPA           252                                    ; 
+5  :  ALLOUER        9            estos        0            ; 
+6  :  DESALLOUER     VARS in Depth 1                         ; 
+7  :  JMPA           252                                    ; 
+8  :  ALLOUER        FONCTION     al                        ; 
+9  :  ALLOUER        9            estos        0            ; 
+10 :  DESALLOUER     VARS in Depth 1                         ; 
+11 :  JMPA           252                                    ; 
+12 :  ALLOUER        FONCTION     ma                        ; 
+13 :  ALLOUER        9            estos        0            ; 
+14 :  DESALLOUER     VARS in Depth 1                         ; 
+15 :  JMPA           252                                    ; 
+16 :  ALLOUER        FONCTION     mak                       ; 
+17 :  6              252          19                        ; 
+18 :  JMP            13                                     ; 
+19 :  6              252          0                         ; 
+20 :  ALLOUER        9            estos        0            ; 
+21 :  5              9            0                         ; 
+22 :  DESALLOUER     VARS in Depth 1                         ; 
+23 :  JMPA           252                                    ; 
+24 :  ALLOUER        FONCTION     ap                        ; 
+25 :  ALLOUER        9            estos        0            ; 
+26 :  DESALLOUER     VARS in Depth 1                         ; 
+27 :  JMPA           252                                    ; 
+28 :  6              252          30                        ; 
+29 :  JMP            17                                     ; 
+30 :  6              252          0                         ; 
+31 :  6              252          33                        ; 
+32 :  JMP            25                                     ; 
+33 :  6              252          0                         ; 
+34 :  5              253          0                         ; 
+35 :  C              253                                    ; 
 
 Errors found : 
-Error found in line: 1 
- The variable 'a' does not exist or is invalid.
+Error found in line: 5 
+ The function already exists.
  
-Error found in line: 4 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 7 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 10 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 17 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 21 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 27 
- The variable 'a' does not exist or is invalid.
- 
-Error found in line: 43 
- The pointer 'Pc' points to an invalid address.
- 
-Error found in line: 43 
- The pointer 'Pc' points to an invalid address.
- 
-Number of lines : 116
+Number of lines : 37

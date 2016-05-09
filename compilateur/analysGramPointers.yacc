@@ -4,6 +4,7 @@
 	#include <stdbool.h>
 
 	#include "symtab.h"
+	#include "funtab.h"
 	#include "stack.h"
 
 	int yylex(void);
@@ -38,8 +39,10 @@
 	int ce = 0; //error counter
 
 	struct labelTable labTab[instSIZE];		//Stores ASM instructions
-	int cp = 0; //instruction counter
+	int cp = 1; //instruction counter (Begins in 1 because 0 is a JMP to avoid executing the decalred functions)
 	int cp_Offset = 0; //Offset of the instruction counter
+
+	struct stack funct_stack;			//Allows to jump back to the line after function call
 
 	struct stack if_iter_stack;			//Keep count of number of ifs to correct
 	struct stack if_stack;				//Allows to assign if begin code lines to jump instructions
@@ -90,6 +93,7 @@
 %start TestStart
 %token tAMPERSAND
 %token tINT 
+%token tVOID
 %token tMIN
 %token tMAY  
 %token tMINEQU
@@ -130,21 +134,136 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	While		{printf("\n Succesful test");}
+TestMessage	: 	Begin		{printf("\n Succesful test");}
 			;
 
-Fonction	: 	tINT tVAR tPO Param tPF tCO Body tCF 	{printf("\n Fonction trouvee");}
+Begin 		: Fonctions {
+							/* Ignore Function instructions at first */
+							sprintf(snum, "%d", cp);	
+							insert_Instruction( "JMP", snum, "", "", "", 0 ); //JMP line
+						}
+			  Main
 			;
+
+Fonctions	: Fonction
+			| Fonctions Fonction
+			;
+
+Fonction	: 	tINT tVAR tPO Param tPF	{
+											depth++;
+
+											if( lookupFunc($2) == -1 ) //Funtion doesn't exist
+											{																
+												insert_Instruction( "ALLOUER", "FONCTION", $2, "", "", cp ); //Reserve space for the function
+											    cp++;	
+												insertFunc( $2, 0, cp );		
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function already exists.\n" );
+												errTab[ce].line = cp;
+												ce++;
+												}
+											}
+				tCO Body tCF 			{		
+											/* Delete variables created on the function */
+											sprintf(snum, "%d", depth);							
+											insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+											cp++;
+											deleteByDepth( depth );	//Delete variables from this depth
+											depth--;				//Used for variable creation
+													
+											sprintf(snum, "%d", lookup("0funct_line"));					
+											insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+											cp++;									
+										}
+			|	tVOID tVAR tPO Param tPF {
+											depth++;
+
+											if( lookupFunc($2) == -1 )
+											{																
+												insert_Instruction( "ALLOUER", "FONCTION", $2, "", "", cp ); //Reserve space for the function
+											    cp++;	
+												insertFunc( $2, 1, cp );		
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function already exists.\n" );
+												errTab[ce].line = cp;
+												ce++;
+											}
+										}
+				tCO Body tCF 			{	
+											/* Delete variables created on the function */
+											sprintf(snum, "%d", depth);							
+											insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+											cp++;
+											deleteByDepth( depth );	//Delete variables from this depth
+											depth--;				//Used for variable creation
+
+											sprintf(snum, "%d", lookup("0funct_line"));					
+											insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+											cp++;	
+										}				 			
+			;
+
 	
 Param 		:	tINT tVAR tV Param 		
-				| tINT tVAR				
+				| tINT tVAR	
+				| /*Nothing*/			
 			;
-				
+
+FunctCall	:tVAR tPO ParamCall tPF tPV	{	
+											if( lookupFunc($1) != -1 )	//Function exists
+											{
+												/* Function CALL */
+												funct_stack = push(cp+2, funct_stack);			//store line after function call
+
+												auxNum = funct_stack.stk[funct_stack.top];			//recover line after function call												
+												sprintf(snum, "%d", lookup("0funct_line"));
+												sprintf(snum2, "%d", auxNum);
+												setValueByName(snum, auxNum); 	//Sets the value
+											    insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result constant 
+											    cp++;	
+										
+												sprintf(snum, "%d", lookupLineFunc($1));
+											    insert_Instruction( "JMP", snum, "", "", "", cp ); //JMP line  
+											    cp++;	
+
+											    funct_stack = pop(funct_stack);						//pop the value	(last line on stack is going to be used on the next instruction)
+
+												auxNum = funct_stack.stk[funct_stack.top];			//recover line after function call								
+												sprintf(snum, "%d", lookup("0funct_line"));
+												sprintf(snum2, "%d", auxNum);
+												setValueByName(snum, auxNum); 	//Sets the value
+												insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result constant 
+											    cp++;	
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function does not exist.\n" );
+												errTab[ce].line = cp;
+												ce++;
+											}
+										}
+			;	
+
+	
+ParamCall 		: tVAR tV ParamCall 		
+				| tVAR	
+				| tNUM
+				| /*Nothing*/			
+			;
+
+Main		: 	tMAIN tPO tPF tCO Body tCF
+			;
+
 Body		:	Declar
 			|	If							
 			|	While						
 			|	Print							
-			| 	Assign						
+			| 	Assign		
+			|   FunctCall				
 			|	Body Body							
 			;
 
@@ -192,7 +311,6 @@ Assign 		:	tVAR tE tVAR tPV	{
 										}	
 									}
 			|	tVAR tE Expr tPV	{
-  printf("look1 for :%s\n", $1);
 										if(lookupType($1) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
 											if( temp1_flag )	//value is in temp1
@@ -204,7 +322,6 @@ Assign 		:	tVAR tE tVAR tPV	{
 											sprintf(snum2, "%d", lookup(auxString));
 											setValueByName($1, getValueByName(auxString)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-  printf("look2 for :%s\n", $1);
 										    cp++;			
 										}
 										else
@@ -411,8 +528,12 @@ If			:	If tELSE tCO Body tCF			{
 															else_stack = pop(else_stack);				
 														}
 													}
-
-													depth--;	//Used for variable creation
+								
+													sprintf(snum, "%d", depth);							
+													insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+													cp++;
+													deleteByDepth( depth );	//Delete variables from this depth
+													depth--;				//Used for variable creation
 												}
 			;
 
@@ -660,8 +781,13 @@ While		:	tWHILE 								{
 																while_end_stack = pop(while_end_stack);				
 															}
 														}
+	
 
-														depth--;	//Used for variable creation
+														sprintf(snum, "%d", depth);							
+														insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+														cp++;
+														deleteByDepth( depth );	//Delete variables from this depth
+														depth--;				//Used for variable creation
 													}
 				;
 
@@ -856,9 +982,6 @@ DeclarCnst	:	tCONST DeclarCnst tPV
 								}
 			;
 
-Main		: 	tMAIN tPO tPF tCO Body tCF
-			;
-
 Val			:	tNUM		{
 								if( !pointer_value_flag )	//pointer value hasn't been initialized
 								{
@@ -880,7 +1003,7 @@ Val			:	tNUM		{
 								sprintf(snum, "%d", lookup(auxString));
 								sprintf(snum2, "%d", $1);
 								setValueByName(auxString, $1); 	//Sets the value
-								insert_Instruction( "6", snum, snum2, "", "", cp ); //COP @result @operand1 
+								insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num 
 								cp++;
 
 								$$ = lookup(auxString);
@@ -1103,17 +1226,9 @@ Expr			:	Expr tPLUS Expr	{
 				|	Val 		
 			;
 
-/*TODO:
 
-      			| error 	{									
-								strcpy( errTab[ce].error, "Expected variable or number in line: " );								
-								sprintf(snum , "%d", cp);
-								strcpy( errTab[ce].error, snum );								
-								strcpy( errTab[ce].error, ".\n" );
-								errTab[ce].line = cp;
-								ce++;
-      						}
-*/																												
+
+
 
 
 
@@ -1130,10 +1245,12 @@ void print_Error_Table()
 	if( ce > 0 )
 		fprintf(fp, "\nErrors found : \n");
 	for (int i = 0 ; i < ce; i++)
-		fprintf(fp, "Error found in line: %d \n %s \n", errTab[i].line+1, errTab[i].error );
+		fprintf(fp, "Error found in line: %d \n %s \n", errTab[i].line, errTab[i].error );
 
 }
 /*End of error management*/
+
+
 
 
 
@@ -1171,6 +1288,10 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 
 
 
+
+
+
+
 int main(void) {
 
 	initializeSymtab(); //Sets parameters like temporal variables, etc..
@@ -1202,15 +1323,18 @@ int main(void) {
 	insert("Pc", 2, 0);
 	setValueByName("Pc", 16);
 
-	delete("a");
+	//delete("a");
+	//delete("b");
 	insert("c", 1, 0);
 	insert("d", 0, 0);
 	insert("e", 1, 0);
 	//delete("c");
+	//delete("d");
 	insert("g", 1, 0);
 
 
 	yyparse();
+	functab_print(fp);
 	symtab_print(fp);
 	print_Label_Table();
 	print_Error_Table();
@@ -1235,6 +1359,16 @@ int main(void) {
 
 	Whitespaces interfer with some tokens for example: int a; will detect the token "int " instead of "int"
 
+
+
+| error 	{									
+								strcpy( errTab[ce].error, "Expected variable or number in line: " );								
+								sprintf(snum , "%d", cp);
+								strcpy( errTab[ce].error, snum );								
+								strcpy( errTab[ce].error, ".\n" );
+								errTab[ce].line = cp;
+								ce++;
+      						}
 
 
 NOTE:

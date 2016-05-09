@@ -69,6 +69,7 @@
 	#include <stdbool.h>
 
 	#include "symtab.h"
+	#include "funtab.h"
 	#include "stack.h"
 
 	int yylex(void);
@@ -103,8 +104,10 @@
 	int ce = 0; //error counter
 
 	struct labelTable labTab[instSIZE];		//Stores ASM instructions
-	int cp = 0; //instruction counter
+	int cp = 1; //instruction counter (Begins in 1 because 0 is a JMP to avoid executing the decalred functions)
 	int cp_Offset = 0; //Offset of the instruction counter
+
+	struct stack funct_stack;			//Allows to jump back to the line after function call
 
 	struct stack if_iter_stack;			//Keep count of number of ifs to correct
 	struct stack if_stack;				//Allows to assign if begin code lines to jump instructions
@@ -146,7 +149,7 @@
 	char retrievedString[64]; //Used to store user input in the printf instructions.
 	char stringPrinter[4]; 	//Used to create the printf instructions.
 
-#line 150 "y.tab.c" /* yacc.c:339  */
+#line 153 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -183,81 +186,83 @@ extern int yydebug;
   {
     tAMPERSAND = 258,
     tINT = 259,
-    tMIN = 260,
-    tMAY = 261,
-    tMINEQU = 262,
-    tMAYEQU = 263,
-    tEQU = 264,
-    tDIF = 265,
-    tOR = 266,
-    tAND = 267,
-    tPO = 268,
-    tPF = 269,
-    tCO = 270,
-    tCF = 271,
-    tPV = 272,
-    tPLUS = 273,
-    tVAR = 274,
-    tSTRING = 275,
-    tE = 276,
-    tMAIN = 277,
-    tSOU = 278,
-    tMUL = 279,
-    tDIV = 280,
-    tPRINT = 281,
-    tNUM = 282,
-    tIF = 283,
-    tWHILE = 284,
-    tELSE = 285,
-    tV = 286,
-    tCONST = 287,
-    tGUILLEMETS = 288
+    tVOID = 260,
+    tMIN = 261,
+    tMAY = 262,
+    tMINEQU = 263,
+    tMAYEQU = 264,
+    tEQU = 265,
+    tDIF = 266,
+    tOR = 267,
+    tAND = 268,
+    tPO = 269,
+    tPF = 270,
+    tCO = 271,
+    tCF = 272,
+    tPV = 273,
+    tPLUS = 274,
+    tVAR = 275,
+    tSTRING = 276,
+    tE = 277,
+    tMAIN = 278,
+    tSOU = 279,
+    tMUL = 280,
+    tDIV = 281,
+    tPRINT = 282,
+    tNUM = 283,
+    tIF = 284,
+    tWHILE = 285,
+    tELSE = 286,
+    tV = 287,
+    tCONST = 288,
+    tGUILLEMETS = 289
   };
 #endif
 /* Tokens.  */
 #define tAMPERSAND 258
 #define tINT 259
-#define tMIN 260
-#define tMAY 261
-#define tMINEQU 262
-#define tMAYEQU 263
-#define tEQU 264
-#define tDIF 265
-#define tOR 266
-#define tAND 267
-#define tPO 268
-#define tPF 269
-#define tCO 270
-#define tCF 271
-#define tPV 272
-#define tPLUS 273
-#define tVAR 274
-#define tSTRING 275
-#define tE 276
-#define tMAIN 277
-#define tSOU 278
-#define tMUL 279
-#define tDIV 280
-#define tPRINT 281
-#define tNUM 282
-#define tIF 283
-#define tWHILE 284
-#define tELSE 285
-#define tV 286
-#define tCONST 287
-#define tGUILLEMETS 288
+#define tVOID 260
+#define tMIN 261
+#define tMAY 262
+#define tMINEQU 263
+#define tMAYEQU 264
+#define tEQU 265
+#define tDIF 266
+#define tOR 267
+#define tAND 268
+#define tPO 269
+#define tPF 270
+#define tCO 271
+#define tCF 272
+#define tPV 273
+#define tPLUS 274
+#define tVAR 275
+#define tSTRING 276
+#define tE 277
+#define tMAIN 278
+#define tSOU 279
+#define tMUL 280
+#define tDIV 281
+#define tPRINT 282
+#define tNUM 283
+#define tIF 284
+#define tWHILE 285
+#define tELSE 286
+#define tV 287
+#define tCONST 288
+#define tGUILLEMETS 289
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 85 "analysGramPointers.yacc" /* yacc.c:355  */
+#line 88 "analysGramPointers.yacc" /* yacc.c:355  */
 
 	int nb;
 	char * variable;
 
-#line 261 "y.tab.c" /* yacc.c:355  */
+#line 266 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -272,7 +277,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 276 "y.tab.c" /* yacc.c:358  */
+#line 281 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -512,23 +517,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  6
+#define YYFINAL  10
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   173
+#define YYLAST   226
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  34
+#define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  25
+#define YYNNTS  35
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  64
+#define YYNRULES  82
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  144
+#define YYNSTATES  186
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   288
+#define YYMAXUTOK   289
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -565,20 +570,22 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   130,   130,   133,   143,   144,   145,   146,   147,   148,
-     151,   178,   194,   244,   271,   298,   336,   365,   378,   382,
-     419,   425,   425,   445,   445,   462,   468,   468,   488,   488,
-     505,   508,   511,   517,   548,   590,   612,   624,   624,   668,
-     677,   678,   679,   682,   683,   684,   722,   741,   742,   743,
-     780,   799,   800,   801,   840,   862,   888,   944,   991,  1042,
-    1057,  1072,  1087,  1102,  1103
+       0,   134,   134,   137,   140,   140,   148,   149,   152,   152,
+     180,   180,   211,   212,   213,   216,   252,   253,   254,   255,
+     258,   261,   262,   263,   264,   265,   266,   267,   270,   297,
+     313,   361,   388,   415,   453,   482,   495,   499,   540,   546,
+     546,   566,   566,   583,   589,   589,   609,   609,   626,   629,
+     632,   638,   669,   711,   733,   745,   745,   794,   803,   804,
+     805,   808,   809,   810,   848,   867,   868,   869,   906,   925,
+     926,   927,   966,   985,  1011,  1067,  1114,  1165,  1180,  1195,
+    1210,  1225,  1226
 };
 #endif
 
@@ -587,14 +594,16 @@ static const yytype_uint16 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "tAMPERSAND", "tINT", "tMIN", "tMAY",
-  "tMINEQU", "tMAYEQU", "tEQU", "tDIF", "tOR", "tAND", "tPO", "tPF", "tCO",
-  "tCF", "tPV", "tPLUS", "tVAR", "tSTRING", "tE", "tMAIN", "tSOU", "tMUL",
-  "tDIV", "tPRINT", "tNUM", "tIF", "tWHILE", "tELSE", "tV", "tCONST",
-  "tGUILLEMETS", "$accept", "TestStart", "TestMessage", "Body", "Assign",
-  "Condition", "If", "Cond", "$@1", "$@2", "CondWhile", "$@3", "$@4",
-  "CompareToken", "CondValue", "ConditionWhile", "While", "$@5", "Print",
-  "Declar", "DeclarInt", "DeclarPtr", "DeclarCnst", "Val", "Expr", YY_NULLPTR
+  "$end", "error", "$undefined", "tAMPERSAND", "tINT", "tVOID", "tMIN",
+  "tMAY", "tMINEQU", "tMAYEQU", "tEQU", "tDIF", "tOR", "tAND", "tPO",
+  "tPF", "tCO", "tCF", "tPV", "tPLUS", "tVAR", "tSTRING", "tE", "tMAIN",
+  "tSOU", "tMUL", "tDIV", "tPRINT", "tNUM", "tIF", "tWHILE", "tELSE", "tV",
+  "tCONST", "tGUILLEMETS", "$accept", "TestStart", "TestMessage", "Begin",
+  "$@1", "Fonctions", "Fonction", "$@2", "$@3", "Param", "FunctCall",
+  "ParamCall", "Main", "Body", "Assign", "Condition", "If", "Cond", "$@4",
+  "$@5", "CondWhile", "$@6", "$@7", "CompareToken", "CondValue",
+  "ConditionWhile", "While", "$@8", "Print", "Declar", "DeclarInt",
+  "DeclarPtr", "DeclarCnst", "Val", "Expr", YY_NULLPTR
 };
 #endif
 
@@ -606,14 +615,14 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288
+     285,   286,   287,   288,   289
 };
 # endif
 
-#define YYPACT_NINF -75
+#define YYPACT_NINF -131
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-75)))
+  (!!((Yystate) == (-131)))
 
 #define YYTABLE_NINF -1
 
@@ -624,21 +633,25 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -12,   -75,     7,   -75,   -75,     3,   -75,   101,    32,   101,
-     -75,     0,   -75,    28,    77,    69,    43,   -75,   -75,   -75,
-     -75,   -75,    50,     4,    58,    73,    87,    98,    29,     5,
-     -75,    82,   -75,   -75,   -75,    90,    99,   107,     2,   -75,
-       8,    92,    11,   -11,    72,   119,   100,   110,   124,   123,
-       1,   -75,    69,   130,     8,    11,    29,   -75,   -75,    91,
-     122,   126,    23,   -75,   129,    91,   132,   131,   134,   -75,
-     118,    22,   133,   -75,   135,   -75,   139,   110,   141,    77,
-      69,    91,   -75,    69,    90,    99,   107,   143,   144,    84,
-      91,   -75,   142,   108,   -75,   145,   -75,   -75,    91,    91,
-      91,    91,   146,   147,   -75,   -75,   148,   152,   -75,    50,
-      34,    84,    52,   101,   101,    84,   -75,   -75,   -75,    27,
-      27,   -75,   -75,   -75,   -75,   -75,    78,   -75,   -75,   -75,
-     153,   154,   -75,   -75,   -75,   -75,   156,   157,   110,   110,
-     158,   159,   -75,   -75
+     130,    -4,     2,    50,  -131,  -131,   130,  -131,    51,    54,
+    -131,    52,  -131,    75,    75,    93,  -131,    70,   107,   109,
+     114,    94,  -131,  -131,   123,    75,   125,   131,   140,  -131,
+     140,   140,     6,    72,   134,   142,   145,  -131,    37,  -131,
+       3,  -131,   132,  -131,  -131,  -131,   143,   144,   146,    68,
+      83,     5,   149,    17,    -3,    71,    31,   161,    38,   152,
+     148,   170,   164,    28,  -131,   140,   171,     5,    17,    37,
+    -131,  -131,    64,   163,   167,    29,  -131,   162,  -131,   147,
+     173,    64,   177,   176,   179,  -131,    -7,    76,   178,  -131,
+     180,  -131,   184,   152,  -131,   181,  -131,   187,    99,   140,
+     154,   188,    64,  -131,   140,   143,   144,   146,    95,    64,
+    -131,    71,   185,   189,   166,  -131,   190,  -131,  -131,    64,
+      64,    64,    64,   191,   192,  -131,  -131,   193,   197,  -131,
+    -131,  -131,  -131,  -131,    49,    98,   154,   198,    99,   140,
+      95,   113,    95,  -131,  -131,  -131,  -131,  -131,   111,   111,
+    -131,  -131,  -131,  -131,  -131,   137,  -131,  -131,   199,  -131,
+      49,   128,  -131,  -131,  -131,   139,  -131,  -131,   201,   202,
+    -131,  -131,   152,   152,   203,   204,   205,   206,   154,   154,
+    -131,  -131,   207,   208,  -131,  -131
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -646,37 +659,43 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    37,     0,     2,     3,     0,     1,     0,     0,     0,
-      33,     0,    35,     0,     0,     0,     0,    34,    36,    30,
-      31,    32,     0,     0,    46,     0,     0,     0,     0,     0,
-       8,     5,     6,     7,     4,    40,    41,    42,     0,    25,
-       0,    46,     0,     0,     0,     0,     0,     0,     0,    54,
-       0,    38,     9,     0,     0,     0,     0,    26,    28,     0,
-       0,    50,     0,    43,     0,     0,    56,     0,    55,    64,
-      45,     0,     0,    56,     0,    55,     0,     0,     0,     0,
-       0,     0,    51,     0,    44,    48,    52,     0,     0,    45,
-       0,    47,    58,     0,    10,    57,    11,    12,     0,     0,
-       0,     0,     0,     0,    58,    57,     0,     0,    17,     0,
-       0,    53,     0,     0,     0,    49,    16,    63,    13,    59,
-      60,    61,    62,    14,    15,    39,     0,    20,    19,    18,
-       0,     0,    21,    23,    27,    29,     0,     0,     0,     0,
-       0,     0,    22,    24
+       0,     0,     0,     0,     2,     3,     4,     6,     0,     0,
+       1,     0,     7,    14,    14,     0,     5,     0,     0,     0,
+       0,    13,     8,    10,     0,    14,     0,     0,     0,    12,
+       0,     0,     0,    64,     0,     0,     0,    55,     0,    26,
+       0,    25,    22,    23,    24,    21,    58,    59,    60,     0,
+       0,     0,    64,     0,     0,    19,     0,     0,     0,     0,
+       0,     0,    72,     0,    20,    27,     0,     0,     0,     0,
+       9,    11,     0,     0,    68,     0,    61,    17,    18,     0,
+       0,     0,    74,     0,    73,    82,    63,     0,     0,    74,
+       0,    73,     0,     0,    51,     0,    53,     0,     0,     0,
+       0,     0,     0,    69,     0,    62,    66,    70,    63,     0,
+      65,    19,     0,    76,     0,    28,    75,    29,    30,     0,
+       0,     0,     0,     0,     0,    76,    75,     0,     0,    52,
+      35,    48,    49,    50,     0,     0,     0,     0,     0,     0,
+      71,     0,    67,    16,    15,    34,    81,    31,    77,    78,
+      79,    80,    32,    33,    57,     0,    38,    37,     0,    54,
+       0,     0,    36,    39,    41,     0,    43,    56,     0,     0,
+      44,    46,     0,     0,     0,     0,     0,     0,     0,     0,
+      40,    42,     0,     0,    45,    47
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -75,   -75,   -75,   -13,   -75,   -75,   -75,   -74,   -75,   -75,
-      -8,   -75,   -75,    79,   -22,   -75,   160,   -75,   -75,   -75,
-     -18,    17,   -17,   115,   -55
+    -131,  -131,  -131,  -131,  -131,  -131,   200,  -131,  -131,    48,
+    -131,   108,  -131,   -28,  -131,  -131,  -131,   -92,  -131,  -131,
+    -130,  -131,  -131,    67,   -96,  -131,  -131,  -131,  -131,  -131,
+     -24,   -29,   -25,   168,   -67
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,     3,    52,    30,    48,    31,    78,   136,   137,
-      13,    87,    88,    22,    14,     8,    32,     5,    33,    34,
-      35,    36,    37,    69,    70
+      -1,     3,     4,     5,    11,     6,     7,    26,    27,    18,
+      39,    79,    16,    65,    41,    60,    42,    97,   168,   169,
+     137,   174,   175,   134,    98,   101,    43,    61,    44,    45,
+      46,    47,    48,    85,    86
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -684,91 +703,109 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      39,    16,    29,   107,    89,    43,    63,     6,    40,    23,
-      93,    50,    40,    57,    58,    60,     7,     1,    82,    17,
-      54,    51,    43,    41,    24,    79,   111,    41,    42,    25,
-      61,    26,    56,    27,     1,   115,    84,    28,    23,    86,
-      91,   102,    18,   119,   120,   121,   122,    15,    49,   103,
-     128,   100,   101,    24,    55,    79,    23,    38,    25,    62,
-      26,    28,    27,     1,   140,   141,    28,   110,   129,    10,
-     112,    24,    85,    23,    11,    64,    25,    12,    26,    44,
-      27,     1,    19,    20,    28,    65,    21,   127,    24,   132,
-     133,    66,    45,    25,    72,    26,    67,    27,     1,    68,
-      46,    28,    98,    72,    65,   130,   131,    99,   100,   101,
-      73,    47,    53,    59,     9,    74,    79,    79,    75,    73,
-      10,    54,   117,    77,    74,    11,    98,    75,    12,    10,
-      55,    99,   100,   101,    11,    97,    98,    12,    56,    80,
-      71,    99,   100,   101,    81,    83,    42,    90,    92,    94,
-      95,    96,   104,   106,   105,   108,   113,   114,   109,   116,
-       4,    76,   118,   123,   124,   125,   126,   134,   135,   138,
-     139,     0,   142,   143
+      40,   128,    49,    50,   138,   108,   158,    32,    54,    51,
+      51,   118,   119,    63,   114,    76,     8,   120,   121,   122,
+      64,    73,     9,    33,    75,    52,    52,    54,    34,    67,
+      35,    53,    36,    37,    80,   140,    38,    74,   156,   106,
+     138,    88,   142,   105,   107,    81,   103,   110,   182,   183,
+      10,    82,   148,   149,   150,   151,    83,    62,    89,    84,
+      69,    68,    19,    90,   166,    13,    91,    88,    14,    94,
+      38,   135,    32,    29,    95,    15,   141,    96,    81,    17,
+     176,   177,   138,   138,    89,    70,    55,    32,    33,    90,
+      21,    77,    91,    34,    56,    35,   123,    36,    37,    78,
+      71,    38,    32,    33,   124,   131,   132,    20,    34,   133,
+      35,   161,    36,    37,   119,   157,    38,    32,    33,   120,
+     121,   122,    22,    34,    23,    35,    25,    36,    37,    24,
+     162,    38,    32,    33,     1,     2,   121,   122,    34,    28,
+      35,    30,    36,    37,    32,   167,    38,    31,    33,   163,
+     164,   170,   171,    34,    57,    35,    58,    36,    37,    59,
+      33,    38,   112,    66,    99,    34,    93,    35,   136,    36,
+      37,    72,    94,    38,    94,    67,    68,    95,    69,    95,
+      96,   146,    96,    87,   100,   119,   102,   104,    53,   109,
+     120,   121,   122,   113,   111,   115,   116,   117,   125,   127,
+     126,   129,   130,   144,   139,   160,    12,   145,   147,   152,
+     153,   154,   155,   159,   165,   172,   173,   178,   179,   143,
+     180,   181,   184,   185,     0,     0,    92
 };
 
 static const yytype_int16 yycheck[] =
 {
-      22,     9,    15,    77,    59,    23,    17,     0,     4,     4,
-      65,    28,     4,    11,    12,     4,    13,    29,    17,    19,
-      31,    16,    40,    19,    19,    47,    81,    19,    24,    24,
-      19,    26,    31,    28,    29,    90,    54,    32,     4,    56,
-      17,    19,    14,    98,    99,   100,   101,    15,    19,    27,
-      16,    24,    25,    19,    31,    77,     4,    14,    24,    42,
-      26,    32,    28,    29,   138,   139,    32,    80,    16,    19,
-      83,    19,    55,     4,    24,     3,    24,    27,    26,    21,
-      28,    29,     5,     6,    32,    13,     9,   109,    19,    11,
-      12,    19,    19,    24,     3,    26,    24,    28,    29,    27,
-      13,    32,    18,     3,    13,   113,   114,    23,    24,    25,
-      19,    13,    30,    21,    13,    24,   138,   139,    27,    19,
-      19,    31,    14,    13,    24,    24,    18,    27,    27,    19,
-      31,    23,    24,    25,    24,    17,    18,    27,    31,    15,
-      21,    23,    24,    25,    21,    15,    24,    21,    19,    17,
-      19,    17,    19,    14,    19,    14,    13,    13,    79,    17,
-       0,    46,    17,    17,    17,    17,    14,    14,    14,    13,
-      13,    -1,    14,    14
+      28,    93,    30,    31,   100,    72,   136,     4,    32,     4,
+       4,    18,    19,    38,    81,    18,    20,    24,    25,    26,
+      17,     4,    20,    20,    53,    20,    20,    51,    25,    32,
+      27,    25,    29,    30,     3,   102,    33,    20,   134,    68,
+     136,     3,   109,    67,    69,    14,    18,    18,   178,   179,
+       0,    20,   119,   120,   121,   122,    25,    20,    20,    28,
+      32,    32,    14,    25,   160,    14,    28,     3,    14,    20,
+      33,    99,     4,    25,    25,    23,   104,    28,    14,     4,
+     172,   173,   178,   179,    20,    17,    14,     4,    20,    25,
+      20,    20,    28,    25,    22,    27,    20,    29,    30,    28,
+      17,    33,     4,    20,    28,     6,     7,    14,    25,    10,
+      27,   139,    29,    30,    19,    17,    33,     4,    20,    24,
+      25,    26,    15,    25,    15,    27,    32,    29,    30,    15,
+      17,    33,     4,    20,     4,     5,    25,    26,    25,    16,
+      27,    16,    29,    30,     4,    17,    33,    16,    20,    12,
+      13,    12,    13,    25,    20,    27,    14,    29,    30,    14,
+      20,    33,    15,    31,    16,    25,    14,    27,    14,    29,
+      30,    22,    20,    33,    20,    32,    32,    25,    32,    25,
+      28,    15,    28,    22,    14,    19,    22,    16,    25,    22,
+      24,    25,    26,    20,    32,    18,    20,    18,    20,    15,
+      20,    20,    15,    18,    16,   138,     6,    18,    18,    18,
+      18,    18,    15,    15,    15,    14,    14,    14,    14,   111,
+      15,    15,    15,    15,    -1,    -1,    58
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    29,    35,    36,    50,    51,     0,    13,    49,    13,
-      19,    24,    27,    44,    48,    15,    44,    19,    14,     5,
-       6,     9,    47,     4,    19,    24,    26,    28,    32,    37,
-      38,    40,    50,    52,    53,    54,    55,    56,    14,    48,
-       4,    19,    24,    54,    21,    19,    13,    13,    39,    19,
-      56,    16,    37,    30,    31,    31,    31,    11,    12,    21,
-       4,    19,    55,    17,     3,    13,    19,    24,    27,    57,
-      58,    21,     3,    19,    24,    27,    57,    13,    41,    48,
-      15,    21,    17,    15,    54,    55,    56,    45,    46,    58,
-      21,    17,    19,    58,    17,    19,    17,    17,    18,    23,
-      24,    25,    19,    27,    19,    19,    14,    41,    14,    47,
-      37,    58,    37,    13,    13,    58,    17,    14,    17,    58,
-      58,    58,    58,    17,    17,    17,    14,    48,    16,    16,
-      44,    44,    11,    12,    14,    14,    42,    43,    13,    13,
-      41,    41,    14,    14
+       0,     4,     5,    36,    37,    38,    40,    41,    20,    20,
+       0,    39,    41,    14,    14,    23,    47,     4,    44,    44,
+      14,    20,    15,    15,    15,    32,    42,    43,    16,    44,
+      16,    16,     4,    20,    25,    27,    29,    30,    33,    45,
+      48,    49,    51,    61,    63,    64,    65,    66,    67,    48,
+      48,     4,    20,    25,    65,    14,    22,    20,    14,    14,
+      50,    62,    20,    67,    17,    48,    31,    32,    32,    32,
+      17,    17,    22,     4,    20,    66,    18,    20,    28,    46,
+       3,    14,    20,    25,    28,    68,    69,    22,     3,    20,
+      25,    28,    68,    14,    20,    25,    28,    52,    59,    16,
+      14,    60,    22,    18,    16,    65,    66,    67,    69,    22,
+      18,    32,    15,    20,    69,    18,    20,    18,    18,    19,
+      24,    25,    26,    20,    28,    20,    20,    15,    52,    20,
+      15,     6,     7,    10,    58,    48,    14,    55,    59,    16,
+      69,    48,    69,    46,    18,    18,    15,    18,    69,    69,
+      69,    69,    18,    18,    18,    15,    59,    17,    55,    15,
+      58,    48,    17,    12,    13,    15,    59,    17,    53,    54,
+      12,    13,    14,    14,    56,    57,    52,    52,    14,    14,
+      15,    15,    55,    55,    15,    15
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    34,    35,    36,    37,    37,    37,    37,    37,    37,
-      38,    38,    38,    38,    38,    38,    38,    39,    40,    40,
-      41,    42,    41,    43,    41,    44,    45,    44,    46,    44,
-      47,    47,    47,    48,    48,    48,    49,    51,    50,    52,
-      53,    53,    53,    54,    54,    54,    54,    55,    55,    55,
-      55,    56,    56,    56,    56,    57,    57,    57,    57,    58,
-      58,    58,    58,    58,    58
+       0,    35,    36,    37,    39,    38,    40,    40,    42,    41,
+      43,    41,    44,    44,    44,    45,    46,    46,    46,    46,
+      47,    48,    48,    48,    48,    48,    48,    48,    49,    49,
+      49,    49,    49,    49,    49,    50,    51,    51,    52,    53,
+      52,    54,    52,    55,    56,    55,    57,    55,    58,    58,
+      58,    59,    59,    59,    60,    62,    61,    63,    64,    64,
+      64,    65,    65,    65,    65,    66,    66,    66,    66,    67,
+      67,    67,    67,    68,    68,    68,    68,    69,    69,    69,
+      69,    69,    69
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     1,     1,     1,     1,     2,
-       4,     4,     4,     5,     5,     5,     5,     3,     5,     5,
-       3,     0,     8,     0,     8,     3,     0,     8,     0,     8,
-       1,     1,     1,     1,     2,     1,     3,     0,     6,     5,
-       1,     1,     1,     3,     3,     3,     1,     4,     3,     3,
-       1,     3,     3,     3,     1,     1,     1,     2,     2,     3,
-       3,     3,     3,     3,     1
+       0,     2,     1,     1,     0,     3,     1,     2,     0,     9,
+       0,     9,     4,     2,     0,     5,     3,     1,     1,     0,
+       6,     1,     1,     1,     1,     1,     1,     2,     4,     4,
+       4,     5,     5,     5,     5,     3,     5,     5,     3,     0,
+       8,     0,     8,     3,     0,     8,     0,     8,     1,     1,
+       1,     1,     2,     1,     3,     0,     6,     5,     1,     1,
+       1,     3,     3,     3,     1,     4,     3,     3,     1,     3,
+       3,     3,     1,     1,     1,     2,     2,     3,     3,     3,
+       3,     3,     1
 };
 
 
@@ -1445,13 +1482,137 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 133 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 137 "analysGramPointers.yacc" /* yacc.c:1646  */
     {printf("\n Succesful test");}
-#line 1451 "y.tab.c" /* yacc.c:1646  */
+#line 1488 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 4:
+#line 140 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+							/* Ignore Function instructions at first */
+							sprintf(snum, "%d", cp);	
+							insert_Instruction( "JMP", snum, "", "", "", 0 ); //JMP line
+						}
+#line 1498 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 152 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+											depth++;
+
+											if( lookupFunc((yyvsp[-3].variable)) == -1 ) //Funtion doesn't exist
+											{																
+												insert_Instruction( "ALLOUER", "FONCTION", (yyvsp[-3].variable), "", "", cp ); //Reserve space for the function
+											    cp++;	
+												insertFunc( (yyvsp[-3].variable), 0, cp );		
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function already exists.\n" );
+												errTab[ce].line = cp;
+												ce++;
+												}
+											}
+#line 1519 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 168 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {		
+											/* Delete variables created on the function */
+											sprintf(snum, "%d", depth);							
+											insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+											cp++;
+											deleteByDepth( depth );	//Delete variables from this depth
+											depth--;				//Used for variable creation
+													
+											sprintf(snum, "%d", lookup("0funct_line"));					
+											insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+											cp++;									
+										}
+#line 1536 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 151 "analysGramPointers.yacc" /* yacc.c:1646  */
+#line 180 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {
+											depth++;
+
+											if( lookupFunc((yyvsp[-3].variable)) == -1 )
+											{																
+												insert_Instruction( "ALLOUER", "FONCTION", (yyvsp[-3].variable), "", "", cp ); //Reserve space for the function
+											    cp++;	
+												insertFunc( (yyvsp[-3].variable), 1, cp );		
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function already exists.\n" );
+												errTab[ce].line = cp;
+												ce++;
+											}
+										}
+#line 1557 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 196 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {	
+											/* Delete variables created on the function */
+											sprintf(snum, "%d", depth);							
+											insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+											cp++;
+											deleteByDepth( depth );	//Delete variables from this depth
+											depth--;				//Used for variable creation
+
+											sprintf(snum, "%d", lookup("0funct_line"));					
+											insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+											cp++;	
+										}
+#line 1574 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 216 "analysGramPointers.yacc" /* yacc.c:1646  */
+    {	
+											if( lookupFunc((yyvsp[-4].variable)) != -1 )	//Function exists
+											{
+												/* Function CALL */
+												funct_stack = push(cp+2, funct_stack);			//store line after function call
+
+												auxNum = funct_stack.stk[funct_stack.top];			//recover line after function call												
+												sprintf(snum, "%d", lookup("0funct_line"));
+												sprintf(snum2, "%d", auxNum);
+												setValueByName(snum, auxNum); 	//Sets the value
+											    insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result constant 
+											    cp++;	
+										
+												sprintf(snum, "%d", lookupLineFunc((yyvsp[-4].variable)));
+											    insert_Instruction( "JMP", snum, "", "", "", cp ); //JMP line  
+											    cp++;	
+
+											    funct_stack = pop(funct_stack);						//pop the value	(last line on stack is going to be used on the next instruction)
+
+												auxNum = funct_stack.stk[funct_stack.top];			//recover line after function call								
+												sprintf(snum, "%d", lookup("0funct_line"));
+												sprintf(snum2, "%d", auxNum);
+												setValueByName(snum, auxNum); 	//Sets the value
+												insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result constant 
+											    cp++;	
+											}
+											else
+											{
+												strcpy( errTab[ce].error, "The function does not exist.\n" );
+												errTab[ce].line = cp;
+												ce++;
+											}
+										}
+#line 1612 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 270 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) == 0 && lookupType((yyvsp[-1].variable)) == 0 ) //Both variables exist and are integers
 										{		
@@ -1479,11 +1640,11 @@ yyreduce:
 											}
 										}
 									}
-#line 1483 "y.tab.c" /* yacc.c:1646  */
+#line 1644 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 11:
-#line 178 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 29:
+#line 297 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 										if( lookupType((yyvsp[-3].variable)) == 0 ) 	//Variable exists and is integer
 										{			
@@ -1500,13 +1661,12 @@ yyreduce:
 											ce++;
 										}	
 									}
-#line 1504 "y.tab.c" /* yacc.c:1646  */
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 194 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 30:
+#line 313 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
-  printf("look1 for :%s\n", (yyvsp[-3].variable));
 										if(lookupType((yyvsp[-3].variable)) == 0 && !pointer_value)	//Variable exists and is integer and the expression is not for pointer
 										{				
 											if( temp1_flag )	//value is in temp1
@@ -1518,7 +1678,6 @@ yyreduce:
 											sprintf(snum2, "%d", lookup(auxString));
 											setValueByName((yyvsp[-3].variable), getValueByName(auxString)); 	//Sets the value
 											insert_Instruction( "5", snum, snum2, "", "", cp ); //COP @result @operand1 
-  printf("look2 for :%s\n", (yyvsp[-3].variable));
 										    cp++;			
 										}
 										else
@@ -1555,11 +1714,11 @@ yyreduce:
 										pointer_value_flag = false; //reset variable
 										pointer_value_flag2 = false; //reset variable
 									}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
+#line 1718 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 244 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 31:
+#line 361 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) != 2 && lookupType((yyvsp[-4].variable)) != -1 && lookupType((yyvsp[-1].variable)) == 2)	//Variables exist, first variable is not a pointer, and second var is a pointer
 												{	
@@ -1587,11 +1746,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1591 "y.tab.c" /* yacc.c:1646  */
+#line 1750 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 271 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 32:
+#line 388 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Variables exist, first variable is a pointer, and second var is not pointer
 												{														
@@ -1619,11 +1778,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1623 "y.tab.c" /* yacc.c:1646  */
+#line 1782 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 298 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 33:
+#line 415 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-3].variable)) == 2 )	//Variable exists and is pointer
 												{			
@@ -1662,11 +1821,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1666 "y.tab.c" /* yacc.c:1646  */
+#line 1825 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 336 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 34:
+#line 453 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 												if(lookupType((yyvsp[-4].variable)) == 2 && lookupType((yyvsp[-1].variable)) != -1 && lookupType((yyvsp[-1].variable)) != 2)	//Both variable exist, the first is pointer, and the second is not pointer
 												{				
@@ -1694,11 +1853,11 @@ yyreduce:
 													ce++;
 												}
 											}
-#line 1698 "y.tab.c" /* yacc.c:1646  */
+#line 1857 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 365 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 35:
+#line 482 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									depth++;	//Used for variable creation
 
@@ -1710,20 +1869,20 @@ yyreduce:
 									else_iter_stack = push(else_begin_count, else_iter_stack);	//store else begin iterations to later assign if begin line
 									else_begin_count = 0;
 								}
-#line 1714 "y.tab.c" /* yacc.c:1646  */
+#line 1873 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 378 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 36:
+#line 495 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp);									//Obtain else body end
 													insert_Instruction( "JMP", snum, "", "", "", (yyvsp[-4].nb)-1 );		//If ended, jump to else body end
 												}
-#line 1723 "y.tab.c" /* yacc.c:1646  */
+#line 1882 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 382 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 37:
+#line 499 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
 													insert_Instruction( "JMF", "@X", snum, "", "", (yyvsp[-3].nb) );				//If statement is false jump to else body
@@ -1756,25 +1915,29 @@ yyreduce:
 															else_stack = pop(else_stack);				
 														}
 													}
-
-													depth--;	//Used for variable creation
+								
+													sprintf(snum, "%d", depth);							
+													insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+													cp++;
+													deleteByDepth( depth );	//Delete variables from this depth
+													depth--;				//Used for variable creation
 												}
-#line 1763 "y.tab.c" /* yacc.c:1646  */
+#line 1926 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 419 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 38:
+#line 540 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1774 "y.tab.c" /* yacc.c:1646  */
+#line 1937 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 425 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 39:
+#line 546 "analysGramPointers.yacc" /* yacc.c:1646  */
     {									
 											sprintf(snum , "%d", cp+2);	
 											insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1785,11 +1948,11 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1789 "y.tab.c" /* yacc.c:1646  */
+#line 1952 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 435 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 40:
+#line 556 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											sprintf(snum , "%d", cp+2);	
 					 						insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
@@ -1800,44 +1963,44 @@ yyreduce:
 											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
 											cp++;
 										}
-#line 1804 "y.tab.c" /* yacc.c:1646  */
+#line 1967 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 445 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 41:
+#line 566 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;
 										}
-#line 1815 "y.tab.c" /* yacc.c:1646  */
+#line 1978 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 451 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 42:
+#line 572 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
 											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
 											cp++;											
 										}
-#line 1826 "y.tab.c" /* yacc.c:1646  */
+#line 1989 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 462 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 43:
+#line 583 "analysGramPointers.yacc" /* yacc.c:1646  */
     {					
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
 															insert_Instruction( (yyvsp[-1].variable), "@X", snum, snum2, "", cp );			//COMPARISSON
 															cp++;
 														}
-#line 1837 "y.tab.c" /* yacc.c:1646  */
+#line 2000 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 468 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 44:
+#line 589 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1848,11 +2011,11 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1852 "y.tab.c" /* yacc.c:1646  */
+#line 2015 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 478 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 45:
+#line 599 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 												sprintf(snum , "%d", cp+2);										
 												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
@@ -1863,57 +2026,57 @@ yyreduce:
 												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
 												cp++;
 											}
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 2030 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 488 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 46:
+#line 609 "analysGramPointers.yacc" /* yacc.c:1646  */
     {		
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1878 "y.tab.c" /* yacc.c:1646  */
+#line 2041 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 494 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 47:
+#line 615 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 												while_end_count++;
 												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
 												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
 												cp++;	
 											}
-#line 1889 "y.tab.c" /* yacc.c:1646  */
+#line 2052 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 505 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 48:
+#line 626 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="9";	//INF
 						}
-#line 1897 "y.tab.c" /* yacc.c:1646  */
+#line 2060 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 508 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 49:
+#line 629 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="A";	//SUP
 						}
-#line 1905 "y.tab.c" /* yacc.c:1646  */
+#line 2068 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 511 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 50:
+#line 632 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 							(yyval.variable)="B";	//EQU
 						}
-#line 1913 "y.tab.c" /* yacc.c:1646  */
+#line 2076 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 517 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 51:
+#line 638 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 								if( lookup((yyvsp[0].variable)) != -1 && lookupType((yyvsp[0].variable)) != 2	)		//var exists and is not pointer
 								{	
@@ -1945,11 +2108,11 @@ yyreduce:
 									ce++;
 								}	
 							}
-#line 1949 "y.tab.c" /* yacc.c:1646  */
+#line 2112 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 548 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 52:
+#line 669 "analysGramPointers.yacc" /* yacc.c:1646  */
     {			
 									if(lookup((yyvsp[0].variable)) != -1 && lookup((yyvsp[0].variable)) == 2	)		//var exists and is a pointer
 									{	
@@ -1992,11 +2155,11 @@ yyreduce:
 										ce++;
 									}	
 								}
-#line 1996 "y.tab.c" /* yacc.c:1646  */
+#line 2159 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 35:
-#line 590 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 53:
+#line 711 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( !temp1_flag )
 								{
@@ -2017,11 +2180,11 @@ yyreduce:
 								sprintf(snum, "%d", lookup(auxString));
 								(yyval.variable)=snum;
 							}
-#line 2021 "y.tab.c" /* yacc.c:1646  */
+#line 2184 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 36:
-#line 612 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 54:
+#line 733 "analysGramPointers.yacc" /* yacc.c:1646  */
     {											
 											while_last_cond = push(cp, while_last_cond);	//Store while begin
 											cp++;	
@@ -2032,21 +2195,21 @@ yyreduce:
 											while_end_iter_stack = push(while_end_count, while_end_iter_stack);			//store while end iterations to later assign while end line
 											while_end_count = 0;	
 										}
-#line 2036 "y.tab.c" /* yacc.c:1646  */
+#line 2199 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 37:
-#line 624 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 55:
+#line 745 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 														depth++;	//Used for variable creation
 														(yyvsp[0].nb)=cp;										//Save while begin
 			
 													}
-#line 2046 "y.tab.c" /* yacc.c:1646  */
+#line 2209 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 38:
-#line 629 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 56:
+#line 750 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 														int whileBegin = while_last_cond.stk[while_last_cond.top];
 														while_last_cond = pop(while_last_cond);							//pop the value		
@@ -2081,14 +2244,19 @@ yyreduce:
 																while_end_stack = pop(while_end_stack);				
 															}
 														}
+	
 
-														depth--;	//Used for variable creation
+														sprintf(snum, "%d", depth);							
+														insert_Instruction( "DESALLOUER", "VARS in Depth", snum, "", "", cp ); //Reserve space for the function
+														cp++;
+														deleteByDepth( depth );	//Delete variables from this depth
+														depth--;				//Used for variable creation
 													}
-#line 2088 "y.tab.c" /* yacc.c:1646  */
+#line 2256 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 668 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 57:
+#line 794 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 											sprintf(snum, "%d", (yyvsp[-2].nb));
 											insert_Instruction( "C", snum, "", "", "", cp );	//PRI @result
@@ -2096,11 +2264,11 @@ yyreduce:
 											pointer_value_flag = false; //reset variable
 											pointer_value_flag2 = false; //reset variable
 										}
-#line 2100 "y.tab.c" /* yacc.c:1646  */
+#line 2268 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 45:
-#line 684 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 63:
+#line 810 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value)	//Variable doesn't exist and the expr is not for pointers
 									{
@@ -2139,11 +2307,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2143 "y.tab.c" /* yacc.c:1646  */
+#line 2311 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 722 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 64:
+#line 848 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2161,11 +2329,11 @@ yyreduce:
 										ce++;
 									}
 								}
-#line 2165 "y.tab.c" /* yacc.c:1646  */
+#line 2333 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 743 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 67:
+#line 869 "analysGramPointers.yacc" /* yacc.c:1646  */
     {				
 									if(lookup((yyvsp[-2].variable)) == -1 && pointer_value) //Variable exists and the expression is correct
 									{
@@ -2203,11 +2371,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2207 "y.tab.c" /* yacc.c:1646  */
+#line 2375 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 780 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 68:
+#line 906 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2225,11 +2393,11 @@ yyreduce:
 										ce++;
 									}	
 								}
-#line 2229 "y.tab.c" /* yacc.c:1646  */
+#line 2397 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 53:
-#line 801 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 71:
+#line 927 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[-2].variable)) == -1 && !pointer_value) //Variable exists and the expression is correct
 									{
@@ -2269,11 +2437,11 @@ yyreduce:
 									pointer_value_flag = false; //reset variable
 									pointer_value_flag2 = false; //reset variable
 								}
-#line 2273 "y.tab.c" /* yacc.c:1646  */
+#line 2441 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 54:
-#line 840 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 72:
+#line 966 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 									if(lookup((yyvsp[0].variable)) == -1)
 									{
@@ -2291,11 +2459,11 @@ yyreduce:
 										ce++;
 									}
 								}
-#line 2295 "y.tab.c" /* yacc.c:1646  */
+#line 2463 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 55:
-#line 862 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 73:
+#line 985 "analysGramPointers.yacc" /* yacc.c:1646  */
     {
 								if( !pointer_value_flag )	//pointer value hasn't been initialized
 								{
@@ -2317,16 +2485,16 @@ yyreduce:
 								sprintf(snum, "%d", lookup(auxString));
 								sprintf(snum2, "%d", (yyvsp[0].nb));
 								setValueByName(auxString, (yyvsp[0].nb)); 	//Sets the value
-								insert_Instruction( "6", snum, snum2, "", "", cp ); //COP @result @operand1 
+								insert_Instruction( "6", snum, snum2, "", "", cp ); //AFC @result num 
 								cp++;
 
 								(yyval.nb) = lookup(auxString);
 							}
-#line 2326 "y.tab.c" /* yacc.c:1646  */
+#line 2494 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 56:
-#line 888 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 74:
+#line 1011 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if(lookup((yyvsp[0].variable)) != -1)	//var exists
 								{
@@ -2383,11 +2551,11 @@ yyreduce:
 									ce++;
 								}
 							}
-#line 2387 "y.tab.c" /* yacc.c:1646  */
+#line 2555 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 944 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 75:
+#line 1067 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 								if( lookupType((yyvsp[0].variable)) == 2 )	//var exists and is pointer
 								{
@@ -2435,11 +2603,11 @@ yyreduce:
 									ce++;
 								}
 							}
-#line 2439 "y.tab.c" /* yacc.c:1646  */
+#line 2607 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 58:
-#line 991 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 76:
+#line 1114 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 										if( lookupType((yyvsp[0].variable)) != -1 )	//var exists
 										{
@@ -2489,11 +2657,11 @@ yyreduce:
 											ce++;
 										}
 									}
-#line 2493 "y.tab.c" /* yacc.c:1646  */
+#line 2661 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 1042 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 77:
+#line 1165 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 		
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2509,11 +2677,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2513 "y.tab.c" /* yacc.c:1646  */
+#line 2681 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 1057 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 78:
+#line 1180 "analysGramPointers.yacc" /* yacc.c:1646  */
     {	
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2529,11 +2697,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2533 "y.tab.c" /* yacc.c:1646  */
+#line 2701 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 1072 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 79:
+#line 1195 "analysGramPointers.yacc" /* yacc.c:1646  */
     {								
 										 if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2549,11 +2717,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2553 "y.tab.c" /* yacc.c:1646  */
+#line 2721 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 1087 "analysGramPointers.yacc" /* yacc.c:1646  */
+  case 80:
+#line 1210 "analysGramPointers.yacc" /* yacc.c:1646  */
     { 
 										if( temp1_flag )	//value is in temp1
 											sprintf(auxString, "%d", lookup("0temp1"));
@@ -2569,18 +2737,11 @@ yyreduce:
 
 									     (yyval.nb)=auxNum;
 									}
-#line 2573 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 64:
-#line 1103 "analysGramPointers.yacc" /* yacc.c:1646  */
-    {
-  printf("look1 for :%d\n", (yyvsp[0].nb));}
-#line 2580 "y.tab.c" /* yacc.c:1646  */
+#line 2741 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2584 "y.tab.c" /* yacc.c:1646  */
+#line 2745 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2808,7 +2969,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1121 "analysGramPointers.yacc" /* yacc.c:1906  */
+#line 1235 "analysGramPointers.yacc" /* yacc.c:1906  */
 
 
 void yyerror(char *s) {
@@ -2822,10 +2983,12 @@ void print_Error_Table()
 	if( ce > 0 )
 		fprintf(fp, "\nErrors found : \n");
 	for (int i = 0 ; i < ce; i++)
-		fprintf(fp, "Error found in line: %d \n %s \n", errTab[i].line+1, errTab[i].error );
+		fprintf(fp, "Error found in line: %d \n %s \n", errTab[i].line, errTab[i].error );
 
 }
 /*End of error management*/
+
+
 
 
 
@@ -2863,6 +3026,10 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 
 
 
+
+
+
+
 int main(void) {
 
 	initializeSymtab(); //Sets parameters like temporal variables, etc..
@@ -2894,15 +3061,18 @@ int main(void) {
 	insert("Pc", 2, 0);
 	setValueByName("Pc", 16);
 
-	delete("a");
+	//delete("a");
+	//delete("b");
 	insert("c", 1, 0);
 	insert("d", 0, 0);
 	insert("e", 1, 0);
 	//delete("c");
+	//delete("d");
 	insert("g", 1, 0);
 
 
 	yyparse();
+	functab_print(fp);
 	symtab_print(fp);
 	print_Label_Table();
 	print_Error_Table();
@@ -2927,6 +3097,16 @@ int main(void) {
 
 	Whitespaces interfer with some tokens for example: int a; will detect the token "int " instead of "int"
 
+
+
+| error 	{									
+								strcpy( errTab[ce].error, "Expected variable or number in line: " );								
+								sprintf(snum , "%d", cp);
+								strcpy( errTab[ce].error, snum );								
+								strcpy( errTab[ce].error, ".\n" );
+								errTab[ce].line = cp;
+								ce++;
+      						}
 
 
 NOTE:

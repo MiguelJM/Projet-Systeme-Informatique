@@ -47,81 +47,83 @@ extern int yydebug;
   {
     tAMPERSAND = 258,
     tINT = 259,
-    tMIN = 260,
-    tMAY = 261,
-    tMINEQU = 262,
-    tMAYEQU = 263,
-    tEQU = 264,
-    tDIF = 265,
-    tOR = 266,
-    tAND = 267,
-    tPO = 268,
-    tPF = 269,
-    tCO = 270,
-    tCF = 271,
-    tPV = 272,
-    tPLUS = 273,
-    tVAR = 274,
-    tSTRING = 275,
-    tE = 276,
-    tMAIN = 277,
-    tSOU = 278,
-    tMUL = 279,
-    tDIV = 280,
-    tPRINT = 281,
-    tNUM = 282,
-    tIF = 283,
-    tWHILE = 284,
-    tELSE = 285,
-    tV = 286,
-    tCONST = 287,
-    tGUILLEMETS = 288
+    tVOID = 260,
+    tMIN = 261,
+    tMAY = 262,
+    tMINEQU = 263,
+    tMAYEQU = 264,
+    tEQU = 265,
+    tDIF = 266,
+    tOR = 267,
+    tAND = 268,
+    tPO = 269,
+    tPF = 270,
+    tCO = 271,
+    tCF = 272,
+    tPV = 273,
+    tPLUS = 274,
+    tVAR = 275,
+    tSTRING = 276,
+    tE = 277,
+    tMAIN = 278,
+    tSOU = 279,
+    tMUL = 280,
+    tDIV = 281,
+    tPRINT = 282,
+    tNUM = 283,
+    tIF = 284,
+    tWHILE = 285,
+    tELSE = 286,
+    tV = 287,
+    tCONST = 288,
+    tGUILLEMETS = 289
   };
 #endif
 /* Tokens.  */
 #define tAMPERSAND 258
 #define tINT 259
-#define tMIN 260
-#define tMAY 261
-#define tMINEQU 262
-#define tMAYEQU 263
-#define tEQU 264
-#define tDIF 265
-#define tOR 266
-#define tAND 267
-#define tPO 268
-#define tPF 269
-#define tCO 270
-#define tCF 271
-#define tPV 272
-#define tPLUS 273
-#define tVAR 274
-#define tSTRING 275
-#define tE 276
-#define tMAIN 277
-#define tSOU 278
-#define tMUL 279
-#define tDIV 280
-#define tPRINT 281
-#define tNUM 282
-#define tIF 283
-#define tWHILE 284
-#define tELSE 285
-#define tV 286
-#define tCONST 287
-#define tGUILLEMETS 288
+#define tVOID 260
+#define tMIN 261
+#define tMAY 262
+#define tMINEQU 263
+#define tMAYEQU 264
+#define tEQU 265
+#define tDIF 266
+#define tOR 267
+#define tAND 268
+#define tPO 269
+#define tPF 270
+#define tCO 271
+#define tCF 272
+#define tPV 273
+#define tPLUS 274
+#define tVAR 275
+#define tSTRING 276
+#define tE 277
+#define tMAIN 278
+#define tSOU 279
+#define tMUL 280
+#define tDIV 281
+#define tPRINT 282
+#define tNUM 283
+#define tIF 284
+#define tWHILE 285
+#define tELSE 286
+#define tV 287
+#define tCONST 288
+#define tGUILLEMETS 289
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 85 "analysGramPointers.yacc" /* yacc.c:1909  */
+#line 88 "analysGramPointers.yacc" /* yacc.c:1909  */
 
 	int nb;
 	char * variable;
 
-#line 125 "y.tab.h" /* yacc.c:1909  */
+#line 127 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

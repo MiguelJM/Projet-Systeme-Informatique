@@ -6,6 +6,7 @@
 
 %%
 "int" return(tINT);
+"void" return(tVOID);
 "<"  return(tMIN);
 ">"  return(tMAY);
 "<=" return(tMINEQU);
