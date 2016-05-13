@@ -43,7 +43,7 @@ begin
 		elsif(to_integer(unsigned(counter)) = '255') then
 			counter <= 0;
 		end if;
-		DummyQ <= Adr(to_integer(unsigned(counter)));
+		DummyQ <= TABLE(to_integer(unsigned(Adr)));
 	end process;
 	OUTs <= DummyQ;
 end Behavioral;

@@ -130,6 +130,7 @@ component Mult2 is
 end component;
 
 --U09
+--Pipeline EX/Mem
 component EX_Mem is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -142,6 +143,18 @@ component EX_Mem is
 end component;
 
 --U10
+--Multipexor3
+component Mult3 is
+	port(
+		OP 	: in  std_logic_vector(7 downto 0);
+		A		: in  std_logic_vector(7 downto 0);
+		B  	: in  std_logic_vector(7 downto 0);
+		OutB 	: out std_logic_vector(7 downto 0)
+		);
+end component;
+
+--U11
+-- Memoria de Datos
 component MemDonne is
 	port(
 		RST : in  std_logic;
@@ -153,10 +166,19 @@ component MemDonne is
 	);
 end component;
 
---Multiplexor
---U11
-
 --U12
+--Multiplexor4
+component Mult4 is
+	port(
+		OP 	: in  std_logic_vector(7 downto 0);
+		DON	: in  std_logic_vector(7 downto 0);
+		B  	: in  std_logic_vector(7 downto 0);
+		OutB 	: out std_logic_vector(7 downto 0)
+		);
+end component;
+
+--U13
+--Pipeline Mem/RE
 component Mem_RE is
 	port(
 		InA 	: in  std_logic_vector(7 downto 0);
@@ -172,7 +194,9 @@ signal SOUTs : std_logic_vector(31 downto 0);
 signal SA,SOP,SB,SC : std_logic_vector(7 downto 0);
 signal PA,POP,PB,PC : std_logic_vector(7 downto 0);
 signal BROA, BROB : std_logic_vector(7 downto 0);
-signal MO1,MO2 : std_logic_vector(7 downto 0);		
+signal MDON : std_logic_vector(7 downto 0);
+signal MO1,MO2,MO3,MO4 : std_logic_vector(7 downto 0);
+signal RetA,RetB : std_logic_vector(7 downto 0);		
 
 begin
 
@@ -181,11 +205,20 @@ begin
 	U01 : MemIns port map(Adr, CLK, SOUTs);
 	U02 : ModDIv port map(SOUTs, SA, SOP, SB, SC);
 	U03 : LI_DI port map(SA, SOP, SB, SC, PA, POP, PB, PC);
-	U04 : BancReg port map(RST, CLK, PB, PC, PA, /*FROM END*/, /*FROM END*/, BROA, BROB);
+	U04 : BancReg port map(RST, CLK, PB, PC, RetA, /*FROM LAST LC*/, RetB, BROA, BROB);
 	U05 : Mult1 port map(POP, PB, BROA, MO1);
 	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
+	--LC Instruction Decoder
 	--U07 : ALU
 	U08 : Mult2 port map(POP, PB, /*SALIDA ALU*/, MO2);
+	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
+	U10 : Mult3 port map(POP, PA, PB, MO3);
+	--LC Instruction Decoder
+	U11 : MemDonne port map(RST, CLK, MO3, PB, POP, MDON);
+	U12 : Mult4 port map(POP, MDON, PB, MO4);
+	U13 : Mem_RE port map(PA, POP, MO4, RetA, POP, RetB);
+	--LC Instruction Decoder
+	
 	
 	
 	QAp <= BROA;
