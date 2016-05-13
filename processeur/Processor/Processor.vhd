@@ -115,6 +115,14 @@ component DI_EX is
 		);
 end component;
 
+--Decoder1
+component LC_Dec is
+	 port(
+		OPIn  : in  std_logic_vector(7 downto 0);
+		OPOut : out std_logic_vector(1 downto 0)
+		);
+end component;
+
 --Modified ALU
 --U07
 
@@ -150,6 +158,14 @@ component Mult3 is
 		A		: in  std_logic_vector(7 downto 0);
 		B  	: in  std_logic_vector(7 downto 0);
 		OutB 	: out std_logic_vector(7 downto 0)
+		);
+end component;
+
+--Decoder2
+component LC_RW is
+	port(
+		OPIn  : in  std_logic_vector(7 downto 0);
+		OPOut : out std_logic
 		);
 end component;
 
@@ -190,10 +206,21 @@ component Mem_RE is
 		);
 end component;
 
+--Decoder3
+component LC_En is
+	port(
+		OPIn : in  std_logic_vector(7 downto 0);
+		En   : out std_logic
+		);
+end component;
+
+--Senales internas
 signal SOUTs : std_logic_vector(31 downto 0);
 signal SA,SOP,SB,SC : std_logic_vector(7 downto 0);
 signal PA,POP,PB,PC : std_logic_vector(7 downto 0);
 signal BROA, BROB : std_logic_vector(7 downto 0);
+signal CALU : std_logic_vector(1 downto 0);
+signal RW,En : std_logic,
 signal MDON : std_logic_vector(7 downto 0);
 signal MO1,MO2,MO3,MO4 : std_logic_vector(7 downto 0);
 signal RetA,RetB : std_logic_vector(7 downto 0);		
@@ -205,19 +232,19 @@ begin
 	U01 : MemIns port map(Adr, CLK, SOUTs);
 	U02 : ModDIv port map(SOUTs, SA, SOP, SB, SC);
 	U03 : LI_DI port map(SA, SOP, SB, SC, PA, POP, PB, PC);
-	U04 : BancReg port map(RST, CLK, PB, PC, RetA, /*FROM LAST LC*/, RetB, BROA, BROB);
+	U04 : BancReg port map(RST, CLK, PB, PC, RetA, En, RetB, BROA, BROB);
 	U05 : Mult1 port map(POP, PB, BROA, MO1);
 	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
-	--LC Instruction Decoder
+	LC1 : LC_DEC port map(POP, CALU);
 	--U07 : ALU
 	U08 : Mult2 port map(POP, PB, /*SALIDA ALU*/, MO2);
 	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
 	U10 : Mult3 port map(POP, PA, PB, MO3);
-	--LC Instruction Decoder
+	LC2 : LC_RW port map(POP, RW);
 	U11 : MemDonne port map(RST, CLK, MO3, PB, POP, MDON);
 	U12 : Mult4 port map(POP, MDON, PB, MO4);
 	U13 : Mem_RE port map(PA, POP, MO4, RetA, POP, RetB);
-	--LC Instruction Decoder
+	LC3 : LC_En port map(POP, En);
 	
 	
 	

@@ -21,8 +21,106 @@
 
   <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="Processor.xise"/>
 
-  <files xmlns="http://www.xilinx.com/XMLSchema"/>
+  <files xmlns="http://www.xilinx.com/XMLSchema">
+    <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="Processor.cmd_log"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="Processor.lso"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="Processor.prj"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_REPORT" xil_pn:name="Processor.syr"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="Processor.xst"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="Processor_summary.html"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="Processor_xst.xrpt"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
+    <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="webtalk_pn.xml"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xst"/>
+  </files>
 
-  <transforms xmlns="http://www.xilinx.com/XMLSchema"/>
+  <transforms xmlns="http://www.xilinx.com/XMLSchema">
+    <transform xil_pn:end_ts="1463129419" xil_pn:name="TRAN_copyInitialToAbstractSimulation" xil_pn:start_ts="1463129418">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129582" xil_pn:in_ck="7137644686135251711" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1463129582">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputAdded"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
+      <outfile xil_pn:name="ALU.vhd"/>
+      <outfile xil_pn:name="BancReg.vhd"/>
+      <outfile xil_pn:name="DI_EX.vhd"/>
+      <outfile xil_pn:name="EX_Mem.vhd"/>
+      <outfile xil_pn:name="LI_DI.vhd"/>
+      <outfile xil_pn:name="MemDonne.vhd"/>
+      <outfile xil_pn:name="MemIns.vhd"/>
+      <outfile xil_pn:name="Mem_RE.vhd"/>
+      <outfile xil_pn:name="ModDiv.vhd"/>
+      <outfile xil_pn:name="Mult1.vhd"/>
+      <outfile xil_pn:name="Mult2.vhd"/>
+      <outfile xil_pn:name="Mult3.vhd"/>
+      <outfile xil_pn:name="Mult4.vhd"/>
+      <outfile xil_pn:name="Processor.vhd"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129419" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-9044832904953873877" xil_pn:start_ts="1463129419">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129419" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-2793873426928892759" xil_pn:start_ts="1463129419">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129419" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="3152349187619826096" xil_pn:start_ts="1463129419">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="-1093264711524915135" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="3152349187619826096" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="3159804636837795331" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="1106364426758808884" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129601" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="6840086504026546554" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129609" xil_pn:in_ck="7137644686135251711" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="6403068467688928713" xil_pn:start_ts="1463129601">
+      <status xil_pn:value="FailedRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="InputAdded"/>
+      <status xil_pn:value="InputChanged"/>
+      <outfile xil_pn:name="Processor.lso"/>
+      <outfile xil_pn:name="Processor.prj"/>
+      <outfile xil_pn:name="Processor.syr"/>
+      <outfile xil_pn:name="Processor.xst"/>
+      <outfile xil_pn:name="Processor_xst.xrpt"/>
+      <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
+      <outfile xil_pn:name="webtalk_pn.xml"/>
+      <outfile xil_pn:name="xst"/>
+    </transform>
+    <transform xil_pn:end_ts="1463129609" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="-364084108675680040" xil_pn:start_ts="1463129609">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+  </transforms>
 
 </generated_project>
