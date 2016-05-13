@@ -44,7 +44,11 @@ begin
 		elsif(to_integer(unsigned(counter)) = '255') then
 			counter <= 0;
 		end if;
+<<<<<<< HEAD
 		DummyQ <= memory(to_integer(unsigned(counter)));
+=======
+		DummyQ <= TABLE(to_integer(unsigned(Adr)));
+>>>>>>> 5396c519ae1536c3e311f41c84b954fdbc9017d4
 	end process;
 	OUTs <= DummyQ;
 end Behavioral;

@@ -226,7 +226,7 @@ Param 		:	Param tV Param
 										if( lookupFunc(lastFuncCreated) != -1 ) //Funtion doesn't exist
 											insertParameter(lookupFunc(lastFuncCreated), $3, 2, depth); 
 									}
-				| /* Nothing */			
+				| Param			
 			;
 
 FunctCall	:	tVAR tPO 			{	
@@ -341,7 +341,7 @@ ParamCall 		: ParamCall tV ParamCall
 													}
 												}
 											}
-				| /* Nothing */	
+				| ParamCall			
 			;
 
 Main		: 	tMAIN tPO tPF tCO Body tCF

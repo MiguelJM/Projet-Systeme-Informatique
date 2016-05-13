@@ -42,18 +42,21 @@ typedef struct HashRec {
 /* the hash table */
 static Node hashTable[SIZE];
 
-static int hash(char *key);
-int hashPrevious(char *key);
-int hashForInsert(char *key);
+static int hash(char *key, int depth);
+int hashPrevious(char *key, int depth);
+int hashLastDepth(char *key);
+int hashForInsert(char *key, int depth);
 void insert(char *name, int type, int depth);
-Node delete(char *name);
+Node delete(char *name, int depth);
 void deleteByDepth(int depth);
 int lookup(char *name);
 int lookupAddress(int address);
 int setValueByName(char *name, int value);
 int getValueByName(char *name);
 int lookupType(char *name);
+int lookupDepth(char *name, int depth);
 char* lookupName(int address);
+int getInitialized(char *name);
 void symtab_print();
 void initializeSymtab();
 bool varInitialized(char *name);
@@ -98,8 +101,8 @@ void initializeSymtab()
   hashTable[temp2_position] = l;
 }
 
-/* the hash function */
-static int hash ( char * key )
+/* the hash function (Also considers the depth of the key inserted)*/
+static int hash ( char * key, int depth )
 { 
   /*int temp = 0;
   int i = 0;
@@ -118,7 +121,7 @@ static int hash ( char * key )
 
   int temp = 0;
   Node l =  hashTable[temp];
-  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  while ((l != NULL) && ((strcmp(key,l->st_name) != 0) || (l->st_depth != depth))) //not last node, name is not the searched one and depth is not the searched one)
   {
       l = l->next;
       temp++;
@@ -128,7 +131,7 @@ static int hash ( char * key )
 }
 
 /* Used to obtain the previous node to key */
-int hashPrevious ( char * key )
+int hashPrevious ( char * key, int depth )
 { 
   /* Temporal variables should not be seen by the outside*/
   if(strcmp(key,"0funct_line") == 0)
@@ -150,7 +153,7 @@ int hashPrevious ( char * key )
   int temp = 0;
   Node l =  hashTable[temp];
   Node aux = l;
-  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  while ((l != NULL) && ((strcmp(key,l->st_name) != 0) || (l->st_depth != depth))) //not last node, name is not the searched one and depth is not the searched one
   {
       aux = l;
       l = l->next;
@@ -163,8 +166,39 @@ int hashPrevious ( char * key )
     return -1;
 }
 
+/* the hash function: It looks for variable key on the last possible depth */
+int hashLastDepth ( char * key )
+{ 
+  if(strcmp(key,"0funct_line") == 0)
+    return temp1_position-1;  
+  if(strcmp(key,"0temp1") == 0)
+    return temp1_position;  
+  if(strcmp(key,"0temp2") == 0)
+    return temp2_position;  
+
+  int temp = 0, depth = -1;
+  Node l =  NULL;
+  Node aux = hashTable[temp];
+
+  while ( aux != NULL ) //There are elements on the list
+  {
+      if( (strcmp(key,aux->st_name) == 0) && aux->st_depth > depth ) //Name = searched name and depth is deeper than last recorded
+      {
+          l = aux;
+          depth = aux->st_depth;
+      }
+      aux = aux->next;
+      temp++;
+  }
+
+  if( l != NULL )
+    return l->st_address;
+  else
+    return temp;
+}
+
 /* the hash function to insert variables */
-int hashForInsert ( char * key )
+int hashForInsert ( char * key, int depth )
 { 
   if(strcmp(key,"0funct_line") == 0)
     return temp1_position-1;  
@@ -175,7 +209,7 @@ int hashForInsert ( char * key )
 
   int temp = 0;
   Node l =  hashTable[temp];
-  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  while ((l != NULL) && ((strcmp(key,l->st_name) != 0) || (l->st_depth != depth))) //not last node, name is not the searched one and depth is not the searched one
   {
       if( l->st_address != temp )
           return temp;
@@ -191,7 +225,8 @@ int hashForInsert ( char * key )
   */
 void insert( char * name, int type, int depth )
 { 
-  int h = hashForInsert(name);
+  int h = hashForInsert(name, depth);
+printf("%s Inserting variable\n", name);     
   Node l =  hashTable[h];
   
   if (l == NULL && h < temp1_position-1) /* variable not yet in table and there is space on the table */
@@ -221,9 +256,9 @@ void insert( char * name, int type, int depth )
 } 
 
 /* Delete a node returns the next node to the deleted one */
-Node delete( char * name )
+Node delete( char * name, int depth )
 {  
-  int h = hash(name);
+  int h = hash(name, depth);
   Node l =  hashTable[h];
 
   if (l == NULL && h < temp1_position-1) /* variable is not in table, avoids deleting temporals */
@@ -232,12 +267,12 @@ Node delete( char * name )
   }
   else
   {
-    int hP = hashPrevious(name);
+    int hP = hashPrevious(name, depth);
     if(hP != -1) //It is not the first node on the list
     {
         if( l->next != NULL ) //There is a node after (move next node to this position to erease this one)
         {
-          int previousNode = hashPrevious(name);
+          int previousNode = hashPrevious(name, depth);
           Node aux = l->next;     //Next node
 
           l->next = aux->next;        //Point to next of next
@@ -283,7 +318,7 @@ void deleteByDepth(int depth)
   {
       while( l != NULL && l->st_depth == depth )  //Delete this var
       {
-        l = delete( l->st_name );
+        l = delete( l->st_name, depth );
       }
       if( l != NULL )
         l = l->next;
@@ -291,9 +326,9 @@ void deleteByDepth(int depth)
 }
 
 /* return address of symbol if found or -1 if not found  BY NAME*/
-int lookup( char * name )
+int lookup( char * name  )
 { 
-  int h = hash(name);
+  int h = hashLastDepth(name);
   Node l =  hashTable[h];
 
   if (l == NULL){ 
@@ -329,7 +364,7 @@ int lookupAddress ( int address )
 
 int setValueByName( char * name, int value )
 { 
-  int h = hash(name);
+  int h = hashLastDepth(name);
   Node l =  hashTable[h];
 
   if (l == NULL){ 
@@ -348,7 +383,7 @@ int setValueByName( char * name, int value )
 
 int getValueByName( char * name )
 { 
-  int h = hash(name);
+  int h = hashLastDepth(name);
   Node l =  hashTable[h];
 
   if (l == NULL){ 
@@ -365,7 +400,7 @@ int getValueByName( char * name )
 /* return type value of symbol or -1 if symbol not found */
 int lookupType( char * name )
 {
-  int h = hash(name);
+  int h = hashLastDepth(name);
   Node l =  hashTable[h];
 
   if (l == NULL) {
@@ -375,6 +410,38 @@ int lookupType( char * name )
   else {
    // printf("The variable type is: %d.\n", l->st_type);
     return l->st_type;
+  }
+}
+
+/* return 0 or 1 if the value is initialized */
+int getInitialized( char * name )
+{
+  int h = hashLastDepth(name);
+  Node l =  hashTable[h];
+
+  if (l == NULL) {
+   // printf("Variable not found.\n");
+    return -1;
+  }
+  else {
+   // printf("The variable type is: %d.\n", l->st_type);
+    return l->st_initialized;
+  }
+}
+
+/* return the address of a variable Name with Depth, if error returns -1 */
+int lookupDepth( char * name, int depth )
+{
+  int h = hash(name, depth);
+  Node l =  hashTable[h];
+
+  if (l == NULL) {
+   // printf("Variable not found.\n");
+    return -1;
+  }
+  else {
+   // printf("The variable type is: %d.\n", l->st_type);
+    return l->st_address;
   }
 }
 
@@ -399,7 +466,7 @@ char* lookupName( int address )
 
 bool varInitialized( char *name ) //Returns true if the variable has been initialized
 {
-  int h = hash(name);
+  int h = hashLastDepth(name);
   Node l =  hashTable[h];
   if ( l == NULL ) {
    // printf("Variable not found.\n");

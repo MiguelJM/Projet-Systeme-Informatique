@@ -1,0 +1,8 @@
+vhdl work "Mult2.vhd"
+vhdl work "Mult1.vhd"
+vhdl work "ModDiv.vhd"
+vhdl work "MemIns.vhd"
+vhdl work "LI_DI.vhd"
+vhdl work "DI_EX.vhd"
+vhdl work "BancReg.vhd"
+vhdl work "Processor.vhd"
