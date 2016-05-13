@@ -35,6 +35,7 @@ architecture Behavioral of MemIns is
 signal counter : std_logic_vector(7 downto 0) := (others => '0');
 signal DummyQ  : std_logic_vector(31 downto 0);
 type TABLE is array (7 downto 0) of std_logic_vector(31 downto 0);
+signal memory : TABLE;
 begin
 	process(CLK,Adr)
 	begin
@@ -43,7 +44,10 @@ begin
 		elsif(to_integer(unsigned(counter)) = '255') then
 			counter <= 0;
 		end if;
-		DummyQ <= Adr(to_integer(unsigned(counter)));
+		DummyQ <= memory(to_integer(unsigned(counter)));
 	end process;
 	OUTs <= DummyQ;
 end Behavioral;
+
+
+-- Revise with new RAM code
