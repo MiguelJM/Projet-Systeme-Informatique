@@ -5,18 +5,31 @@
 /* maximum size of hash table */
 #define SIZE 255 
 #define MAXTOKENLEN 40
+#define MAXPARAMETERS 10
 
 /* power of two multiplier in hash function */
 #define SHIFT 4
 
+/* Structure of parameters */
+struct paramTable { 
+     char st_name[MAXTOKENLEN];
+     int st_initialized;         //Is the variable initialized?
+     int st_depth;               //Was the variable declared inside a while, function or if? How deep?
+     int st_type;             //0 int 1 constant 2 pointer
+     int st_value;           //Value of the variable
+};
+
 /* hash entry holds variable name and its reference list */
 typedef struct HashRecFun { 
      char st_name[MAXTOKENLEN];
-     int st_address;               //Address of the function
-     int st_line;                  //Line where the function begins
-     int st_type;                  //Return type 0 int 1 void
+     int st_address;                            //Address of the function
+     int st_line;                               //Line where the function begins
+     int st_type;                               //Return type 0 int 1 void     
+     struct paramTable params[MAXPARAMETERS];   //Stores the parameters of the function
+     int param_Count;                          //Counts the parameters of the function
      struct HashRecFun * next;
 } * NodeFunc;
+
 
 /* the hash table */
 static NodeFunc hashTableFunc[SIZE];
@@ -30,17 +43,22 @@ int lookupAddressFunc(int address);
 int lookupTypeFunc(char *name);
 int lookupLineFunc(char *name);
 char* lookupNameFunc(int address);
+void insertParameter( int funcAddress, char *name, int type, int depth);
+void setParameter( int funcAddress, int paramNum, int value);
+int getParameterCount( int funcAddress );
+char *getParameterName( int funcAddress, int paramNum );
 void functab_print();
 
 /* the hash function */
 static int hashFunc ( char * key )
 { 
   int temp = 0;
-  NodeFunc l =  hashTableFunc[temp];
-  while ((l != NULL) && (strcmp(key,l->st_name) != 0))
+  NodeFunc l =  hashTableFunc[temp]; 
+
+  while ( l != NULL && (strcmp(key,l->st_name) != 0))
   {
-      l = l->next;
       temp++;
+      l = hashTableFunc[temp];
   }
 
   return temp;
@@ -55,8 +73,8 @@ int hashPreviousFunc ( char * key )
   while ((l != NULL) && (strcmp(key,l->st_name) != 0))
   {
       aux = l;
-      l = l->next;
       temp++;
+      l = hashTableFunc[temp];
   }
 
   if( aux != l ) //There is no previous var
@@ -67,15 +85,15 @@ int hashPreviousFunc ( char * key )
 
 /* the hash function to insert variables */
 int hashForInsertFunc ( char * key )
-{ 
+{  
   int temp = 0;
   NodeFunc l =  hashTableFunc[temp];
   while ((l != NULL) && (strcmp(key,l->st_name) != 0))
   {
       if( l->st_address != temp )
           return temp;
-      l = l->next;
-      temp++;
+    temp++;
+    l = hashTableFunc[temp];
   }
 
   return temp;
@@ -86,10 +104,11 @@ int hashForInsertFunc ( char * key )
   */
 void insertFunc( char * name, int type, int line )
 { 
+  printf("Inserting: %s\n", name); 
   int h = hashForInsertFunc(name);
   NodeFunc l =  hashTableFunc[h];
   
-  if (l == NULL && h < SIZE) /* variable not yet in table and there is space on the table */
+  if (l == NULL && h < SIZE-1) /* variable not yet in table and there is space on the table */
   { 
     l = (NodeFunc) malloc(sizeof(struct HashRec));
     strcpy(l->st_name, name);  
@@ -97,6 +116,7 @@ void insertFunc( char * name, int type, int line )
     l->st_type = type; 
     l->st_address = h;
     l->st_line = line;
+    l->param_Count = 0;
     hashTableFunc[h] = l; 
 
     if( h > 0 ) //It is not the first insertion 
@@ -116,8 +136,8 @@ void insertFunc( char * name, int type, int line )
 
 /* return address of function if found or -1 if not found  BY NAME*/
 int lookupFunc( char * name )
-{ 
-  int h = hashFunc(name);
+{             
+  int h = hashFunc(name);          
   NodeFunc l =  hashTableFunc[h];
 
   if (l == NULL){ 
@@ -198,6 +218,88 @@ char* lookupNameFunc( int address )
   else {
    //printf("The Function name is: %s.\n", l->st_name);
     return l->st_name;
+  }
+}
+
+void insertParameter( int funcAddress, char *name, int type, int depth)   //Inserts a new parameter to the parameter table
+{
+  if( funcAddress >= SIZE )
+  {
+      printf("Error: Function does not exist.\n");
+  }
+  else
+  {
+    NodeFunc l =  hashTableFunc[funcAddress];
+    if (l == NULL ){ 
+        printf("Error: Function does not exist.\n");
+     }
+    else
+    {   
+        int count = l->param_Count;
+        if( count < MAXPARAMETERS )
+        {            
+            strcpy(l->params[count].st_name, name);  
+            l->params[count].st_initialized = 1;
+            l->params[count].st_depth = depth;
+            l->params[count].st_type = type;
+            //l->params[count].st_value = value;
+            l->param_Count++;
+            hashTableFunc[funcAddress] = l;          
+        }
+        else
+        {    
+            printf("Error: Maxmimum number of parameters reached.\n");
+        }    
+    }
+  }
+  printf("Error: Function does not exist.\n");
+
+}
+
+void setParameter( int funcAddress, int paramNum, int value)   //Sets the parameters values
+{
+  if( funcAddress >= SIZE )
+  {
+      printf("Error: Function does not exist.\n");
+  }
+  else
+  {
+    NodeFunc l =  hashTableFunc[funcAddress];
+    if( paramNum <= l->param_Count )
+    {
+        l->params[paramNum].st_value = value;
+        hashTableFunc[funcAddress] = l;   
+    }
+    else
+    {
+        printf("Error: Different number of parameters.\n");      
+    }
+  }
+}
+
+int getParameterCount( int funcAddress )
+{
+  if( funcAddress >= SIZE )
+  {
+      printf("Error: Function does not exist.\n");
+      return -1;
+  }
+  else
+  {
+      return hashTableFunc[funcAddress]->param_Count;
+  }
+}
+
+char *getParameterName( int funcAddress, int paramNum )
+{  
+  if( funcAddress >= SIZE )
+  {
+      printf("Error: Function does not exist.\n");
+      return "-ERROR";
+  }
+  else
+  {
+      return hashTableFunc[funcAddress]->params[paramNum].st_name;
   }
 }
 

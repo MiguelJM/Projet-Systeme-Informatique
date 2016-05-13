@@ -1,14 +1,10 @@
-253
+
                Function Table        
 
 ----------  ---------    ------    --------
 Name         Address      Type       Line
 ----------  ---------    ------    --------
 make            0          0          2         
-al              1          0          9         
-ma              2          0          13        
-mak             3          1          17        
-ap              4          0          25        
 
                         Symbol Table                               
 
@@ -25,52 +21,27 @@ d             0          6          0          0          0
 e             1          7          0          0          0         
 g             1          8          0          0          0         
 0funct_line   0          252        0          0          0         
-0temp1        0          253        30         0          1         
-0temp2        0          254        0          0          0         
+0temp1        0          253        50         0          1         
+0temp2        0          254        50         0          1         
 
 Label Table :
 ----------------------------------------------------- 
  	Instruction | param1 | param2 | param 3 | comments |
 ----------------------------------------------------- 
-0  :  JMP            28                                     ; 
+0  :  JMP            12                                     ; 
 1  :  ALLOUER        FONCTION     make                      ; 
-2  :  ALLOUER        9            estos        0            ; 
-3  :  DESALLOUER     VARS in Depth 1                         ; 
-4  :  JMPA           252                                    ; 
-5  :  ALLOUER        9            estos        0            ; 
-6  :  DESALLOUER     VARS in Depth 1                         ; 
-7  :  JMPA           252                                    ; 
-8  :  ALLOUER        FONCTION     al                        ; 
-9  :  ALLOUER        9            estos        0            ; 
+2  :  ALLOUER        9            a            0            ; 
+3  :  6              9            10                        ; 
+4  :  5              253          9                         ; 
+5  :  5              254          1                         ; 
+6  :  1              254          253          254          ; 
+7  :  5              9            254                       ; 
+8  :  5              253          9                         ; 
+9  :  C              253                                    ; 
 10 :  DESALLOUER     VARS in Depth 1                         ; 
 11 :  JMPA           252                                    ; 
-12 :  ALLOUER        FONCTION     ma                        ; 
-13 :  ALLOUER        9            estos        0            ; 
-14 :  DESALLOUER     VARS in Depth 1                         ; 
-15 :  JMPA           252                                    ; 
-16 :  ALLOUER        FONCTION     mak                       ; 
-17 :  6              252          19                        ; 
-18 :  JMP            13                                     ; 
-19 :  6              252          0                         ; 
-20 :  ALLOUER        9            estos        0            ; 
-21 :  5              9            0                         ; 
-22 :  DESALLOUER     VARS in Depth 1                         ; 
-23 :  JMPA           252                                    ; 
-24 :  ALLOUER        FONCTION     ap                        ; 
-25 :  ALLOUER        9            estos        0            ; 
-26 :  DESALLOUER     VARS in Depth 1                         ; 
-27 :  JMPA           252                                    ; 
-28 :  6              252          30                        ; 
-29 :  JMP            17                                     ; 
-30 :  6              252          0                         ; 
-31 :  6              252          33                        ; 
-32 :  JMP            25                                     ; 
-33 :  6              252          0                         ; 
-34 :  5              253          0                         ; 
-35 :  C              253                                    ; 
-
-Errors found : 
-Error found in line: 5 
- The function already exists.
- 
-Number of lines : 37
+12 :  6              252          14                        ; 
+13 :  JMP            2                                      ; 
+14 :  6              252          0                         ; 
+15 :  DESALLOUER     VARS in Depth 1                         ; 
+Number of lines : 17
