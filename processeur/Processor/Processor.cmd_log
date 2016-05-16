@@ -1,0 +1,1 @@
+xst -intstyle ise -ifn "/home/jassoavi/Documents/Projet-Systeme-Informatique/processeur/Processor/Processor.xst" -ofn "/home/jassoavi/Documents/Projet-Systeme-Informatique/processeur/Processor/Processor.syr" 
