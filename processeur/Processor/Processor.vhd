@@ -123,8 +123,20 @@ component LC_Dec is
 		);
 end component;
 
---Modified ALU
 --U07
+--ALU
+component ALU is
+    port(
+        A       : in  std_logic_vector(7 downto 0);
+        B       : in  std_logic_vector(7 downto 0);
+        CTRL    : in  std_logic_vector(1 downto 0);
+        N       : out std_logic;
+        O       : out std_logic;
+        Z       : out std_logic;
+        C       : out std_logic;
+        S       : out std_logic_vector(7 downto 0)
+        );
+end component;
 
 --U08
 --Multiplexor 2
@@ -220,6 +232,8 @@ signal SA,SOP,SB,SC : std_logic_vector(7 downto 0);
 signal PA,POP,PB,PC : std_logic_vector(7 downto 0);
 signal BROA, BROB : std_logic_vector(7 downto 0);
 signal CALU : std_logic_vector(1 downto 0);
+signal Nt,Ot,Zt,Ct : std_logic;
+signal ALUOut : std_logic_vector(7 downto 0);
 signal RW,En : std_logic,
 signal MDON : std_logic_vector(7 downto 0);
 signal MO1,MO2,MO3,MO4 : std_logic_vector(7 downto 0);
@@ -236,7 +250,7 @@ begin
 	U05 : Mult1 port map(POP, PB, BROA, MO1);
 	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
 	LC1 : LC_DEC port map(POP, CALU);
-	--U07 : ALU
+    U07 : ALU port map(PB,PC,CALU,Nt,Ot,Zt,Ct,ALUOut);
 	U08 : Mult2 port map(POP, PB, /*SALIDA ALU*/, MO2);
 	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
 	U10 : Mult3 port map(POP, PA, PB, MO3);
