@@ -5,52 +5,32 @@
 %}
 
 %%
-"int" return(tINT);
-"void" return(tVOID);
-"<"  return(tMIN);
-">"  return(tMAY);
-"<=" return(tMINEQU);
-">=" return(tMAYEQU);
-"==" return(tEQU);
-"!=" return(tDIF);
-"("  return(tPO);
-")"  return(tPF);
-"||" return(tOR);
-"&&" return(tAND);
-"&" return(tAMPERSAND);
-"{"  return(tCO);
-"}"  return(tCF);
-";"  return(tPV);
-"+"  return(tPLUS);
-"-"  return(tSOU);
-"*"  return(tMUL);
-"/"  return(tDIV);
-"="  return(tE);
-","  return(tV);
+"R" return(tRETURN);
+"1" return(tADD);
+"2" return(tMUL);
+"3" return(tSOU);
+"4" return(tDIV);
+"5" return(tCOP);
+"6" return(tAFC);
+"7" return(tJMP);
+"8" return(tJMF);
+"9" return(tINF);
+"A" return(tSUP);
+"B" return(tEQU);
+"C" return(tPRI);
+"D" return(tPCOP);
+"E" return(tIPCOP);
+"F" return(tCPA);
+"10" return(tJMPA);
+[ \t]+ 	return(tSPACE);    /*  ignore end of line */
 
-"main"			return(tMAIN);
-"printf"  		return(tPRINT);
-"if" 			return(tIF);
-"while" 		return(tWHILE);
-"const"			return(tCONST);
-"else"			return(tELSE);
-"\""				return(tGUILLEMETS);
+[0-9]+ {
+				yylval.nb = atof(yytext); 
+				return(tNUM);
+			}	
 
-\n      ;    /*  ignore end of line */
-[ \t]+ 	;    /*  ignore end of line */
+\n  ;   /*  ignore end of line */
 
-[0-9]+ 					{
-							yylval.nb = atof(yytext); 
-							return(tNUM);
-						}	
-[a-zA-Z][a-zA-Z0-9_]*	{
-							yylval.variable = strdup(yytext); 
-							return(tVAR);
-						}	
-[a-zA-Z0-9_\ \\]*		{
-							yylval.variable = strdup(yytext); 
-							return(tSTRING);
-						}
 %%
 /*
 void main(void){

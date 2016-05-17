@@ -12,6 +12,7 @@
 
 	char *address_Concat( char * );
 	void insert_Instruction( char *, char *, char *, char *, char *, int );
+	void write_ASM_File();
 
 	FILE *fp;	
 
@@ -138,13 +139,13 @@
 TestStart	:	TestMessage
 			;
 
-TestMessage	: 	Begin		{printf("\n Succesful test");}
+TestMessage	: 	While		{printf("\n Succesful test");}
 			;
 
 Begin 		: Fonctions {
 							/* Ignore Function instructions at first */
 							sprintf(snum, "%d", cp);	
-							insert_Instruction( "JMP", snum, "", "", "", 0 ); //JMP line
+							insert_Instruction( "7", snum, "", "", "", 0 ); //JMP line
 						}
 			  Main
 			;
@@ -181,7 +182,7 @@ Fonction	: 	tINT tVAR 					{
 												depth--;				//Used for variable creation
 														
 												sprintf(snum, "%d", lookup("0funct_line"));					
-												insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+												insert_Instruction( "10", snum, "", "", "", cp ); //JMPA @var
 												cp++;	
 											}
 			|	tVOID tVAR 					{
@@ -211,7 +212,7 @@ Fonction	: 	tINT tVAR 					{
 												depth--;				//Used for variable creation
 
 												sprintf(snum, "%d", lookup("0funct_line"));					
-												insert_Instruction( "JMPA", snum, "", "", "", cp ); //JMPA @var
+												insert_Instruction( "10", snum, "", "", "", cp ); //JMPA @var
 												cp++;	
 											}				 			
 			;
@@ -258,7 +259,7 @@ FunctCall	:	tVAR tPO 			{
 											    cp++;	
 										
 												sprintf(snum, "%d", lookupLineFunc($1));
-											    insert_Instruction( "JMP", snum, "", "", "", cp ); //JMP line  
+											    insert_Instruction( "7", snum, "", "", "", cp ); //JMP line  
 											    cp++;	
 
 											    funct_stack = pop(funct_stack);						//pop the value	(last line on stack is going to be used on the next instruction)
@@ -583,14 +584,17 @@ Condition 	: 	tPO Cond tPF	{
 
 If			:	If tELSE tCO Body tCF			{
 													sprintf(snum , "%d", cp);									//Obtain else body end
-													insert_Instruction( "JMP", snum, "", "", "", $1-1 );		//If ended, jump to else body end
+													insert_Instruction( "7", snum, "", "", "", $1-1 );		//If ended, jump to else body end
 												}
-			| 	tIF Condition tCO Body tCF		{
-													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp
-													insert_Instruction( "JMF", "@X", snum, "", "", $2 );				//If statement is false jump to else body
+			| 	tIF Condition tCO Body tCF		{	
+													strcpy( auxString, "0temp1" );
+													sprintf(auxString, "%d", lookup(auxString));
+													sprintf(snum , "%d", cp+1);												//next instruction to ignore else jmp 						
+													//Can't set the value because we don't know the last comparrison results
+													insert_Instruction( "8", auxString, snum, "", "", $2 );				//If statement is false jump to else body JMF
 
 													sprintf(snum , "%d", cp+1);									//Obtain if end
-													insert_Instruction( "JMP", snum, "", "", "", cp );			//If ended, jump to else body end (If there is an else instruction, will be overwritten)
+													insert_Instruction( "7", snum, "", "", "", cp );			//JMP If ended, jump to else body end (If there is an else instruction, will be overwritten)
 													cp++;		
 													$$ = cp; 													//Obtain else body end	
 
@@ -626,43 +630,63 @@ If			:	If tELSE tCO Body tCF			{
 												}
 			;
 
-Cond		:	CondValue CompareToken CondValue 		{					
+Cond		:	CondValue CompareToken CondValue 		{		
+															if( !temp1_flag )
+															{
+																temp1_flag = true;
+															}
+
+															strcpy( auxString, "0temp1" );
+															sprintf(auxString, "%d", lookup(auxString));
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
-															insert_Instruction( $2, "@X", snum, snum2, "", cp );			//COMPARISSON
+															//Can't assign value from comparisson to temp
+															insert_Instruction( $2, auxString, snum, snum2, "", cp ); //COMPARISSON
 															cp++;
 														}
 				|  	tPO Cond tPF tOR  	{									
-											sprintf(snum , "%d", cp+2);	
-											insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
+											strcpy( auxString, "0temp1" );
+											sprintf(auxString, "%d", lookup(auxString));
+											sprintf(snum , "%d", cp+2);			
+											//Can't set the value because we don't know the last comparrison results
+											insert_Instruction( "8", auxString, snum, "", "", cp );				//If statement is false jump to else body JMF
 											cp++;
 
 											if_begin_count++;
 											if_stack = push(cp, if_stack);												//Remember this line to later add the if begin line
-											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
+											insert_Instruction( "7", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value JMP
 											cp++;
 										}
-					tPO Cond tPF 		{
-											sprintf(snum , "%d", cp+2);	
-					 						insert_Instruction( "JMF", "@X", snum, "", "", cp );					//If statement is false jump to the next statement
-											cp++;	
+					tPO Cond tPF 		{									
+											strcpy( auxString, "0temp1" );
+											sprintf(auxString, "%d", lookup(auxString));
+											sprintf(snum , "%d", cp+2);			
+											//Can't set the value because we don't know the last comparrison results
+											insert_Instruction( "8", auxString, snum, "", "", cp );				//If statement is false jump to else body JMF
+											cp++;
 
 											if_begin_count++;
 											if_stack = push(cp, if_stack);												//Remember this line to later add the if begin line
-											insert_Instruction( "JMP", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value
+											insert_Instruction( "7", "IF BEGIN", "", "", "", cp );					//If statement is true jump to the last if and return true value JMP
 											cp++;
 										}
 				| tPO Cond tPF tAND 	{
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
-											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
+													
+											strcpy( auxString, "0temp1" );
+											sprintf(auxString, "%d", lookup(auxString));	
+											insert_Instruction( "8", auxString, "ELSE BEGIN", "", "", cp );				//If statement is false jump to else body JMF
 											cp++;
 										}
 					tPO Cond tPF		{
 											else_begin_count++;
 											else_stack = push(cp, else_stack);											//Remember this line to later add the else begin line
-											insert_Instruction( "JMF", "@X", "ELSE BEGIN", "", "", cp );			//If statement is false jump to the else body
-											cp++;											
+			
+											strcpy( auxString, "0temp1" );
+											sprintf(auxString, "%d", lookup(auxString));
+											insert_Instruction( "8", auxString, "ELSE BEGIN", "", "", cp );				//If statement is false jump to else body JMF
+											cp++;										
 										}
 			;
 
@@ -670,41 +694,60 @@ Cond		:	CondValue CompareToken CondValue 		{
 //TODO: conditions must be like: ((cond)||(cond))  or  ((cond)||((cond)||(cond)))
 
 CondWhile		:	CondValue CompareToken CondValue 	{					
+															if( !temp1_flag )
+															{
+																temp1_flag = true;
+															}
+															strcpy( auxString, "0temp1" );
+															sprintf(auxString, "%d", lookup(auxString));
 															sprintf(snum, "%d", lookup("0temp1"));
 															sprintf(snum2, "%d", lookup("0temp2"));	
-															insert_Instruction( $2, "@X", snum, snum2, "", cp );			//COMPARISSON
+															//Can't assign value from comparisson to temp
+															insert_Instruction( $2, auxString, snum, snum2, "", cp ); //COMPARISSON
 															cp++;
 														}
-				|  tPO CondWhile tPF tOR  	{											
-												sprintf(snum , "%d", cp+2);										
-												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
-												cp++;	
+				|  tPO CondWhile tPF tOR  	{					
+												strcpy( auxString, "0temp1" );
+												sprintf(auxString, "%d", lookup(auxString));
+												sprintf(snum , "%d", cp+2);			
+												//Can't set the value because we don't know the last comparrison results
+												insert_Instruction( "8", auxString, snum, "", "", cp );				//If statement is false jump to else body JMF
+												cp++;
 
 												while_begin_count++;
 												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
-												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
+												insert_Instruction( "7", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while JMP
 												cp++;
 											}
-				 tPO CondWhile tPF 			{											
-												sprintf(snum , "%d", cp+2);										
-												insert_Instruction( "JMF", "@X", snum, "", "", cp );				//If statement is false, jump to next condition
-												cp++;	
+				 tPO CondWhile tPF 			{				
+												strcpy( auxString, "0temp1" );
+												sprintf(auxString, "%d", lookup(auxString));	
+												sprintf(snum , "%d", cp+2);			
+												//Can't set the value because we don't know the last comparrison results
+												insert_Instruction( "8", auxString, snum, "", "", cp );				//If statement is false jump to else body JMF
+												cp++;
 
 												while_begin_count++;
 												while_begin_stack = push(cp, while_begin_stack);					//Remember this line to later add the while begin line
-												insert_Instruction( "JMP", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while
+												insert_Instruction( "7", "WHILE BEGIN", "", "", "", cp );			//Jump to the begining of the while JMP
 												cp++;
 											}
 				| tPO CondWhile tPF tAND 	{		
 												while_end_count++;
-												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line				
-												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
-												cp++;	
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line		
+											
+												strcpy( auxString, "0temp1" );
+												sprintf(auxString, "%d", lookup(auxString));
+												insert_Instruction( "8", auxString, "WHILE END", "", "", cp );				//If statement is false jump to else body JMF
+												cp++;
 											}
 				tPO CondWhile tPF			{			
 												while_end_count++;
-												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line			
-												insert_Instruction( "JMF", "@X", "WHILE END", "", "", cp );			//If statement is false, jump to the end of the while
+												while_end_stack = push(cp, while_end_stack);						//Remember this line to later add the while end line		
+															
+												strcpy( auxString, "0temp1" );
+												sprintf(auxString, "%d", lookup(auxString));	
+												insert_Instruction( "8", auxString, "WHILE END", "", "", cp );				//If statement is false jump to else body JMF
 												cp++;	
 											}
 			;
@@ -839,12 +882,15 @@ While		:	tWHILE 								{
 				ConditionWhile tCO Body tCF			{				
 														int whileBegin = while_last_cond.stk[while_last_cond.top];
 														while_last_cond = pop(while_last_cond);							//pop the value		
-
-														sprintf(snum , "%d", cp+1);										
-														insert_Instruction( "JMF", "@X", snum, "", "",  whileBegin);	//Jump to while end in case condition is not met
+																	
+														strcpy( auxString, "0temp1" );
+														sprintf(auxString, "%d", lookup(auxString));
+														sprintf(snum , "%d", cp+1);	
+														//Can't assign value from comparisson
+														insert_Instruction( "8", auxString, snum, "", "", whileBegin );				//Jump to while end in case condition is not met JMF
 
 														sprintf(snum , "%d", $1);												
-														insert_Instruction( "JMP", snum, "", "", "", cp );	//JMP to while begin
+														insert_Instruction( "7", snum, "", "", "", cp );	//JMP to while begin
 														cp++;
 
 														if(while_begin_iter_stack.top != -1)	//If there is one jmp to if begin
@@ -1376,7 +1422,21 @@ void insert_Instruction( char *inst, char *p1, char *p2, char *p3, char *comment
 /*End of label Table Management*/
 
 
-
+void write_ASM_File()
+{	
+	FILE *ASM_File;	
+	ASM_File = fopen("asm_Code.out","w");
+	int total_lines = cp;
+	for( int i=0; i<total_lines; i++)
+	{
+		if((strcmp(labTab[i].instruct, "ALLOUER") != 0) && (strcmp(labTab[i].instruct, "DESALLOUER") != 0))	//These two instructions are not implemented yet
+		{
+			fprintf(ASM_File, "%s %s %s %s\n", labTab[i].instruct, labTab[i].param1, labTab[i].param2, labTab[i].param3); 
+		}
+	}
+	fprintf(ASM_File, "R\n"); 
+	fclose(ASM_File);
+}
 
 
 
@@ -1427,6 +1487,8 @@ int main(void) {
 	print_Error_Table();
 	fprintf(fp, "Number of lines : %d\n", cp+1); 
 	fclose(fp);
+	write_ASM_File();
+
 	return 0;
 }
 

@@ -45,85 +45,58 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    tAMPERSAND = 258,
-    tINT = 259,
-    tVOID = 260,
-    tMIN = 261,
-    tMAY = 262,
-    tMINEQU = 263,
-    tMAYEQU = 264,
-    tEQU = 265,
-    tDIF = 266,
-    tOR = 267,
-    tAND = 268,
-    tPO = 269,
-    tPF = 270,
-    tCO = 271,
-    tCF = 272,
-    tPV = 273,
-    tPLUS = 274,
-    tVAR = 275,
-    tSTRING = 276,
-    tE = 277,
-    tMAIN = 278,
-    tSOU = 279,
-    tMUL = 280,
-    tDIV = 281,
-    tPRINT = 282,
-    tNUM = 283,
-    tIF = 284,
-    tWHILE = 285,
-    tELSE = 286,
-    tV = 287,
-    tCONST = 288,
-    tGUILLEMETS = 289
+    tRETURN = 258,
+    tADD = 259,
+    tMUL = 260,
+    tSOU = 261,
+    tDIV = 262,
+    tCOP = 263,
+    tAFC = 264,
+    tJMP = 265,
+    tJMF = 266,
+    tINF = 267,
+    tSUP = 268,
+    tEQU = 269,
+    tPRI = 270,
+    tPCOP = 271,
+    tIPCOP = 272,
+    tCPA = 273,
+    tJMPA = 274,
+    tSPACE = 275,
+    tNUM = 276
   };
 #endif
 /* Tokens.  */
-#define tAMPERSAND 258
-#define tINT 259
-#define tVOID 260
-#define tMIN 261
-#define tMAY 262
-#define tMINEQU 263
-#define tMAYEQU 264
-#define tEQU 265
-#define tDIF 266
-#define tOR 267
-#define tAND 268
-#define tPO 269
-#define tPF 270
-#define tCO 271
-#define tCF 272
-#define tPV 273
-#define tPLUS 274
-#define tVAR 275
-#define tSTRING 276
-#define tE 277
-#define tMAIN 278
-#define tSOU 279
-#define tMUL 280
-#define tDIV 281
-#define tPRINT 282
-#define tNUM 283
-#define tIF 284
-#define tWHILE 285
-#define tELSE 286
-#define tV 287
-#define tCONST 288
-#define tGUILLEMETS 289
+#define tRETURN 258
+#define tADD 259
+#define tMUL 260
+#define tSOU 261
+#define tDIV 262
+#define tCOP 263
+#define tAFC 264
+#define tJMP 265
+#define tJMF 266
+#define tINF 267
+#define tSUP 268
+#define tEQU 269
+#define tPRI 270
+#define tPCOP 271
+#define tIPCOP 272
+#define tCPA 273
+#define tJMPA 274
+#define tSPACE 275
+#define tNUM 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 93 "analysGramPointers.yacc" /* yacc.c:1909  */
+#line 20 "analysGramInterpret.yacc" /* yacc.c:1909  */
 
 	int nb;
-	char * variable;
 
-#line 127 "y.tab.h" /* yacc.c:1909  */
+#line 100 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
