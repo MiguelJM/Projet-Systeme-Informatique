@@ -63,7 +63,9 @@ extern int yydebug;
     tCPA = 273,
     tJMPA = 274,
     tSPACE = 275,
-    tNUM = 276
+    tALL = 276,
+    tDESA = 277,
+    tNUM = 278
   };
 #endif
 /* Tokens.  */
@@ -85,18 +87,20 @@ extern int yydebug;
 #define tCPA 273
 #define tJMPA 274
 #define tSPACE 275
-#define tNUM 276
+#define tALL 276
+#define tDESA 277
+#define tNUM 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 20 "analysGramInterpret.yacc" /* yacc.c:1909  */
+#line 21 "analysGramInterpret.yacc" /* yacc.c:1909  */
 
 	int nb;
 
-#line 100 "y.tab.h" /* yacc.c:1909  */
+#line 104 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

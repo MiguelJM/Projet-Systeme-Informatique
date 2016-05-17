@@ -7,6 +7,7 @@
 	void yyerror(char *);
 
 extern FILE *yyin;
+extern int yylineno;     //To keep track of the lex lines
 
 #define maxINSTRUCT 2048 
 #define maxSYMBOLS 255 
@@ -21,7 +22,7 @@ extern FILE *yyin;
 	int nb;
 }
 
-%start TestStart
+%start Is
 %token tRETURN;
 %token tADD
 %token tMUL
@@ -40,21 +41,16 @@ extern FILE *yyin;
 %token tCPA
 %token tJMPA
 %token tSPACE
+%token tALL
+%token tDESA
 %token <nb> tNUM 
 
 
 %%
 
-
-TestStart	:	TestMessage
-			;
-
-TestMessage	: Is		{printf("\n Succesful test\n");}
-			| tRETURN	{printf("\n Return foud, end test\n");}
-			;
-
 Is : 	I Is
 	| 	I
+	| tRETURN
 	;
 
 I : 
@@ -115,6 +111,7 @@ I :
             ins[cp][0] = tJMF;
 	        ins[cp][1] = $3;
 	        ins[cp][2] = $5;
+				printf("JUMP TO: %d\n", $5);	
         	cp++;
       }
     | tINF tSPACE tNUM tSPACE tNUM tSPACE tNUM
@@ -174,6 +171,19 @@ I :
 	        ins[cp][1] = $3;
         	cp++;
       }
+    | tALL 
+      {
+            ins[cp][0] = tJMP;	//Ignore
+	        ins[cp][1] = cp+1;
+        	cp++;
+      }
+    | tDESA
+      {
+            ins[cp][0] = tJMP;	//Ignore
+	        ins[cp][1] = cp+1;	
+        	cp++;
+      }
+	| tSPACE /* NOTHING */
     ;
 
 %%
@@ -185,7 +195,7 @@ void yyerror(char *s) {
 
 int main(void) {
 
-	printf("Interpreter V1.0\n\n");
+	printf("\nInterpreter V1.0\n");
 
 	yyin = fopen("asm_Code.out", "r");
 
@@ -198,7 +208,6 @@ int main(void) {
 	{
 		do{
 			yyparse();
-			printf("%p\n",yyin);
 		}while(!feof(yyin));
 	}
 
@@ -215,80 +224,121 @@ int main(void) {
 	}
 
 	printf("\nExecuting the code.\n");
-	for( cp=0; cp < total_lines; cp++)
+
+	cp=0;
+	while( cp < total_lines )
 	{
+		//printf("cp: %d ", cp);
 		switch(ins[cp][0])
 		{
 			case tADD:	
+			//printf("ADD %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = symTab[ins[cp][2]] + symTab[ins[cp][3]];
-
+				cp++;
 			break;
 
 			case tMUL: 
+			//printf("MUL %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = symTab[ins[cp][2]] * symTab[ins[cp][3]];
+				cp++;
 			break;
 
 			case tSOU: 
+			//printf("SOU %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = symTab[ins[cp][2]] - symTab[ins[cp][3]];
+				cp++;
 			break;	
 
 			case tDIV: 
+			//printf("DIV %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = symTab[ins[cp][2]] / symTab[ins[cp][3]];
+				cp++;
 			break;
 
 			case tCOP: 
+			//printf("COP %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = symTab[ins[cp][2]];
+				cp++;
 			break;
 
 			case tAFC: 
+			//printf("AFC %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				symTab[ins[cp][1]] = ins[cp][2];
+				cp++;
 			break;
 
 			case tJMP:
-				cp = symTab[ins[cp][1]];
-			break;
-
-			case tJMF:
-				if( symTab[ins[cp][1]] == 0 )	//If the condition is false
-					cp = symTab[ins[cp][2]];	
-			break;
-
-			case tINF:
-				if( symTab[ins[cp][2]] < symTab[ins[cp][3]] )	
-					symTab[ins[cp][1]] == 1;
-			break;
-
-			case tSUP:
-				if( symTab[ins[cp][2]] > symTab[ins[cp][3]] )	
-					symTab[ins[cp][1]] == 1;
-			break;
-
-			case tEQU:
-				if( symTab[ins[cp][2]] == symTab[ins[cp][3]] )	
-					symTab[ins[cp][1]] == 1;
-			break;
-
-			case tPRI:	
-				printf("%d\n", symTab[ins[cp][1]]);
-			break;
-
-			case tPCOP:
-				symTab[ins[cp][1]] = symTab[symTab[ins[cp][2]]];
-			break;
-
-			case tIPCOP:
-				symTab[symTab[ins[cp][1]]] = symTab[ins[cp][2]];
-			break;
-
-			case tCPA:
-				symTab[ins[cp][1]] = ins[cp][2];
-			break;
-
-			case tJMPA:
+			//printf("JMP %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
 				cp = ins[cp][1];
 			break;
 
+			case tJMF:
+			//printf("JMF %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				if( symTab[ins[cp][1]] == 0 )	//If the condition is false
+					cp = ins[cp][2];
+				else
+					cp++;
+			break;
+
+			case tINF:
+			//printf("INF %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				if( symTab[ins[cp][2]] > symTab[ins[cp][3]] )	
+					symTab[ins[cp][1]] = 1;
+				else
+					symTab[ins[cp][1]] = 0;
+				cp++;
+			break;
+
+			case tSUP:
+			//printf("SUP %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				if( symTab[ins[cp][2]] < symTab[ins[cp][3]] )
+					symTab[ins[cp][1]] = 1;
+				else
+					symTab[ins[cp][1]] = 0;
+				cp++;
+			break;
+
+			case tEQU:
+			//printf("EQU %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				if( symTab[ins[cp][2]] == symTab[ins[cp][3]] )	
+					symTab[ins[cp][1]] = 1;
+				else
+					symTab[ins[cp][1]] = 0;
+				cp++;
+			break;
+
+			case tPRI:	
+			//printf("PRI %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				printf("%d\n", symTab[ins[cp][1]]);
+				cp++;
+			break;
+
+			case tPCOP:
+			//printf("PCOP %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				symTab[ins[cp][1]] = symTab[symTab[ins[cp][2]]];
+				cp++;
+			break;
+
+			case tIPCOP:
+			//printf("IPCOP %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				symTab[symTab[ins[cp][1]]] = symTab[ins[cp][2]];
+				cp++;
+			break;
+
+			case tCPA:
+			//printf("CPA %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				symTab[ins[cp][1]] = ins[cp][2];
+				cp++;
+			break;
+
+			case tJMPA:
+			//printf("JMPA %d %d %d\n", ins[cp][1], ins[cp][2], ins[cp][3]);
+				cp = ins[cp][1];
+				cp++;
+			break;
+
 			default:	//UNKNOWN instruction
+				cp++;
 			break;
 		}
 	}
