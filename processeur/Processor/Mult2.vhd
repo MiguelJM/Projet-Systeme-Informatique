@@ -33,9 +33,11 @@ architecture Behavioral of Mult2 is
 begin
 	process(OP,B,ALU)
 	begin
-		case OP is  
-			when "01010101" => OutB <= B;
-			when others => OutB <= ALU;
+		case OP is
+            when "00001010" => OutB <= ALU; --Addition
+			when "00001100" => OutB <= ALU; --Soustraction
+			when "00001011" => OutB <= ALU; --Multiplicat
+			when others => OutB <= B;
 		end case;
 	end process;
 end Behavioral;

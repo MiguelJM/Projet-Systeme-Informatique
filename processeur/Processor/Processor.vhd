@@ -251,7 +251,7 @@ begin
 	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
 	LC1 : LC_DEC port map(POP, CALU);
     U07 : ALU port map(PB,PC,CALU,Nt,Ot,Zt,Ct,ALUOut);
-	U08 : Mult2 port map(POP, PB, /*SALIDA ALU*/, MO2);
+	U08 : Mult2 port map(POP, PB, ALUOut, MO2);
 	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
 	U10 : Mult3 port map(POP, PA, PB, MO3);
 	LC2 : LC_RW port map(POP, RW);

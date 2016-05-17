@@ -33,10 +33,10 @@ begin
 	process(OPIn)
 	begin
 		case OPIn is
-			when "00000000" => OPOut <= "00"; --Addition
-			when "00000001" => OPOut <= "01"; --Soustraction
-			when "00000010" => OPOut <= "10"; --Multiplication
-			when others => OPOut <= "11";
+			when "00001010" => OPOut <= "01"; --Addition
+			when "00001100" => OPOut <= "10"; --Soustraction
+			when "00001011" => OPOut <= "11"; --Multiplication
+			when others => OPOut <= "00";
 		end case;
 	end process;
 

@@ -36,6 +36,7 @@ end MemDonne;
 
 architecture Behavioral of MemDonne is
 signal Qp,Qn : std_logic_vector(7 downto 0);
+type Mem is array (7 downto 0) of std_logic_vector(7 downto 0);
 begin
 	Secuencial: process(RST,CLK)
 	begin
@@ -50,8 +51,8 @@ begin
 	Combinatoire: process(Qp,RW,Adr,INT)
 	begin
 		case RW is
-			when "1" =>	Qn <= INT;		--Ecriture
-			when others =>	Qn <= Qp;	--Lecture
+			when "0" => Mem(to_integer(unsigned(Adr))) <= INT;      --Ecriture
+			when others => Qn <= Mem(to_integer(unsigned(Adr)));	--Lecture
 		end case;
 	end process Combinatoire;
 	

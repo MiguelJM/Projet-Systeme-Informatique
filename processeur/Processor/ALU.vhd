@@ -60,7 +60,7 @@ begin
                 S <= std_logic_vector(Somme(7 downto 0));
                 C <= std_logic(Somme(8));
                 N <= std_logic(Somme(7));
-                O <= (A(7) AND B(7) AND (NOT std_logic(Somme(7)))) OR ((NOT A(7)) AND NOT B(7)) AND std_logic(Somme(7))));
+                O <= (A(7) AND B(7) AND (NOT std_logic(Somme(7)))) OR ((NOT A(7)) AND (NOT B(7)) AND std_logic(Somme(7)));
                 Ze <= std_logic_vector(Somme(7 downto 0));
                 Q(0) <= Ze(0);
                 for i in 1 to 7 loop
@@ -68,41 +68,41 @@ begin
                 end loop;
                 Z <= NOT(Q(7));
 
-when "10" =>
-Sous := unsigned('0'& A) - unsigned('0'& B);
-S <= std_logic_vector(Sous(7 downto 0));
-C <= std_logic(Sous(8));
-N <= std_logic(Sous(7));
-O <= (A(7) AND B(7) AND (NOT std_logic(Sous(7)))) OR ((NOT A(7)) AND NOT B(7)) AND std_logic(Sous(7))));
-Ze <= std_logic_vector(Sous(7 downto 0));
-Q(0) <= Ze(0);
-for i in 1 to 7 loop
-Q(i) <= Ze(i) OR Q(i-1);
-end loop;
-Z <= NOT(Q(7));
+            when "10" =>
+                Sous := unsigned('0'& A) - unsigned('0'& B);
+                S <= std_logic_vector(Sous(7 downto 0));
+                C <= std_logic(Sous(8));
+                N <= std_logic(Sous(7));
+                O <= (A(7) AND B(7) AND (NOT std_logic(Sous(7)))) OR ((NOT A(7)) AND (NOT B(7)) AND std_logic(Sous(7)));
+                Ze <= std_logic_vector(Sous(7 downto 0));
+                Q(0) <= Ze(0);
+                for i in 1 to 7 loop
+                    Q(i) <= Ze(i) OR Q(i-1);
+                end loop;
+                Z <= NOT(Q(7));
 
-when "11" =>
-Mult := unsigned('0'& A) * unsigned('0'& B);
-S <= std_logic_vector(Mult(7 downto 0));
-C <= std_logic(Mult(8));
-N <= std_logic(Mult(7));
-O <= (A(7) AND B(7) AND (NOT std_logic(Mult(7)))) OR ((NOT A(7)) AND NOT B(7)) AND std_logic(Mult(7))));
-Ze <= std_logic_vector(Mult(7 downto 0));
-Q(0) <= Ze(0);
-for i in 1 to 7 loop
-Q(i) <= Ze(i) OR Q(i-1);
-end loop;
-Z <= NOT(Q(7));
+            when "11" =>
+                Mult := signed('0'& A) * signed('0'& B);
+                S <= std_logic_vector(Mult(7 downto 0));
+                C <= std_logic(Mult(8));
+                N <= std_logic(Mult(7));
+                O <= (A(7) AND B(7) AND (NOT std_logic(Mult(7)))) OR ((NOT A(7)) AND (NOT B(7)) AND std_logic(Mult(7)));
+                Ze <= std_logic_vector(Mult(7 downto 0));
+                Q(0) <= Ze(0);
+                for i in 1 to 7 loop
+                    Q(i) <= Ze(i) OR Q(i-1);
+                end loop;
+                Z <= NOT(Q(7));
 
-when others =>
-C <= '0';
-N <= '0';
-O <= '0';
-Z <= '0';
-S <= (others => '0');
+            when others =>
+                C <= '0';
+                N <= '0';
+                O <= '0';
+                Z <= '0';
+                S <= (others => '0');
 
-end case;
-end process;
+        end case;
+    end process;
 
 end Behavioral;
 

@@ -34,8 +34,8 @@ begin
 	process(OP,DON,B)
 	begin
 		case OP is  
-			when "01010101" => OutB <= B;
-			when others => OutB <= DON;
+			when "10111100" => OutB <= DON;
+			when others => OutB <= B;
 		end case;
 	end process;
 end Behavioral;

@@ -59,7 +59,7 @@ begin
 				QAn <= Reg(to_integer(unsigned(AA)));
 				QBn <= Reg(to_integer(unsigned(AB)));
 			when others =>		--Ecriture
-				Reg(to_integer(unsigned(AW))); <= DATA;
+				Reg(to_integer(unsigned(AW))) <= DATA;
 		end case;
 	end process Combinatoire;
 	QA <= QAp;
