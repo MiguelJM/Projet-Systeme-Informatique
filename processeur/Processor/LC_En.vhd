@@ -33,14 +33,14 @@ begin
 	process(OPIn)
 	begin
 		case OPIn is
-			when "00001010" => En <= "1";
-            when "00001011" => En <= "1";
-            when "00001100" => En <= "1";
-            when "00001101" => En <= "1";
-            when "00001110" => En <= "1";
-            when "00001111" => En <= "1";
-            when "10111100" => En <= "1";
-			when others => En <= "0";
+			when "00001010" => En <= '1';
+            when "00001011" => En <= '1';
+            when "00001100" => En <= '1';
+            when "00001101" => En <= '1';
+            when "00001110" => En <= '1';
+            when "00001111" => En <= '1';
+            when "10111100" => En <= '1';
+			when others => En <= '0';
 		end case;
 	end process;
 

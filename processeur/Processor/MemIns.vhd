@@ -20,14 +20,13 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_unsigned.all;
-use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity MemIns is
 	port(
 		Adr : in  std_logic_vector(7 downto 0);
 		CLK : in  std_logic;
-		OUTs: out std_logic-vector(31 downto 0)
+		OUTs: out std_logic_vector(31 downto 0)
 		);
 end MemIns;
 

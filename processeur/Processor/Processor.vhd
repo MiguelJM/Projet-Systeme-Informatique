@@ -27,6 +27,7 @@ entity Processor is
 	port(
 		RST 	: in  std_logic;
 		CLK 	: in  std_logic;
+		Adr   : in  std_logic_vector(7 downto 0);
 		--Entradas
 		--Salidas
 		QAp	: out std_logic_vector(7 downto 0);
@@ -42,7 +43,7 @@ component MemIns is
 	port(
 		Adr : in  std_logic_vector(7 downto 0);
 		CLK : in  std_logic;
-		OUTs: out std_logic-vector(31 downto 0)
+		OUTs: out std_logic_vector(31 downto 0)
 		);
 end component;
 
@@ -79,9 +80,9 @@ component BancReg is
 	port(
 		RST 	: in  std_logic;
 		CLK 	: in  std_logic;
-		AA 	: in  std_logic_vector(3 downto 0);
-		AB 	: in  std_logic_vector(3 downto 0);
-		AW 	: in  std_logic_vector(3 downto 0);
+		AA 	: in  std_logic_vector(3 downto 0) := (others => '0');
+		AB 	: in  std_logic_vector(3 downto 0) := (others => '0');
+		AW 	: in  std_logic_vector(3 downto 0) := (others => '0');
 		W 		: in  std_logic;
 		DATA	: in  std_logic_vector(7 downto 0);
 		QA		: out std_logic_vector(7 downto 0);
@@ -227,17 +228,20 @@ component LC_En is
 end component;
 
 --Senales internas
-signal SOUTs : std_logic_vector(31 downto 0);
+signal SOUTs : std_logic_vector(31 downto 0) := (others => '0');
 signal SA,SOP,SB,SC : std_logic_vector(7 downto 0);
 signal PA,POP,PB,PC : std_logic_vector(7 downto 0);
+signal P2A,P2OP,P2B,P2C : std_logic_vector(7 downto 0);
 signal BROA, BROB : std_logic_vector(7 downto 0);
 signal CALU : std_logic_vector(1 downto 0);
 signal Nt,Ot,Zt,Ct : std_logic;
 signal ALUOut : std_logic_vector(7 downto 0);
-signal RW,En : std_logic,
+signal RW,En : std_logic;
 signal MDON : std_logic_vector(7 downto 0);
 signal MO1,MO2,MO3,MO4 : std_logic_vector(7 downto 0);
-signal RetA,RetB : std_logic_vector(7 downto 0);		
+signal RetA,RetB : std_logic_vector(7 downto 0);
+
+--signal UNO,DOS,TRES : std_logic_vector(3 downto 0);		
 
 begin
 
@@ -246,16 +250,17 @@ begin
 	U01 : MemIns port map(Adr, CLK, SOUTs);
 	U02 : ModDIv port map(SOUTs, SA, SOP, SB, SC);
 	U03 : LI_DI port map(SA, SOP, SB, SC, PA, POP, PB, PC);
-	U04 : BancReg port map(RST, CLK, PB, PC, RetA, En, RetB, BROA, BROB);
+	--U04 : BancReg port map(RST, CLK, PB, PC, RetA, En, RetB, BROA, BROB);
+	U04 : BancReg port map(RST, CLK, PB(3 downto 0), PC(3 downto 0), RetA(3 downto 0), En, RetB, BROA, BROB);
 	U05 : Mult1 port map(POP, PB, BROA, MO1);
-	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, PC);
+	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, P2C);
 	LC1 : LC_DEC port map(POP, CALU);
-    U07 : ALU port map(PB,PC,CALU,Nt,Ot,Zt,Ct,ALUOut);
+   U07 : ALU port map(PB,P2C,CALU,Nt,Ot,Zt,Ct,ALUOut);
 	U08 : Mult2 port map(POP, PB, ALUOut, MO2);
 	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
 	U10 : Mult3 port map(POP, PA, PB, MO3);
 	LC2 : LC_RW port map(POP, RW);
-	U11 : MemDonne port map(RST, CLK, MO3, PB, POP, MDON);
+	U11 : MemDonne port map(RST, CLK, MO3, PB, RW, MDON);
 	U12 : Mult4 port map(POP, MDON, PB, MO4);
 	U13 : Mem_RE port map(PA, POP, MO4, RetA, POP, RetB);
 	LC3 : LC_En port map(POP, En);

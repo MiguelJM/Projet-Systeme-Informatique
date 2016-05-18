@@ -33,8 +33,8 @@ begin
 	process(OPIn)
 	begin
 		case OPIn is
-			when "10111100" => OPOut <= "0";
-			when others => OPOut <= "1";
+			when "10111100" => OPOut <= '0';
+			when others => OPOut <= '1';
 		end case;
 	end process;
 

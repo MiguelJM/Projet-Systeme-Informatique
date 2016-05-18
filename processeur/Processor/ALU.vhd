@@ -21,7 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
-use IEEE.numeric_std.all;
+--use IEEE.numeric_std.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -50,9 +50,9 @@ signal Q  : std_logic_vector(7 downto 0);
 signal Ze : std_logic_vector(7 downto 0);
 begin
     process(A,B,Q,Ze)
-    variable Somme :  unsigned (8 downto 0);
+    variable Somme : unsigned (8 downto 0);
     variable Sous :  unsigned (8 downto 0);
-    variable Mult :  unsigned (15 downto 0);
+    variable Mult :  signed (15 downto 0);
     begin
         case CTRL is
             when "01" =>
@@ -82,7 +82,7 @@ begin
                 Z <= NOT(Q(7));
 
             when "11" =>
-                Mult := signed('0'& A) * signed('0'& B);
+                Mult := signed(A) * signed(B);
                 S <= std_logic_vector(Mult(7 downto 0));
                 C <= std_logic(Mult(8));
                 N <= std_logic(Mult(7));

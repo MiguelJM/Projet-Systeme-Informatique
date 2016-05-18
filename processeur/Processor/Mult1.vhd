@@ -36,7 +36,7 @@ begin
 		case OP is  
 			when "00001111" => OutB <= B;
 			when "00001110" => OutB <= QA;
-            when ohters => OutB <= B;
+            when others => OutB <= B;
 		end case;
 	end process;
 end Behavioral;

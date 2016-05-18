@@ -20,7 +20,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_unsigned.all;
-use IEEE.std_logic_arith.all;
+--use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity MemDonne is
@@ -36,7 +36,8 @@ end MemDonne;
 
 architecture Behavioral of MemDonne is
 signal Qp,Qn : std_logic_vector(7 downto 0);
-type Mem is array (7 downto 0) of std_logic_vector(7 downto 0);
+type TABLE is array (7 downto 0) of std_logic_vector(7 downto 0);
+signal Mem : TABLE;
 begin
 	Secuencial: process(RST,CLK)
 	begin
@@ -51,7 +52,7 @@ begin
 	Combinatoire: process(Qp,RW,Adr,INT)
 	begin
 		case RW is
-			when "0" => Mem(to_integer(unsigned(Adr))) <= INT;      --Ecriture
+			when '0' => Mem(to_integer(unsigned(Adr))) <= INT;      --Ecriture
 			when others => Qn <= Mem(to_integer(unsigned(Adr)));	--Lecture
 		end case;
 	end process Combinatoire;
