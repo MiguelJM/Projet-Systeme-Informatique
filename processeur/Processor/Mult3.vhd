@@ -33,9 +33,11 @@ architecture Behavioral of Mult3 is
 begin
 	process(OP,A,B)
 	begin
-		case OP is  
-			when "01010101" => OutB <= B;
-			when others => OutB <= A;
+		case OP is 
+            when "00001010" => OutB <= A; --Addition
+			when "00001100" => OutB <= A; --Soustraction
+			when "00001011" => OutB <= A; --Multiplication
+			when others => OutB <= B;
 		end case;
 	end process;
 end Behavioral;

@@ -1,0 +1,1 @@
+-intstyle "ise" -incremental -lib "secureip" -o "/home/jassoavi/Documents/Projet-Systeme-Informatique/processeur/Processor/testINS_isim_beh.exe" -prj "/home/jassoavi/Documents/Projet-Systeme-Informatique/processeur/Processor/testINS_beh.prj" "work.testINS" 

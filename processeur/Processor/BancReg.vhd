@@ -20,16 +20,16 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_unsigned.all;
-use IEEE.std_logic_arith.all;
+--use IEEE.std_logic_arith.all;
 use IEEE.numeric_std.all;
 
 entity BancReg is
 	port(
 		RST 	: in  std_logic;
 		CLK 	: in  std_logic;
-		AA 	: in  std_logic_vector(3 downto 0);
-		AB 	: in  std_logic_vector(3 downto 0);
-		AW 	: in  std_logic_vector(3 downto 0);
+		AA 	: in  std_logic_vector(3 downto 0) := (others => '0');
+		AB 	: in  std_logic_vector(3 downto 0) := (others => '0');
+		AW 	: in  std_logic_vector(3 downto 0) := (others => '0');
 		W 		: in  std_logic;
 		DATA	: in  std_logic_vector(7 downto 0);
 		QA		: out std_logic_vector(7 downto 0);
@@ -38,9 +38,10 @@ entity BancReg is
 end BancReg;
 
 architecture Behavioral of BancReg is
-signal QAp,QBn : std_logic_vector(7 downto 0);
-signal QAp,QBn : std_logic_vector(7 downto 0);
-type Reg is array (3 downto 0) of std_logic_vector(7 downto 0);
+signal QAp,QBp : std_logic_vector(7 downto 0);
+signal QAn,QBn : std_logic_vector(7 downto 0);
+type TABLE is array (3 downto 0) of std_logic_vector(7 downto 0);
+signal Reg : TABLE;
 begin
 	Secuential: process(RST,CLK)
 	begin
@@ -54,12 +55,13 @@ begin
 	end process Secuential;
 	
 	Combinatoire: process(W,QAp,QBp,AA,AB,AW)
-		case W is 0
+	begin
+		case W is
 			when '0' =>			--Lecture
 				QAn <= Reg(to_integer(unsigned(AA)));
 				QBn <= Reg(to_integer(unsigned(AB)));
 			when others =>		--Ecriture
-				Reg(to_integer(unsigned(AW))); <= DATA;
+				Reg(to_integer(unsigned(AW))) <= DATA;
 		end case;
 	end process Combinatoire;
 	QA <= QAp;
