@@ -40,7 +40,7 @@ end BancReg;
 architecture Behavioral of BancReg is
 signal QAp,QBp : std_logic_vector(7 downto 0);
 signal QAn,QBn : std_logic_vector(7 downto 0);
-type TABLE is array (3 downto 0) of std_logic_vector(7 downto 0);
+type TABLE is array (0 to 15) of std_logic_vector(7 downto 0);
 signal Reg : TABLE;
 begin
 	Secuential: process(RST,CLK)
@@ -48,6 +48,7 @@ begin
 		if(RST = '0') then
 			QAp <= (others => '0');
 			QBp <= (others => '0');
+            Reg <= (others => X"00");
 		elsif(CLK'event and CLK = '1') then
 			QAp <= QAn;
 			QBp <= QBn;
@@ -62,6 +63,16 @@ begin
 				QBn <= Reg(to_integer(unsigned(AB)));
 			when others =>		--Ecriture
 				Reg(to_integer(unsigned(AW))) <= DATA;
+                if(AW = AA) then
+                    QAn <= DATA;
+                else
+                    QAn <= Reg(to_integer(unsigned(AA)));
+                end if;
+                 if(AW = AB) then
+                    QBn <= DATA;
+                else
+                    QBn <= Reg(to_integer(unsigned(AB)));
+                end if;
 		end case;
 	end process Combinatoire;
 	QA <= QAp;

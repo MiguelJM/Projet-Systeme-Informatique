@@ -239,9 +239,7 @@ signal ALUOut : std_logic_vector(7 downto 0);
 signal RW,En : std_logic;
 signal MDON : std_logic_vector(7 downto 0);
 signal MO1,MO2,MO3,MO4 : std_logic_vector(7 downto 0);
-signal RetA,RetB : std_logic_vector(7 downto 0);
-
---signal UNO,DOS,TRES : std_logic_vector(3 downto 0);		
+signal RetA,RetB : std_logic_vector(7 downto 0);		
 
 begin
 
@@ -255,7 +253,7 @@ begin
 	U05 : Mult1 port map(POP, PB, BROA, MO1);
 	U06 : DI_EX port map(PA, POP, MO1, BROB, PA, POP, PB, P2C);
 	LC1 : LC_DEC port map(POP, CALU);
-   U07 : ALU port map(PB,P2C,CALU,Nt,Ot,Zt,Ct,ALUOut);
+    U07 : ALU port map(PB,P2C,CALU,Nt,Ot,Zt,Ct,ALUOut);
 	U08 : Mult2 port map(POP, PB, ALUOut, MO2);
 	U09 : EX_Mem port map(PA, POP, MO2, PA, POP, PB);
 	U10 : Mult3 port map(POP, PA, PB, MO3);

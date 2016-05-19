@@ -34,7 +34,15 @@ architecture Behavioral of MemIns is
 --signal counter : std_logic_vector(7 downto 0) := (others => '0');
 signal DummyQ  : std_logic_vector(31 downto 0);
 type TABLE is array (7 downto 0) of std_logic_vector(31 downto 0);
-signal memory : TABLE;
+signal memory : TABLE := (
+	0 => X"0F011100",
+--	1 => X"0E021200",
+--	2 => X"0A031323",
+--  3 => X"0B041424",
+--  4 => X"0C051525",
+--  5 => X"BC061626",
+	others => (others => '0')
+);
 begin
 	process(CLK,Adr)
 	begin

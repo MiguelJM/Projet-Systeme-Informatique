@@ -37,6 +37,6 @@ architecture Behavioral of ModDiv is
 begin
 	C <= INS(7 downto 0);
 	B <= INS(15 downto 8);
-	OP<= INS(23 downto 16);
-	A <= INS(31 downto 24);
+	A <= INS(23 downto 16);
+	OP <= INS(31 downto 24);
 end Behavioral;

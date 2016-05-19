@@ -36,13 +36,14 @@ end MemDonne;
 
 architecture Behavioral of MemDonne is
 signal Qp,Qn : std_logic_vector(7 downto 0);
-type TABLE is array (7 downto 0) of std_logic_vector(7 downto 0);
+type TABLE is array (0 to 255) of std_logic_vector(7 downto 0);
 signal Mem : TABLE;
 begin
 	Secuencial: process(RST,CLK)
 	begin
 		if(RST = '0') then
 			Qp <= (others => '0');
+            Mem <= (others => X"00");
 		elsif(CLK'event and CLK = '1') then
 			Qp <= Qn;
 		end if;
